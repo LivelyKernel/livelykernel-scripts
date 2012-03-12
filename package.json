@@ -1,0 +1,30 @@
+{
+  "author": "The Lively Kernel Team <lively-kernel@hpi.uni-potsdam.de>",
+  "name": "livelykernel-scripts",
+  "description": "Scripts and minimal server for running, testing and maintaining LivelyKernel",
+  "version": "0.0.1",
+  "homepage": "http://lively-kernel.org",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:rksm/livelykernel-scripts.git"
+  },
+  "engines": {
+    "node": "~0.6.7"
+  },
+  "bin" : {
+    "lk" : "./bin/lk"
+  },
+  "dependencies": {
+    "express": "2.x",
+    "colorize": "0.1.0",
+    "nodemon": "~0.6",
+    "optparse": "~1.0",
+    "seq": "https://github.com/dsc/node-seq/tarball/master",
+    "async": "0.1",
+    "jshint": "~0.5",
+    "forever": "~0.8.5"
+    "qunit": "~0.2"
+  },
+  "devDependencies": {},
+  "optionalDependencies": {}
+}
