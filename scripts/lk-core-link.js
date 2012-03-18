@@ -1,4 +1,4 @@
-/*global require, process, console, JSON, __dirname, setTimeout*/
+/*global require, module, process, console, JSON, __dirname, setTimeout*/
 
 /*
  * Script for linking the lk core to webwerkstatt
@@ -12,13 +12,13 @@
  */
 
 
-var args  = require('./helper/args'),
-    fs    = require('fs'),
-    shell = require('./helper/shell'),
-    exec  = require('child_process').exec,
-    Seq   = require('seq'),
-    env   = process.env;
-
+var args           = require('./helper/args'),
+    fs             = require('fs'),
+    shell          = require('./helper/shell'),
+    exec           = require('child_process').exec,
+    Seq            = require('seq'),
+    env            = process.env,
+    calledDirectly = require.main === module;
 
 // -=-=-=-=-=-=-=-=-=-=-
 // script options
@@ -37,17 +37,21 @@ var options = args.options([
 + "1. Update both repos\n"
 + "2. Ask you to update the change log (release documentation, History.md)\n"
 + "3. Update the version file (coreVersion.json)\n"
-+ "4. Syncing the core source code with the webwerksatt code (uses `lk sync`)\n"
-+ "5. Tag the git core reposiory with the new version.\n\n"
++ "4. Update npm package file (package.json)\n"
++ "5. Syncing the core source code with the webwerksatt code (uses `lk sync`)\n"
++ "6. Tag the git core reposiory with the new version.\n\n"
 + "To really make the changes on the remote repositories you will have to"
 + " run 'git push' and 'svn commit' afterwards");
 
-if (!options.lkDir || !options.wwDir || !options.tag) options.showHelpAndExit();
+if (calledDirectly) {
+  if (!options.lkDir || !options.wwDir || !options.tag) options.showHelpAndExit();
+}
 
 // those things are fixed for now
 options.lkCore             = options.lkDir + '/core/';
-options.changeLogFile      = options.lkCore + 'History.md';
+options.changeLogFile      = options.lkDir + '/History.md';
 options.changeLogInputFile = options.lkDir + '/changes-' + options.tag + '.md';
+options.npmPackageFile     = options.lkDir + '/package.json';
 options.wwCore             = options.wwDir + '/core/';
 options.versionFile        = options.wwCore + 'coreVersion.json';
 
@@ -89,6 +93,18 @@ function getSVNRev(callback) {
 
 
 // -=-=-=-=-=-=-=-=-=-=-
+// package.json
+// -=-=-=-=-=-=-=-=-=-=-
+function updatePackageJSON(fs, whenDone) {
+    var file = options.lkDir + '/package.json';
+    fs.readFile(file, function(err, data) {
+        var json = JSON.parse(data);
+        json.version = options.tag;
+        fs.writeFile(file, JSON.stringify(json, null, 2), whenDone);
+    });
+}
+
+// -=-=-=-=-=-=-=-=-=-=-
 // git helpers
 // -=-=-=-=-=-=-=-=-=-=-
 
@@ -116,6 +132,8 @@ function logger(msg) {
 
 function wait(ms) { return function() { setTimeout(this, ms) } }
 
+
+if (calledDirectly) {
 
 // -=-=-=-=-=-=-=-=-=-=-
 // the real thing
@@ -159,18 +177,24 @@ Seq()
 })
 .seq(logger('\n3. done'), Seq)
 
+// ==== Update package.json ====
+.seq(logger('\n4. Update package.json:'))
+.seq(updatePackageJSON, fs, Seq)
+.seq(execLogger('package.json'))
+.seq(logger('\n4. Update package.json done.'))
+
 // ==== synching ww with lk ====
-.seq(logger('\n4. Syncing changes from LivelyKernel to webwerksatt:'))
+.seq(logger('\n5. Syncing changes from LivelyKernel to webwerksatt:'))
 .seq(exec, [env.LK_SCRIPTS_ROOT + "/bin/lk sync --from-lk-to-ww " +
           "--lk-dir ", options.lkDir, "--ww-dir ", options.wwDir].join(''), Seq)
 .seq(execLogger('svn status'))
-.seq(logger('\n4. Syncing changes done. See `svn diff ' + options.wwDir + '`' +
+.seq(logger('\n5. Syncing changes done. See `svn diff ' + options.wwDir + '`' +
            ' for a list of changes'))
 
 // ==== tag ====
-.seq(logger('\n5. Running `git tag ' + options.tag + '`:'))
+.seq(logger('\n6. Running `git tag ' + options.tag + '`:'))
 .seq(exec, 'git tag ' + options.tag, {cwd: options.lkCore}, Seq)
-.seq(logger('\n5. done'))
+.seq(logger('\n6. done'))
 
 // ==== final Message ====
 .seq(logger('\nThe core is almost linked...\n\nWhat you have to do now is to go into\n' +
@@ -182,4 +206,52 @@ Seq()
            'If you want to reset the changes made run\n\t ' +
             'cd ' + options.lkDir + ' && ' + 'git tag ' + options.tag + ' -d && git reset --hard' +
            '\nand\n\tcd ' + options.wwDir + ' && svn revert . -R'))
-.seq(function() { process.exit(0) })
+.seq(function() { process.exit(0) });
+
+} // end if invokedFromShell
+
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// tests below
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+// nodemon node_modules/nodeunit/bin/nodeunit scripts/lk-core-link.js
+var UpdatePackageJSONTest = {
+    setUp: function(callback) {
+        var packageJSONString = "{\n"
+                               + "\"author\": \"The Lively Kernel...\",\n"
+                               + "\"name\": \"livelykernel-scripts\",\n"
+                               + "\"version\": \"0.0.1\"\n"
+                               + "}";
+        this.fs = {
+            readFile: function(filename, cb) {
+                this.readFileName = filename;
+                cb(0, packageJSONString);
+            },
+            writeFile: function(filename, data, cb) {
+                this.writeFileName = filename;
+                this.writtenString = data;
+                cb(0, '', '');
+            }
+        };
+        callback();
+    },
+    testUpdatePackageJSONWithNewTag: function(test) {
+        var fs = this.fs,
+            expected = "{\n"
+                     + "  \"author\": \"The Lively Kernel...\",\n"
+                     + "  \"name\": \"livelykernel-scripts\",\n"
+                     + "  \"version\": \"3.1.4\"\n"
+                     + "}";
+        options.lkDir = 'foo/bar';
+        options.tag = '3.1.4';
+        updatePackageJSON(this.fs, function() {
+            test.equal(fs.readFileName, 'foo/bar/package.json', 'filename read');
+            test.equal(fs.writeFileName, 'foo/bar/package.json', 'filename write');
+            test.equal(fs.writtenString, expected, 'package.json not correctly updated');
+            test.done();
+        });
+    }
+}
+
+module.exports = UpdatePackageJSONTest;
