@@ -3,15 +3,18 @@
 // interactive shell commands
 // see http://groups.google.com/group/nodejs/browse_thread/thread/6fd25d16b250aa7d
 var spawn = require('child_process').spawn,
+    exec = require('child_process').exec,
     tty = require('tty'),
     fs = require('fs'),
-    path = require('path');
+    path = require('path'),
+    Seq = require('seq');
 
 
 function runInteractively(cmd, opts, callback) {
+    console.log('istty? ' + tty.isatty(process.stdin))
     process.stdin.pause();
     tty.setRawMode(false);
-    var  p = spawn(cmd, opts, {
+    var p = spawn(cmd, opts, {
         customFds: [0, 1, 2]
     });
     return p.on('exit', function() {
@@ -40,16 +43,21 @@ function redirectedSpawn(cmd, args, cb, options, verbose) {
     });
     spawned.on('exit', function (code) {
         if (cb) { cb(code, out, err) }
+        });
+}
+
+function XredirectedSpawn(cmd, args, cb, options, verbose) {
+    var completeCmd = cmd + ' ' + args.join(' ');
+    exec(completeCmd, options, function(code, out, err) {
+        console.log(completeCmd + ":\n" + out + "\n" + err);
+        cb && cb(code, out, err);
     });
-};
+}
 
 exports.redirectedSpawn = redirectedSpawn;
 
 // ---------------------------------------------
 // stuff below is still WIP
-
-var exec = require('child_process').exec,
-    Seq = require('seq');
 
 function run(cmd, cb, options, verbose) {
     exec(cmd, options, function(code, out, err) {

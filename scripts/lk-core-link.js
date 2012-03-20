@@ -143,19 +143,22 @@ console.log('Link process started: Will link version ' + options.tag +
 
 Seq()
 // ==== update ====
-.seq(logger('\n1. Doing `svn up` and `git pull`:'))
-.seq(exec, 'svn up', {cwd: options.wwDir}, Seq)
+/*.seq(logger('\n1. Doing `svn up` and `git pull`:'))
+.seq(exec, 'svn up', {cwd: options.wwCore}, Seq)
 .seq(execLogger('svn up'))
 .seq(exec, 'git co master; git pull --rebase', {cwd: options.lkDir}, Seq)
 .seq(execLogger('git co + pull'))
 .seq(logger('1. done.'))
-
+*/
 // ==== change log ====
 .seq(logger('\n2. Updating change log (' + options.changeLogFile + '):'))
 .seq(fs.writeFile, options.changeLogInputFile,
      changeLogEntryTemplate(options.tag, new Date()), Seq)
 .seq(logger('Please edit the change log in the editor that will open...'))
 .seq(wait(3000))
+// .seq(exec,
+//      __dirname + '/helper/edit-changelog.sh', [options.changeLogInputFile],
+//      Seq)
 .seq(shell.runInteractively,
      __dirname + '/helper/edit-changelog.sh', [options.changeLogInputFile],
      Seq)

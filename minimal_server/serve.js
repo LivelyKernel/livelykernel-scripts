@@ -17,15 +17,16 @@ var express = require('express'),
 // start with "nodemon minimal_server/serve.js" for development
 
 var args = process.argv.slice(2),
-    port = args[0] && parseInt(args[0], 10);
+    port = args[0] && parseInt(args[0], 10),
+    lkDir = args[1] || __dirname + '/../';
 
 /*
  * http interface
  */
 function setupServer(testHandler) {
     var app = express.createServer();
-    // app.use(express.logger());
-    app.use("/", express["static"](__dirname + '/../'));
+    app.use(express.logger());
+    app.use("/", express["static"](lkDir));
     app.use(express.errorHandler({dumpExceptions: true, showStack: true}));
     app.use(express.bodyParser());
 
