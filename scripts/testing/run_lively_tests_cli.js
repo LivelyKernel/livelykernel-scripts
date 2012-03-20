@@ -1,9 +1,10 @@
 /*global require, console, process, JSON, setTimeout*/
-var http = require('http'),
+var http     = require('http'),
     colorize = require('colorize'),
-    config = require('./config'),
+    config   = require('./config'),
     optparse = require('optparse'),
-    spawn = require('child_process').spawn;
+    spawn    = require('child_process').spawn,
+    env      = process.env;
 
 
 ////////////////////////////////////////////////////////
@@ -38,7 +39,7 @@ var platformConf = config.platformConfigs[process.platform],
                                + "those test methods that match 'filter'."],
         ['--test-script FILE', "Script file that is sent to the browser and "
                              + "runs the tests. If not specified then \""
-                             + config.defaultTestScript + "\" is used."]],
+                             + env.LK_TEST_WORLD_SCRIPT + "\" is used."]],
     parser = new optparse.OptionParser(switches);
 
 
@@ -47,8 +48,8 @@ var options = {
     browserName: config.defaultBrowser,
     browserConf: platformConf[config.defaultBrowser],
     notifier: null,
-    testScript: config.defaultTestScript,
-    testWorld: config.defaultTestWorld,
+    testScript: env.LK_TEST_WORLD_SCRIPT,
+    testWorld: env.LK_TEST_WORLD,
     verbose: false,
     maxRequests: config.timeout,
     testFilter: null,

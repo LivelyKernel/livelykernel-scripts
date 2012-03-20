@@ -18,8 +18,6 @@ var Config = {
     // ------------- what system do you want to test on?
     defaultBrowser: "chrome",
     defaultNotifier: "growlnotify",
-    defaultTestScript: "run_tests.js",
-    defaultTestWorld: 'testing/run_tests.xhtml',
 
     platformConfigs: {
         "darwin": {
