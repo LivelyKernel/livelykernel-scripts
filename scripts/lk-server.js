@@ -13,7 +13,8 @@ var options = args.options([
     ['-w', '--watch', 'Run with nodemon and watch for file changes'],
     ['-f', '--forever', 'Run with forever and restart server on a crash'],
     ['-p', '--port NUMBER', "On which port to run"],
-    ['-m', '--mini-server', 'Start the minimal server (this is the default)']],
+    ['-m', '--mini-server', 'Start the minimal server (this is the default)'],
+    [      '--lk-dir DIR', 'The directory of the Lively Kernel core repository (git) ']],
     {},
     "Start the LivelyKernel mini-server used for running the tests.");
 
@@ -23,7 +24,7 @@ if (!options.miniServer) {
   options.miniServer = true;
 }
 
-if (!options.defined('miniServer')) options.showHelpAndExit();
+if (!options.defined('miniServer') || !options.defined('lkDir')) options.showHelpAndExit();
 
 
 // -=-=-=-=-=-=-=-=-=-=-
@@ -53,5 +54,6 @@ if (!options.defined('forever') && !options.defined('watch')) {
 
 cmdAndArgs.push(path.relative(env.LK_SCRIPTS_ROOT, env.MINISERVER));
 cmdAndArgs.push(options.port || env.MINISERVER_PORT);
+cmdAndArgs.push(options.lkDir);
 
 shell.redirectedSpawn(cmdAndArgs[0], cmdAndArgs.slice(1), null, null, true);
