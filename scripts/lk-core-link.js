@@ -16,6 +16,8 @@ var args           = require('./helper/args'),
     fs             = require('fs'),
     shell          = require('./helper/shell'),
     exec           = require('child_process').exec,
+    colorize       = require('colorize'),
+    console        = colorize.console,
     Seq            = require('seq'),
     env            = process.env,
     calledDirectly = require.main === module;
@@ -121,7 +123,11 @@ function updatePackageJSON(fs, whenDone) {
 // -=-=-=-=-=-=-=-=-=-=-
 function execLogger(cmd) {
     return function(out, err) {
-        console.log(['===\n', cmd, ':\n', out, '\n', err ? err : '', '\n==='].join(''));
+        var msg = "#bold[" + cmd + "]";
+        if ((out && out !== "") || (err && err !== "")) msg += ":\n";
+        if (out && out !== "") msg += out;
+        if (err && err !== "") msg += "#red[" +  err + "]";
+        console.log(msg);
         this();
     }
 }
@@ -138,77 +144,75 @@ if (calledDirectly) {
 // -=-=-=-=-=-=-=-=-=-=-
 // the real thing
 // -=-=-=-=-=-=-=-=-=-=-
-console.log('Link process started: Will link version ' + options.tag +
-            ' of core repo ' + options.lkDir + ' to ' + options.wwDir);
+console.log('\n#bold[Link process started:] Will link version ' + options.tag +
+            ' of core repo #blue[' + options.lkDir + '] to #blue[' + options.wwDir + ']');
 
 Seq()
 // ==== update ====
-/*.seq(logger('\n1. Doing `svn up` and `git pull`:'))
+.seq(logger('\n#bold[1. Doing `svn up` and `git pull`]'))
+.seq(wait(500))
 .seq(exec, 'svn up', {cwd: options.wwCore}, Seq)
 .seq(execLogger('svn up'))
 .seq(exec, 'git co master; git pull --rebase', {cwd: options.lkDir}, Seq)
 .seq(execLogger('git co + pull'))
-.seq(logger('1. done.'))
-*/
+
 // ==== change log ====
-.seq(logger('\n2. Updating change log (' + options.changeLogFile + '):'))
+.seq(logger('\n#underline[2. Updating change log (' + options.changeLogFile + ')]'))
+.seq(wait(500))
 .seq(fs.writeFile, options.changeLogInputFile,
      changeLogEntryTemplate(options.tag, new Date()), Seq)
 .seq(logger('Please edit the change log in the editor that will open...'))
 .seq(wait(3000))
-// .seq(exec,
-//      __dirname + '/helper/edit-changelog.sh', [options.changeLogInputFile],
-//      Seq)
-.seq(shell.runInteractively,
-     __dirname + '/helper/edit-changelog.sh', [options.changeLogInputFile],
-     Seq)
+.seq(shell.call, __dirname + '/helper/edit-changelog.sh', [options.changeLogInputFile], Seq)
 .seq(fs.readFile, options.changeLogInputFile, Seq)
 .seq(function(changes) { embedInChangeLog(changes, options.changeLogFile, this) })
 .seq(fs.unlink, options.changeLogInputFile, Seq)
-.seq(logger('2. done.'))
 
 // ==== version file ====
-.seq(logger('\n3. Updating version file (' + options.versionFile + '):'))
+.seq(logger('\n#underline[3. Updating version file (' + options.versionFile + ')]'))
+.seq(wait(1000))
 .seq(getSVNRev, Seq)
 .seq(function(svnRev) {
     var info = {
         "coreVersion": options.tag,
         "svnRevision": svnRev.toString().replace(/\n/,'')
     }
-    console.log(JSON.stringify(info, null, 2));
-    fs.writeFile(options.versionFile, JSON.stringify(info, null, 2), this);
+    var json = JSON.stringify(info, null, 2);
+    console.log("New version file content:\n" + json);
+    fs.writeFile(options.versionFile, json, this);
 })
-.seq(logger('\n3. done'), Seq)
 
 // ==== Update package.json ====
-.seq(logger('\n4. Update package.json:'))
+.seq(logger('\n#underline[4. Update package.json]'))
+.seq(wait(2000))
 .seq(updatePackageJSON, fs, Seq)
 .seq(execLogger('package.json'))
-.seq(logger('\n4. Update package.json done.'))
 
 // ==== synching ww with lk ====
-.seq(logger('\n5. Syncing changes from LivelyKernel to webwerksatt:'))
+.seq(logger('\n#underline[5. Syncing changes from LivelyKernel to webwerksatt]'))
+.seq(wait(2000))
 .seq(exec, [env.LK_SCRIPTS_ROOT + "/bin/lk sync --from-lk-to-ww " +
-          "--lk-dir ", options.lkDir, "--ww-dir ", options.wwDir].join(''), Seq)
+          "--lk-dir ", options.lkDir, " --ww-dir ", options.wwDir].join(''), Seq)
+.seq(exec, 'svn status', {cwd: options.wwCore}, Seq)
 .seq(execLogger('svn status'))
-.seq(logger('\n5. Syncing changes done. See `svn diff ' + options.wwDir + '`' +
-           ' for a list of changes'))
+.seq(logger('\nSee #blue[svn diff ' + options.wwDir + ']' +
+           ' for a full list of changes'))
 
 // ==== tag ====
-.seq(logger('\n6. Running `git tag ' + options.tag + '`:'))
+.seq(logger('\n#underline[6. Running `git tag ' + options.tag + '`]'))
+.seq(wait(2000))
 .seq(exec, 'git tag ' + options.tag, {cwd: options.lkCore}, Seq)
-.seq(logger('\n6. done'))
 
 // ==== final Message ====
-.seq(logger('\nThe core is almost linked...\n\nWhat you have to do now is to go into\n' +
-            '\t' + options.lkDir + '\n\t and run `git push && git push tags` ' +
-            'To commit the new change log and the new tag.\nAlso, in\n' +
-           '\t' + options.wwDir + '\n\trun `svn st` and `svn diff` to review ' +
-           'and maybe modify the changes. Remember to run the tests!\n\t' +
-            'When you are done run `svn ci`. Thats it! The new core is linked.\n\n' +
-           'If you want to reset the changes made run\n\t ' +
-            'cd ' + options.lkDir + ' && ' + 'git tag ' + options.tag + ' -d && git reset --hard' +
-           '\nand\n\tcd ' + options.wwDir + ' && svn revert . -R'))
+.seq(logger('\n#bold[Remaining manual steps]\n' +
+            '1. Visit #blue[' + options.lkDir + ']\n   and run #blue[git push && git push tags] ' +
+            'to commit the new change log and the new tag.\n2. In ' +
+           '#blue[' + options.wwDir + ']\n   run #blue[svn st] and #blue[svn diff] to review ' +
+           'and modify the changes (if required).\n3. Run the tests.\n' +
+            '4. Run #blue[svn commit] to upload the changes to webwerkstatt.\n\nThats it! The new core is linked.\n\n' +
+           '#yellow[== NOTE ==]\nIf you want to reset the changes run\n ' +
+            '#blue[cd ' + options.lkDir + ' && ' + 'git tag ' + options.tag + ' -d && git reset --hard]' +
+           '\nand\n #blue[svn revert ' + options.wwCore + ' -R]'))
 .seq(function() { process.exit(0) });
 
 } // end if invokedFromShell
