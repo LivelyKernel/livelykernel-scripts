@@ -1,7 +1,8 @@
 /*global require, process, console, __dirname*/
 var args = require('./helper/args'),
     shell = require('./helper/shell'),
-    path = require('path');
+    path = require('path'),
+    fs = require('fs');
 
 /*
  * Call the diff reporter for specifically diffing webwerkstatt and core
@@ -12,14 +13,12 @@ var args = require('./helper/args'),
 // -=-=-=-=-=-=-=-=-=-=-
 var env = process.env,
     defaultDiffFile = env.WORKSPACE_DIR + '/ww-lk-diff.json',
-    defaultWWDir = env.WORKSPACE_WW,
-    defaultLKDir = env.WORKSPACE_LK,
     options = args.options([
         ['-h', '--help', 'show this help'],
         ['--lk DIR', "Root directory of the Lively Kernel git repository."
-                   + "If not set then look for " + defaultLKDir],
+                   + "If not set then look for " + env.WORKSPACE_LK],
         ['--ww DIR', "Root directory of the Webwerksatt svn repository."
-                   + "If not set then look for " + defaultWWDir],
+                   + "If not set then look for " + env.WORKSPACE_WW],
         ['--output FILE', "JSON file to write the diff report into. If not specified"
                           + " then " + defaultDiffFile + " is used"]],
        {},
@@ -27,8 +26,8 @@ var env = process.env,
        + "and the HEAD of the master branch of the LK core git repository.");
 
 if (!options.lk) {
-    if (path.existsSync(defaultLKDir)) {
-        options.lk = defaultLKDir;
+    if (env.WORKSPACE_LK_EXISTS) {
+        options.lk = env.WORKSPACE_LK;
     } else {
         console.log("No lk directory specified and none in " + env.WORKSPACE_DIR +
                     " found!");
@@ -38,8 +37,8 @@ if (!options.lk) {
 options.lk = path.resolve(env.PWD, options.lk);
 
 if (!options.ww) {
-    if (path.existsSync(defaultWWDir)) {
-        options.ww = defaultWWDir;
+    if (env.WORKSPACE_WW_EXISTS) {
+        options.ww = env.WORKSPACE_WW;
     } else {
         console.log("No webwerksatt directory specified and none in " +
                     env.WORKSPACE_DIR + " found!");
@@ -59,5 +58,5 @@ var argList = ['--lk', options.lk,
                '--ww', options.ww,
               '--output', options.output];
 
-shell.redirectedSpawn(env.LK_SCRIPTS_DIR + '/ww-diff/runDiff.sh', argList,
+shell.call(env.LK_SCRIPTS_DIR + '/ww-diff/runDiff.sh', argList,
                       function(code) { process.exit(code); }, null, true);

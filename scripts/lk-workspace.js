@@ -28,7 +28,8 @@ options = args.options([
     ['--reset', 'reset both the svn and git repositories if they exist but do not delete them'],
     ['--checkout-ww', 'create ./workspace/ww/, checked out from ' + options.wwSvnUrl],
     ['--checkout-lk', 'create ./workspace/lk/, checked out from ' + options.lkGitUrl +
-     ' on branch ' + options.lkBranch]], options,
+     ' on branch ' + options.lkBranch],
+    ['--init', 'Do both --checkout-ww and --checkout-lk']], options,
     "Script that manages local copies of the LivelyKernel core "
     + "and webwerksatt repository in " + env.WORKSPACE_DIR + '/');
 
@@ -40,7 +41,7 @@ if (options.defined('remove')) {
     actions.push({
         msg: 'clean',
         func: function(next) {
-            shell.redirectedSpawn('rm', ['-rfv', env.WORKSPACE_DIR], next);
+            shell.call('rm', ['-rfv', env.WORKSPACE_DIR], next);
         }
     });
 }
@@ -72,7 +73,7 @@ if (options.defined('reset')) {
     });
 }
 
-if (options.defined('checkoutLk')) {
+if (options.defined('checkoutLk') || options.defined('init')) {
     actions.push({
         msg: 'git clone ' + options.lkGitUrl,
         func: function(next) {
@@ -85,13 +86,13 @@ if (options.defined('checkoutLk')) {
     });
 }
 
-if (options.defined('checkoutWw')) {
+if (options.defined('checkoutWw') || options.defined('init')) {
     actions.push({
         msg: 'svn co ' + options.wwSvnUrl,
         func: function(next) {
             Seq()
             .seq(exec, 'mkdir -p ' + env.WORKSPACE_DIR, shellOpts, Seq)
-            .seq(exec, ['svn co ', options.wwSvnUrl, env.WORKSPACE_WW].join(' '),
+            .seq(exec, ['svn co ', options.wwSvnUrl + '/core', env.WORKSPACE_WW + '/core'].join(' '),
                  shellOpts, next);
         }
     });

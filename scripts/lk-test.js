@@ -54,4 +54,4 @@ argList.push([env.LK_TEST_STARTER]);
     }
 });
 
-shell.redirectedSpawn(cmd, argList, null, null, true);
+shell.call(cmd, argList, null, null, true);

@@ -3,6 +3,8 @@ var args = require('./helper/args'),
     shell = require('./helper/shell'),
     path = require('path');
 
+var env = process.env,
+    cmdAndArgs = [];
 
 // -=-=-=-=-=-=-=-=-=-=-
 // script options
@@ -24,14 +26,16 @@ if (!options.miniServer) {
   options.miniServer = true;
 }
 
+if (!options.lkDir && env.WORKSPACE_LK_EXISTS) {
+  options.lkDir = env.WORKSPACE_LK;
+}
+
 if (!options.defined('miniServer') || !options.defined('lkDir')) options.showHelpAndExit();
 
 
 // -=-=-=-=-=-=-=-=-=-=-
 // Start the mini server & how to do that
 // -=-=-=-=-=-=-=-=-=-=-
-var env = process.env,
-    cmdAndArgs = [];
 
 // TODO add logfile param for forever
 // TODO add forever stop since forever automatically starts daemonized
@@ -52,8 +56,12 @@ if (!options.defined('forever') && !options.defined('watch')) {
   cmdAndArgs.push('node');
 }
 
+var port = options.port || env.MINISERVER_PORT;
 cmdAndArgs.push(path.relative(env.LK_SCRIPTS_ROOT, env.MINISERVER));
-cmdAndArgs.push(options.port || env.MINISERVER_PORT);
+cmdAndArgs.push(port);
 cmdAndArgs.push(options.lkDir);
 
-shell.redirectedSpawn(cmdAndArgs[0], cmdAndArgs.slice(1), null, null, true);
+
+console.log("Starting server from " + options.lkDir + ". " + "http://localhost:" + port);
+
+shell.call(cmdAndArgs[0], cmdAndArgs.slice(1), null, null, true);

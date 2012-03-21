@@ -28,7 +28,6 @@ var args           = require('./helper/args'),
 var options = args.options([
     ['-h', '--help', 'foo'],
     ['-t', '--tag TAG', 'New version tag'],
-    ['--push-tag', 'Push the tag to github?'],
     ['--lk-dir DIR', 'Path to Lively-Kernel repository'],
     ['--ww-dir DIR', 'Path to Lively-Kernel repository']],
     {},
@@ -44,6 +43,14 @@ var options = args.options([
 + "6. Tag the git core reposiory with the new version.\n\n"
 + "To really make the changes on the remote repositories you will have to"
 + " run 'git push' and 'svn commit' afterwards");
+
+if (!options.wwDir && env.WORKSPACE_WW_EXISTS) {
+    options.wwDir = env.WORKSPACE_WW;
+}
+
+if (!options.lkDir && env.WORKSPACE_LK_EXISTS) {
+    options.lkDir = env.WORKSPACE_LK;
+}
 
 if (calledDirectly) {
   if (!options.lkDir || !options.wwDir || !options.tag) options.showHelpAndExit();

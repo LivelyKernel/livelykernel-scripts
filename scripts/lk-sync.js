@@ -28,6 +28,14 @@ var options = args.options([
     + "git: `git clean -f -d && git reset --hard`\n"
     + "svn: `svn revert core/ -R`");
 
+if (!options.lkDir && env.WORKSPACE_LK_EXISTS) {
+    options.lkDir = env.WORKSPACE_LK;
+}
+
+if (!options.wwDir && env.WORKSPACE_WW_EXISTS) {
+    options.wwDir = env.WORKSPACE_WW;
+}
+
 if (!options.lkDir || !options.wwDir) {
     options.showHelpAndExit();
 }

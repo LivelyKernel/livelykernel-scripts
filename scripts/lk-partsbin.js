@@ -30,5 +30,5 @@ if (options.defined('install')) {
     options.showHelpAndExit();
 }
 
-shell.redirectedSpawn('svn', argList,
-                      function(code) { process.exit(code); }, null, true);
+shell.call('svn', argList,
+           function(code) { process.exit(code); }, null, true);
