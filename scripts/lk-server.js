@@ -57,7 +57,7 @@ if (!options.defined('forever') && !options.defined('watch')) {
 }
 
 var port = options.port || env.MINISERVER_PORT;
-cmdAndArgs.push(path.relative(env.LK_SCRIPTS_ROOT, env.MINISERVER));
+cmdAndArgs.push(env.MINISERVER);
 cmdAndArgs.push(port);
 cmdAndArgs.push(options.lkDir);
 
