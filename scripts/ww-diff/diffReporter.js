@@ -4,6 +4,12 @@
 var exec = require('child_process').exec,
     fs = require('fs');
 
+// we depent on parsing the diff output and another
+// locale changes it
+process.env.LANG = "en_US";
+process.env.LC_ALL = "en_US";
+
+
 function RepoDiffReporter(spec) {
     for (var name in spec) {
         if (spec.hasOwnProperty(name)) {
