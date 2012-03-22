@@ -93,7 +93,7 @@ function checkIfCoreCommit(thenDo) {
 }
 
 function updateWebwerkstattWorkingCopy() {
-    run(['svn up', svnWc, '-r', rev].join(' '),
+    run(['svn up', svnWc + '/core', '-r', rev].join(' '),
 	      function(err, out) { console.log('updated: ' + out); return true; }, this);
 }
 
