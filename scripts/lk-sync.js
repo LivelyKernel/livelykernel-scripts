@@ -51,8 +51,10 @@ options.wwCore = path.join(options.wwDir, "core/");
 if (options.defined('fromLkToWw')) { // lk -> ww
     async.series([
         function(next) {
-            exec(['rsync -ra --delete --filter=". ', options.filter, '" ',
-                  options.lkCore, ' ', options.wwCore].join(''), next);
+            var cmd = ['rsync -v -ra --delete --filter=". ', options.filter, '" ',
+                       options.wwCore, ' ', options.lkCore];
+            console.log(cmd);
+            exec(cmd.join(''), next);
         },
         function(next) {
             exec('svn rm $( svn status | sed -e "/^!/!d" -e "s/^!//" )', // `svn rm` missing
@@ -71,8 +73,10 @@ if (options.defined('fromLkToWw')) { // lk -> ww
 } else if (options.defined('fromWwToLk')) { // ww -> lk
     async.waterfall([
         function(next) {
-            exec(['rsync -v -ra --delete --filter=". ', options.filter, '" ',
-                  options.wwCore, ' ', options.lkCore].join(''), next);
+            var cmd = ['rsync -v -ra --delete --filter=". ', options.filter, '" ',
+                       options.wwCore, ' ', options.lkCore].join('');
+            console.log(cmd);
+            exec(cmd, next);
         },
         function(out, err, next) {
             exec('git add .', {cwd: options.lkDir}, next);

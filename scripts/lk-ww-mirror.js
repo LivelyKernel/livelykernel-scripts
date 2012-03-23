@@ -73,7 +73,7 @@ function run(cmd, cb, next, options) {
 function syncWithGit() {
     var next = this;
     exec([env.LK_SCRIPTS_ROOT + "/bin/lk sync --from-ww-to-lk " +
-          "--lk-dir ", gitRepoDir, "--ww-dir ", svnWc].join(''),
+          "--lk-dir ", gitRepoDir, " --ww-dir ", svnWc].join(''),
          function(code, out, err) { console.log("lk sync: " + out + "\n" + err); next(code) });
 }
 
