@@ -19,6 +19,12 @@ var Config = {
     defaultBrowser: "chrome",
     defaultNotifier: "growlnotify",
 
+    testScript: "run_tests.js",
+    testWorld: "run_tests.xhtml",
+
+    server: "localhost",
+    port: 4444,
+    
     platformConfigs: {
         "darwin": {
             "chrome": {
