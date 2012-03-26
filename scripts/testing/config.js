@@ -24,6 +24,11 @@ var Config = {
 
     server: "localhost",
     port: 4444,
+
+    verbose: false,
+
+    testFilter: null,
+    display: null,
     
     platformConfigs: {
         "darwin": {

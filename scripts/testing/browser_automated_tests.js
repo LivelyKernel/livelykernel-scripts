@@ -26,48 +26,35 @@ var platformConf = config.platformConfigs[process.platform],
     parser = new optparse.OptionParser(switches);
 
 
-// Internal variable to store options.
-var options = {
-    server: config.server,
-    port: config.port,
-    browserName: config.defaultBrowser,
-    browserConf: platformConf[config.defaultBrowser],
-    notifier: null,
-    testScript: config.testScript,
-    testWorld: config.testWorld,
-    verbose: false,
-    maxRequests: config.timeout,
-    testFilter: null,
-    display: null
-};
-
-parser.on("help", function() {
-    console.log(parser.toString());
-    process.exit(0);
+function parseCommandLineOptions() {
+    parser.on("help", function() {
+        console.log(parser.toString());
+        process.exit(0);
+    });
+    
+    parser.on("verbose", function() { config.verbose = true; });
+    
+    parser.on("browser", function(name, value) {
+        console.assert(supportedBrowsers.indexOf(value) >= 0,
+                      "Unsupported browser: " + value);
+        config.browserName = value;
+        config.browserConf = platformConf[value];
+    });
+    
+    parser.on("server", function(name, value) {
+        var tokens = value.split(':');
+        config.server = tokens[0];
+        config.port = tokens[1] || config.port;
+    });
+    
+    parser.parse(process.argv);
 });
-
-parser.on("verbose", function() { options.verbose = true; });
-
-parser.on("browser", function(name, value) {
-    console.assert(supportedBrowsers.indexOf(value) >= 0,
-                  "Unsupported browser: " + value);
-    options.browserName = value;
-    options.browserConf = platformConf[value];
-});
-
-parser.on("server", function(name, value) {
-    var tokens = value.split(':');
-    options.server = tokens[0];
-    options.port = tokens[1] || config.port;
-});
-
-parser.parse(process.argv);
 
 function log(msg) {
-    if (options.verbose) console.log(msg);
+    if (config.verbose) console.log(msg);
 }
 
-log(options);
+log(config);
 
 
 ///////////////////////////////////////////////////////////
@@ -76,8 +63,8 @@ log(options);
 
 function post(path, data, callback) {
     var postOptions = {
-        host: options.server,
-        port: options.port,
+        host: config.server,
+        port: config.port,
         path: path,
         method: 'POST',
         headers: {'Content-Type':  'application/json'}
@@ -108,7 +95,7 @@ function post(path, data, callback) {
 
 function printResult(testRunId, data) {
     console.log('\n=== test result for test run %s in %s ===',
-                testRunId, options.browserName);
+                testRunId, config.browserName);
     console.log('\nexecution time per test case:');
     data.runtimes.forEach(function(ea) {
        console.log(ea.time + '\t' + ea.module);
@@ -125,17 +112,17 @@ function printResult(testRunId, data) {
 }
 
 function notifyResult(testRunId, data) {
-    if (!options.notifier) return;
+    if (!config.notifier) return;
     var msg = (data.fails ? "FAILURE" : 'SUCCCESS') + "\n"
             + data.runs + " tests run, " + data.fails + " failures"
             + "\n" + data.failedTestNames.join("\n");
-    spawn(options.notifier, ["--message", msg,
-                             "--identifier", "LivelyCoreTests" + options.testScript,
+    spawn(config.notifier, ["--message", msg,
+                             "--identifier", "LivelyCoreTests" + config.testScript,
                              "--image", "core/media/lively_logo.png"]);
 }
 
 // poll
-var maxRequests = options.maxRequests, currentRequests = 0;
+var maxRequests = config.timeout, currentRequests = 0;
 
 function tryToGetReport(data) {
     if (currentRequests >= maxRequests) {
@@ -158,13 +145,18 @@ function tryToGetReport(data) {
 
 function startTests() {
     post('/test-request', {
-        browser: options.browserConf.path,
-        browserArgs: options.browserConf.args,
-        display: options.display,
-        testWorldPath: options.testWorld,
-        loadScript: options.testScript,
-        testFilter: options.testFilter
+        browser: config.browserConf.path,
+        browserArgs: config.browserConf.args,
+        display: config.display,
+        testWorldPath: config.testWorld,
+        loadScript: config.testScript,
+        testFilter: config.testFilter
     }, tryToGetReport);
 }
 
-startTests();
+function main() {
+    var testId = Math.floor(Math.random() * 10000);
+    parseCommandLineOptions();
+    
+    startTests();
+}
