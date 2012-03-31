@@ -16,6 +16,7 @@ env.LK_SCRIPTS_ROOT = path.normalize(__dirname + '/..');
 env.LK_SCRIPTS_DIR  = lkScriptDir("/scripts");
 env.NODEMODULES     = env.NODEMODULES || lkScriptDir("/node_modules");
 env.QUNIT           = env.QUNIT       || env.NODEMODULES + "/qunit/bin/cli.js";
+env.NODEUNIT        = env.NODEUNIT       || env.NODEMODULES + "/nodeunit/bin/nodeunit";
 env.NODEMON         = env.NODEMON     || env.NODEMODULES + "/nodemon/nodemon.js";
 env.FOREVER         = env.FOREVER     || env.NODEMODULES + "/forever/bin/forever";
 

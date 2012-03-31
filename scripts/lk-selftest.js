@@ -1,5 +1,6 @@
 /*global require, process*/
 var args = require('./helper/args'),
+    exec = require('child_process').exec,
     shell = require('./helper/shell'),
     path = require('path'),
     async = require('async'),
@@ -17,6 +18,19 @@ function qunitRun(spec, callback) {
     var args = ['--code', (spec.scope ? spec.scope : "") + spec.code, '--tests', spec.test];
     shell.call(env.QUNIT, args, callback, null, true);
 }
+
+function nodeunitRun(spec) {
+    return function(callback) {
+        exec(env.NODEUNIT + ' ' + spec.target,
+         {cwd: env.LK_SCRIPTS_ROOT},
+         function(code, out, err) {
+             console.log(out);
+             callback(code);
+         });
+    }
+}
+
+env.LK_SCRIPT_TEST_RUN = "1";
 
 // -=-=-=-=-=-=-=-=-=-=-
 // run tests with quint
