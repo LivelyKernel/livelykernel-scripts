@@ -47,5 +47,6 @@ async.series([
         scope: 'lk:'}),
     qunitRun.bind(null, {
         code: path.join(env.LK_SCRIPTS_ROOT, "/scripts/ww-diff/diffReporter.js"),
-        test: path.join(env.LK_SCRIPTS_ROOT, "/scripts/ww-diff/diffReporterTest.js")})
+        test: path.join(env.LK_SCRIPTS_ROOT, "/scripts/ww-diff/diffReporterTest.js")}),
+    nodeunitRun({target: 'scripts/ww-merge/cherry-picker.js'})
 ]);
