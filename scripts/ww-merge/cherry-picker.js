@@ -70,12 +70,24 @@ function cherryPickAndCommit(exec, mergeSpec, lkDir, callback) {
         }
     }));
 
-    // 3) Now commit everything
+    // 3) figure out the author by using the first rev
+    var author = '';
     actions.push(function(callback) {
-        var realLog = realLogMessages.join('\n\n');
-        exec("git commit -am '"
-            + parsed.commitMessage + (realLog != "" ? '\n\n\n' + realLog : "")
-            + "'",
+        var rev = parsed.revisions[0];
+        exec('git log ' + rev + ' -1 --format=format:"%an"', {cwd: lkDir}, function(c, out, err) {
+            author = out;
+            callback(c);
+        });
+    });
+
+    // 4) Now commit everything
+    actions.push(function(callback) {
+        var realLog = realLogMessages.join('\n\n'),
+            cmd = "git commit"
+                + " --author=\"" + author + "\""
+                + " -am '" + parsed.commitMessage + (realLog != "" ? '\n\n\n' + realLog : "") + "'";
+        console.log('Commiting...\n' + cmd);
+        exec(cmd,
              {cwd: lkDir},
              function(c, out) { console.log(out); callback(c) });
     });
@@ -138,7 +150,8 @@ if (!process.env.LK_SCRIPT_TEST_RUN) {
                 execSpy(test, {cmd: 'git cherry-pick -n baz...zork', cwd: 'foo/bar'}),
                 execSpy(test, {cmd: 'git log foo...bar --format=format:"%B"', cwd: 'foo/bar', out: 'git commit log 1'}),
                 execSpy(test, {cmd: 'git log baz...zork --format=format:"%B"', cwd: 'foo/bar', out: 'git commit log 2'}),
-                execSpy(test, {cmd: 'git commit -am \'boing, test commit\nsecond line\n\n\ngit commit log 1\n\ngit commit log 2\'', cwd: 'foo/bar'})
+                execSpy(test, {cmd: 'git log foo...bar -1 --format=format:"%an"', cwd: 'foo/bar', out: 'some author'}),
+                execSpy(test, {cmd: 'git commit --author="some author" -am \'boing, test commit\nsecond line\n\n\ngit commit log 1\n\ngit commit log 2\'', cwd: 'foo/bar'})
             ];
             cherryPickAndCommit(execMock(execSpies), this.mergeSpec, 'foo/bar');
             execSpies.forEach(function(spy) {
