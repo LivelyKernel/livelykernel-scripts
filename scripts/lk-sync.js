@@ -21,7 +21,9 @@ var options = args.options([
     ['--from-ww-to-lk', 'Update a lk repo with ww changes'],
     ['--from-lk-to-ww', 'Update ww working copy with lk changes'],
     ['--ww-dir DIR', 'Path to Webwerkstatt repository'],
-    ['--lk-dir DIR', 'Path to Lively Kernel repository']],
+    ['--lk-dir DIR', 'Path to Lively Kernel repository'],
+    ['-cp', '--cherry-pick FILE', 'read cherry-pick spec (according to ww-merge/cherry-pick.js) '
+                           + 'from FILE which will apply and commit changes from ww-mirror']],
     {},
     "This utility rsyncs changes from local Webwerkstatt repositories to local Lively Kernel core repositories and vice versa.\nIt is internally used by `lk ww-mirror` and `lk core-link`, however, it is also useful in itself when porting changes between git and svn.\n\nIt applies modifications only locally and will not commit any changes.\n\n"
     + "In case you want to reset the local changes following commands are handy:\n"
@@ -100,6 +102,17 @@ if (options.defined('fromLkToWw')) { // lk -> ww
                 console.log("ww -> lk sync done, status:\n" + out);
                 next(code);
             });
+        }
+    ]);
+} else if (options.defined('cherryPick')) { // read merge spec for merging ww-mirror
+    var cherryPickAndCommit = require('./ww-merge/cherry-picker').cherryPickAndCommit;
+    async.waterfall([
+        fs.readFile.bind(null, options.cherryPick),
+        function(mergeSpec, next) {
+            if (!mergeSpec || mergeSpec == "") {
+                throw new Error('Cannot cherry-pick from ' + mergeSpec);
+            }
+            cherryPickAndCommit(exec, '' + mergeSpec, options.lkDir);
         }
     ]);
 } else {

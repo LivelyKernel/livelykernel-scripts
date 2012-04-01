@@ -44,14 +44,18 @@ function parseMergeSpec(mergeSpec) {
     }
 }
 
-function cherryPickAndCommit(exec, mergeSpec, lkDir) {
+function cherryPickAndCommit(exec, mergeSpec, lkDir, callback) {
+    console.log('mergeSpec: ' + mergeSpec)
     var parsed = parseMergeSpec(mergeSpec),
         actions = [];
 
     // 1) cherry pick the revs
     actions = actions.concat(parsed.revisions.map(function(rev) {
         return function(callback) {
-            exec('git cherry-pick -n ' + rev, {cwd: lkDir}, callback);
+            exec('git cherry-pick -n ' + rev, {cwd: lkDir}, function(c, out, err) {
+                console.log('cherry picking revision(s) ' + rev + ': ' + out + '\n' + err);
+                callback(c);
+            });
         }
     }));
 
@@ -59,7 +63,7 @@ function cherryPickAndCommit(exec, mergeSpec, lkDir) {
     var realLogMessages = [];
     actions = actions.concat(parsed.revisions.map(function(rev) {
         return function(callback) {
-            exec('git log ' + rev + ' --format=format:"%B"', {cwd: lkDir}, function(c, out) {
+            exec('git log ' + rev + ' --format=format:"%B"', {cwd: lkDir}, function(c, out, err) {
                 realLogMessages.push(out);
                 callback(c);
             });
@@ -76,7 +80,7 @@ function cherryPickAndCommit(exec, mergeSpec, lkDir) {
              function(c, out) { console.log(out); callback(c) });
     });
 
-    async.series(actions);
+    async.series(actions, callback);
 }
 
 if (!process.env.LK_SCRIPT_TEST_RUN) {
