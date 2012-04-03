@@ -28,7 +28,7 @@ function publish(env, optionalVersion, repoDir) {
     async.series([
         function readPackageJSON(next) {
             fs.readFile(packageFile, function(code, data) {
-                packageContent = data;
+                packageContent = data.toString();
                 next(code);
             });
         },
@@ -42,17 +42,30 @@ function publish(env, optionalVersion, repoDir) {
         },
         function commitPackageJSON(next) {
             exec('git add package.json && git ci -m "version ' + newVersion + '"',
-                 {cwd: repoDir}, next);
+                 {cwd: repoDir}, function(code, out, err) {
+                     console.log(out + '\n' + err);
+                     next(code);
+                 });
         },
         function gitTag(next) {
-            exec('git tag ' + newVersion, {cwd: repoDir}, next);
+            exec('git tag ' + newVersion, {cwd: repoDir}, function(code, out, err) {
+                console.log(out + '\n' + err);
+                next(code);
+            });
         },
         function gitPush(next) {
-            exec('git push --tags', {cwd: repoDir}, next);
+            exec('git push --tags', {cwd: repoDir}, function(code, out, err) {
+                console.log(out + '\n' + err);
+                next(code);
+            });
         },
         function npmPublish(next) {
-            exec('npm publish', {cwd: repoDir}, next);
-        }
+            exec('npm publish', {cwd: repoDir}, function(code, out, err) {
+                console.log(out + '\n' + err);
+                next(code);
+            });
+        },
+        console.log.bind(console, 'done')
     ]);
 }
 
