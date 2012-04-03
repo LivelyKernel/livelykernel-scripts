@@ -107,29 +107,7 @@ if (!process.env.LK_SCRIPT_TEST_RUN) {
      * = = = = =
      */
 
-    function execEquals(test, actualCommand, expectedCmd, actualCwd, expectedCwd) {
-        test.equal(actualCommand, expectedCmd);
-        test.equal(actualCwd, expectedCwd);
-    }
-
-    function execSpy(test, spec, args) {
-        var spy = function(cmd, options, callback) {
-            spy.called++;
-            execEquals(test, cmd, spec.cmd, options.cwd, spec.cwd);
-            callback(spec.code || null, spec.out || "");
-        }
-        spy.called = 0;
-        spy.toString = function() { return 'execSpy<' + spec.cmd + '>' };
-        return spy;
-    }
-
-    function execMock(spies) {
-        var mySpies = [].concat(spies);
-        return function() {
-            var spy = mySpies.shift();
-            spy.apply(null, arguments);
-        }
-    }
+    var testHelper = require('./../helper/test-helper');
 
     module.exports = {
         setUp: function (callback) {
@@ -145,18 +123,21 @@ if (!process.env.LK_SCRIPT_TEST_RUN) {
         },
 
         testCherryPickAndCommit: function(test) {
-            var execSpies = [
-                execSpy(test, {cmd: 'git cherry-pick -n foo...bar', cwd: 'foo/bar'}),
-                execSpy(test, {cmd: 'git cherry-pick -n baz...zork', cwd: 'foo/bar'}),
-                execSpy(test, {cmd: 'git log foo...bar --format=format:"%B"', cwd: 'foo/bar', out: 'git commit log 1'}),
-                execSpy(test, {cmd: 'git log baz...zork --format=format:"%B"', cwd: 'foo/bar', out: 'git commit log 2'}),
-                execSpy(test, {cmd: 'git log foo...bar -1 --format=format:"%an"', cwd: 'foo/bar', out: 'some author'}),
-                execSpy(test, {cmd: 'git commit --author="some author" -am \'boing, test commit\nsecond line\n\n\ngit commit log 1\n\ngit commit log 2\'', cwd: 'foo/bar'})
-            ];
-            cherryPickAndCommit(execMock(execSpies), this.mergeSpec, 'foo/bar');
-            execSpies.forEach(function(spy) {
-                test.equal(spy.called, 1, 'spy called? ' + spy);
-            });
+            var exec = testHelper.execForTest(test).expect(
+                {cmd: 'git cherry-pick -n foo...bar', cwd: 'foo/bar'},
+                {cmd: 'git cherry-pick -n baz...zork', cwd: 'foo/bar'},
+                {cmd: 'git log foo...bar --format=format:"%B"',
+                 cwd: 'foo/bar', out: 'git commit log 1'},
+                {cmd: 'git log baz...zork --format=format:"%B"',
+                 cwd: 'foo/bar', out: 'git commit log 2'},
+                {cmd: 'git log foo...bar -1 --format=format:"%an"',
+                 cwd: 'foo/bar', out: 'some author'},
+                {cmd: 'git commit --author="some author" -am '
+                    + '\'boing, test commit\nsecond line\n\n\n'
+                    + 'git commit log 1\n\ngit commit log 2\'',
+                 cwd: 'foo/bar'});
+            cherryPickAndCommit(exec, this.mergeSpec, 'foo/bar');
+            exec.assertAllCalled(test);
             test.done();
         }
     };
