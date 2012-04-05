@@ -107,7 +107,7 @@ function isValidVersion(version) {
 function checkHistoryMd(fs, repoDir, version, next) {
     var historyMd = path.join(repoDir, 'History.md');
     fs.readFile(historyMd, function(code, data) {
-        if (data.indexOf(version) === -1) {
+        if (data.toString().indexOf(version) === -1) {
             throw new Error('No entry for ' + version + ' in ' + historyMd);
         }
         next(code);

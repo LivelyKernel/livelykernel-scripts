@@ -18,7 +18,7 @@ var env = process.env,
 // -=-=-=-=-=-=-=-=-=-=-
 // the real thing
 // -=-=-=-=-=-=-=-=-=-=-
-var cmdAndArgs = ['node'];
+var cmdAndArgs = ['node', path.join(env.LK_SCRIPTS_DIR, 'publish.js')];
 if (options.defined('tag')) {
     cmdAndArgs.push('--tag');
     cmdAndArgs.push(options.tag);
