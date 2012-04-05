@@ -57,7 +57,7 @@ function publish(env, optionalVersion, repoDir) {
             });
         },
         function gitPush(next) {
-            exec('git push --tags', {cwd: repoDir}, function(code, out, err) {
+            exec('git push && git push --tags', {cwd: repoDir}, function(code, out, err) {
                 console.log(out + '\n' + err);
                 next(code);
             });
@@ -213,7 +213,7 @@ if (!env.LK_SCRIPT_TEST_RUN) {
             var exec = testHelper.execForTest(test).expect(
                 {cmd: 'git add package.json && git ci -m "version 0.0.7"', cwd: 'foo/bar'},
                 {cmd: 'git tag 0.0.7', cwd: 'foo/bar'},
-                {cmd: 'git push --tags', cwd: 'foo/bar'},
+                {cmd: 'git push && git push --tags', cwd: 'foo/bar'},
                 {cmd: 'npm publish', cwd: 'foo/bar'});
 
             publish({fs: fs, exec: exec}, null, this.scriptDir);
