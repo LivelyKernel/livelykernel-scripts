@@ -25,6 +25,10 @@ function genericMock(spyFactory, test) {
         });
     }
 
+    run.toString = function() {
+        return 'Mock< spies:' + spies.join('\n') + '>';
+    }
+
     return run;
 }
 

@@ -37,6 +37,9 @@ function publish(env, optionalVersion, repoDir) {
             newVersion = extractVersionFrom(newPackageContent);
             next();
         },
+        function checkHistoryFile(next) {
+            checkHistoryMd(env.fs, repoDir, newVersion, next);
+        },
         function writePackageJSON(next) {
             fs.writeFile(packageFile, newPackageContent, next);
         },
@@ -101,6 +104,16 @@ function isValidVersion(version) {
     return parsed && typeof parsed[0] == 'number';
 }
 
+function checkHistoryMd(fs, repoDir, version, next) {
+    var historyMd = path.join(repoDir, 'History.md');
+    fs.readFile(historyMd, function(code, data) {
+        if (data.indexOf(version) === -1) {
+            throw new Error('No entry for ' + version + ' in ' + historyMd);
+        }
+        next(code);
+    });
+}
+
 if (!env.LK_SCRIPT_TEST_RUN) {
 
     var args           = require('./helper/args'),
@@ -121,9 +134,7 @@ if (!env.LK_SCRIPT_TEST_RUN) {
         process.exit(1);
     }
 
-    // "scripts/.."
-    var scriptDir = path.dirname(__dirname);
-    publish({fs: fs, exec: exec}, options.tag, scriptDir);
+    publish({fs: fs, exec: exec}, options.tag, env.LK_SCRIPTS_ROOT);
 
 } else {
 
@@ -156,6 +167,7 @@ if (!env.LK_SCRIPT_TEST_RUN) {
             this.packageJSONSrcWithMinorInc = this.packageJSONSrc.replace('0.0.6', '0.0.7');
             this.scriptDir = 'foo/bar';
             this.packageFile = this.scriptDir + '/package.json';
+            this.historyFile = this.scriptDir + '/History.md';
             callback();
         },
 
@@ -192,6 +204,10 @@ if (!env.LK_SCRIPT_TEST_RUN) {
             var fs = testHelper.fsForTest(test);
             fs.readFile.expect(
                 {file: this.packageFile, data: this.packageJSONSrc});
+            fs.readFile.expect(
+                {file: this.historyFile, data: "0.0.7 / 2012-04-06\n"
+                                             +"==================\n"
+                                             + "  * ...\n"});
             fs.writeFile.expect(
                 {file: this.packageFile, data: this.packageJSONSrcWithMinorInc});
             var exec = testHelper.execForTest(test).expect(
