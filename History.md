@@ -1,3 +1,9 @@
+0.0.8 / 2012-04-07
+==================
+
+* fixing node-ffi install on Linux
+* core-link fixes
+
 0.0.7 / 2012-04-06
 ==================
 
