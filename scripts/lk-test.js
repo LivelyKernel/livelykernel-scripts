@@ -16,7 +16,7 @@ var platformConf = config.platformConfigs[process.platform],
     defaultBrowser = '"' + config.defaultBrowser + '"',
     options = args.options([
         ['-h', '--help', 'show this help'],
-        ['-w', '--watch', 'Run with nodemon and watch for file changes'],
+        ['-w', '--watch DIR', 'Run with nodemon and watch for file changes'],
         ['-v', '--verbose', "Print progress and debug information."],
         ['-b', '--browser NAME', "Which browser to use. Options are \""
                                + supportedBrowsers.join('", "')
@@ -42,10 +42,18 @@ var platformConf = config.platformConfigs[process.platform],
         {},
         "Run the core tests.");
 
-var cmd = options.defined('watch') ? env.NODEMON : 'node',
-    argList = [];
+var cmd, argList = [];
+if (options.watch) {
+    cmd = env.NODEMON;
+    argList.push('--watch');
+    argList.push(options.watch);
+} else {
+    cmd = 'node';
+}
 
-argList.push([env.LK_TEST_STARTER]);
+// nodemon needs it relative...
+argList.push([path.relative(env.PWD, env.LK_TEST_STARTER)]);
+
 ['verbose', 'browser', 'notfier', 'display', 'focus', 'testScript'].forEach(function(option) {
     if (!options.defined(option)) return;
     argList.push(options.dasherize(option));
@@ -54,4 +62,4 @@ argList.push([env.LK_TEST_STARTER]);
     }
 });
 
-shell.callShowOutput(cmd, argList);
+shell.callShowOutput(cmd, argList, function(code) { process.exit(code); });

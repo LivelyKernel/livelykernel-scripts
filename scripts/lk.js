@@ -125,11 +125,9 @@ function processArgs(args) {
     if (!subCmd) {
         console.log('Unknown subcommand "' + cmdName + '"!');
         lk.showUsage();
-        process.exit(0);
+        process.exit(1);
     }
-    subCmd.spawn(cmdArgs, function() {
-        // console.log('DONE');
-    });
+    subCmd.spawn(cmdArgs, function(code) { process.exit(code); });
 }
 
 if (calledDirectly) {
