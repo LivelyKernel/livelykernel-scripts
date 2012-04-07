@@ -1,7 +1,7 @@
 0.0.8 / 2012-04-07
 ==================
 
-* fixing node-ffi install on Linux
+* getting rid of ffi package that is broken on Linux x64, it is still required for `lk core-link`, though. In case you need to do a core link install it on your machine (if you have a Mac that is)
 * core-link fixes
 
 0.0.7 / 2012-04-06
