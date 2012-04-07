@@ -23,7 +23,6 @@
     "async": "0.1",
     "jshint": "~0.5",
     "forever": "~0.8.5",
-    "qunit": "~0.2",
     "nodeunit": "~0.7"
   },
   "devDependencies": {},

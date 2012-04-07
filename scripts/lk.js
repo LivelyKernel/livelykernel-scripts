@@ -130,16 +130,63 @@ function processArgs(args) {
     subCmd.spawn(cmdArgs, function(code) { process.exit(code); });
 }
 
-if (calledDirectly) {
-    lk.readSubcommandsFrom(scriptDir, function() {
-        processArgs(process.argv.slice(2));
-    });
-}
 
+if (calledDirectly || !process.env.LK_SCRIPT_TEST_RUN) {
+    if (calledDirectly) {
+        lk.readSubcommandsFrom(scriptDir, function() {
+            processArgs(process.argv.slice(2));
+        });
+    }
 
-// -=-=-=-=-=-=-=-=-=-=-
-// exports
-// -=-=-=-=-=-=-=-=-=-=-
-for (var name in lk) {
-    exports[name] = lk[name];
+    // -=-=-=-=-=-=-=-=-=-=-
+    // exports
+    // -=-=-=-=-=-=-=-=-=-=-
+    for (var name in lk) {
+        exports[name] = lk[name];
+    }
+
+} else {
+
+    // Test code
+    var fsMock, testScriptDir = '/foo/bar';
+
+    exports.SubcommandTests = {
+        setUp: function(run) {
+            var fileNames = ['lk-foo.js', 'lk-bar-baz.sh', 'xxx.js'];
+            fsMock = {readdir: function(dir, cb) { cb(null, fileNames); }};
+            lk.fs = fsMock;
+            lk.readSubcommandsFrom(testScriptDir);
+            run();
+        },
+
+        "should list subcommands from file names": function(test) {
+            var subs = lk.subcommands()
+            test.equal(2, subs.length, "not two subcommands");
+            test.equal('foo', subs[0].name(), "foo");
+            test.equal('bar-baz', subs[1].name(), "bar-baz");
+            test.done();
+        },
+
+        "should get subcommand": function(test) {
+            var cmd = lk.getSubcommand('foo');
+            test.equal('lk-foo.js', cmd.filename, "foo");
+            test.done();
+        },
+
+        "should get spawn args js": function(test) {
+            var cmd = lk.getSubcommand('foo'),
+                spawnSpec = cmd.spawnCmdAndArgs(['--foo']);
+            test.deepEqual({cmd: 'node', args: [testScriptDir + '/lk-foo.js', '--foo']}, spawnSpec);
+            test.done();
+        },
+
+        "should get spawn args sh": function(test) {
+            var cmd = lk.getSubcommand('bar-baz'),
+                spawnSpec = cmd.spawnCmdAndArgs(['--foo']);
+            test.deepEqual({cmd: testScriptDir + '/lk-bar-baz.sh', args: ['--foo']}, spawnSpec);
+            test.done();
+        }
+
+    }
+
 }

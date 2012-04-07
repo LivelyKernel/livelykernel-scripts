@@ -42,6 +42,7 @@ function callShowOutput(cmd, args, cb, options, verbose) {
 }
 
 exports.callShowOutput = callShowOutput;
+exports.run = callShowOutput;
 
 // ---------------------------------------------
 // stuff below is still WIP
@@ -74,7 +75,6 @@ function pipe(cmds) {
     return cmds;
 }
 
-exports.run = run;
 exports.runV = runVerbose;
 exports.runAll = runVerbose;
 exports.pipe = pipe;
