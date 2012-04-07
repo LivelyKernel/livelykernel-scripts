@@ -64,4 +64,4 @@ cmdAndArgs.push(options.lkDir);
 
 console.log("Starting server from " + options.lkDir + ". " + "http://localhost:" + port);
 
-shell.call(cmdAndArgs[0], cmdAndArgs.slice(1), null, null, true);
+shell.callShowOutput(cmdAndArgs[0], cmdAndArgs.slice(1));

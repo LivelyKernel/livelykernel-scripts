@@ -24,8 +24,7 @@
     "jshint": "~0.5",
     "forever": "~0.8.5",
     "qunit": "~0.2",
-    "nodeunit": "~0.7",
-    "node-ffi": "0.4.2"
+    "nodeunit": "~0.7"
   },
   "devDependencies": {},
   "optionalDependencies": {}

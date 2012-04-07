@@ -41,7 +41,7 @@ if (options.defined('remove')) {
     actions.push({
         msg: 'clean',
         func: function(next) {
-            shell.call('rm', ['-rfv', env.WORKSPACE_DIR], next);
+            shell.callShowOutput('rm', ['-rfv', env.WORKSPACE_DIR], next);
         }
     });
 }

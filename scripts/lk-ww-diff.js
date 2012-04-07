@@ -58,5 +58,5 @@ var argList = ['--lk', options.lk,
                '--ww', options.ww,
               '--output', options.output];
 
-shell.call(env.LK_SCRIPTS_DIR + '/ww-diff/runDiff.sh', argList,
-                      function(code) { process.exit(code); }, null, true);
+shell.callShowOutput(env.LK_SCRIPTS_DIR + '/ww-diff/runDiff.sh', argList,
+                      function(code) { process.exit(code); });

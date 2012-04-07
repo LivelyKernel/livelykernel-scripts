@@ -30,7 +30,7 @@ Subcommand.prototype.spawnCmdAndArgs = function(args) {
 
 Subcommand.prototype.spawn = function(args, onExit) {
     var spawnSpec = this.spawnCmdAndArgs(args);
-    shell.call(spawnSpec.cmd, spawnSpec.args, onExit);
+    shell.callShowOutput(spawnSpec.cmd, spawnSpec.args, onExit);
 };
 
 Subcommand.prototype.showHelp = function(thenDo) {

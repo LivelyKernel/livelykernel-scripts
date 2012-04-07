@@ -16,7 +16,7 @@ var options = args.options([
 
 function qunitRun(spec, callback) {
     var args = ['--code', (spec.scope ? spec.scope : "") + spec.code, '--tests', spec.test];
-    shell.call(env.QUNIT, args, callback, null, true);
+    shell.callShowOutput(env.QUNIT, args, callback);
 }
 
 function nodeunitRun(spec) {

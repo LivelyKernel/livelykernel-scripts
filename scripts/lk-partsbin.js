@@ -30,5 +30,5 @@ if (options.defined('install')) {
     options.showHelpAndExit();
 }
 
-shell.call('svn', argList,
-           function(code) { process.exit(code); }, null, true);
+shell.callShowOutput('svn', argList,
+           function(code) { process.exit(code); });

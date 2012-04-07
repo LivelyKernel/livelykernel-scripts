@@ -3,22 +3,43 @@
 // interactive shell commands
 // see http://groups.google.com/group/nodejs/browse_thread/thread/6fd25d16b250aa7d
 var spawn = require('child_process').spawn,
-    exec = require('child_process').exec,
-    ffi = require("node-ffi"),
-    systemCall = new ffi.Library(null, {"system": ["int32", ["string"]]}).system,
-    tty = require('tty'),
-    fs = require('fs'),
-    path = require('path'),
-    Seq = require('seq');
+    exec  = require('child_process').exec,
+    tty   = require('tty'),
+    fs    = require('fs'),
+    path  = require('path'),
+    Seq   = require('seq');
 
 
 function call(cmd, args, cb, options, verbose) {
-    var completeCmd = cmd + ' ' + args.join(' ');
+    var ffi         = require("node-ffi"),
+        systemCall  = new ffi.Library(null, {"system": ["int32", ["string"]]}).system,
+        completeCmd = cmd + ' ' + args.join(' ');
     systemCall(completeCmd);
     cb && cb();
 }
 
 exports.call = call;
+
+function callWithExec(cmd, args, cb, options, verbose) {
+    var proc = spawn(cmd, args, options),
+        out, err;
+
+    proc.stdout.on('data', function (data) {
+        out += data;
+        console.log(data);
+    });
+
+    proc.stderr.on('data', function (data) {
+        err += data;
+        console.log(data);
+    });
+
+    proc.on('exit', function (code) {
+        cb && cb(code, out, err);
+    });
+}
+
+exports.callWithExec = callWithExec;
 
 // ---------------------------------------------
 // stuff below is still WIP

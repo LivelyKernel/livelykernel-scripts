@@ -33,5 +33,5 @@ if (options.defined('watch')) {
 var cmd = cmdAndArgs[0],
     cmdArgs = cmdAndArgs.slice(1);
 
-shell.call(cmd, cmdArgs,
-           function(code) { process.exit(code); }, null, true);
+shell.callShowOutput(cmd, cmdArgs,
+           function(code) { process.exit(code); });

@@ -54,4 +54,4 @@ argList.push([env.LK_TEST_STARTER]);
     }
 });
 
-shell.call(cmd, argList, null, null, true);
+shell.callShowOutput(cmd, argList);

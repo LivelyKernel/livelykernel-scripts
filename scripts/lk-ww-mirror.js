@@ -150,7 +150,7 @@ function lock() {
     try {
         fs.statSync(lockFile);
         console.log('is locked, waiting');
-        setTimeout(function() { lock.call(next); }, 200);
+        setTimeout(function() { lock.callShowOutput(next); }, 200);
     } catch (e) {
         // if error, means that file not there, we are ready to go
         fs.writeFileSync(lockFile, 'locked by mirror script, rev ' + rev);
