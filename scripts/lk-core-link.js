@@ -67,38 +67,15 @@ options.versionFile        = path.join(options.wwCore, 'coreVersion.json');
 
 
 // -=-=-=-=-=-=-=-=-=-=-
-// changelog helpers
-// -=-=-=-=-=-=-=-=-=-=-
-function changeLogEntryTemplate(tag, date) {
-    var templ = tag + ' / ';
-    templ += date.toISOString().replace(/T.*/, '');
-    templ += '\n' + new Array(templ.length + 1).join('=');
-    templ += '\n\n  * Describe what has changed....';
-    return templ;
-}
-
-function embedInChangeLog(descr, logFile, callback) {
-    // newline cleanup
-    descr = descr.toString().
-        replace(/^\n*/, '').
-        replace(/\n*$/, '') + '\n';
-    // using cat and tmp file for prepend
-    var logFileTmp = logFile + '.tmp',
-        cmd = ['{ echo "', descr, '"; cat ', logFile, '; } > ', logFileTmp,
-               '; mv ', logFileTmp, ' ', logFile].join('');
-    exec(cmd, callback);
-}
-
-
-// -=-=-=-=-=-=-=-=-=-=-
 // svn helpers
 // -=-=-=-=-=-=-=-=-=-=-
-function getSVNRev(callback) {
+var svnRev;
+function getSVNRev() {
     var next = this;
     exec('svn info | ' +
          'grep "Last Changed Rev:" | ' +
          'sed "s/^[^0-9]*\\([0-9]*\\)/\\1/g"',
-         {cwd: options.wwDir}, callback);
+         {cwd: options.wwDir}, next);
 }
 
 
@@ -146,6 +123,15 @@ function logger(msg) {
 
 function wait(ms) { return function() { setTimeout(this, ms) } }
 
+function checkHistoryMd(fs, repoDir, version, next) {
+    var historyMd = path.join(repoDir, 'History.md');
+    fs.readFile(historyMd, function(code, data) {
+        if (data.toString().indexOf(version) === -1) {
+            throw new Error('No entry for ' + version + ' in ' + historyMd);
+        }
+        next(code);
+    });
+}
 
 if (calledDirectly) {
 
@@ -165,16 +151,10 @@ Seq()
 .seq(execLogger('git co + pull'))
 
 // ==== change log ====
-.seq(logger('\n#underline[2. Updating change log (' + options.changeLogFile + ')]'))
-.seq(wait(500))
-.seq(fs.writeFile, options.changeLogInputFile,
-     changeLogEntryTemplate(options.tag, new Date()), Seq)
-.seq(logger('Please edit the change log in the editor that will open...'))
-.seq(wait(3000))
-.seq(shell.call, __dirname + '/helper/edit-changelog.sh', [options.changeLogInputFile], Seq)
-.seq(fs.readFile, options.changeLogInputFile, Seq)
-.seq(function(changes) { embedInChangeLog(changes, options.changeLogFile, this) })
-.seq(fs.unlink, options.changeLogInputFile, Seq)
+.seq(logger('\n#underline[2. Checking change log for version entry (' + options.changeLogFile + ')]'))
+.seq(function() {
+    checkHistoryMd(fs, options.lkCore, options.tag, this);
+})
 
 // ==== version file ====
 .seq(logger('\n#underline[3. Updating version file (' + options.versionFile + ')]'))
