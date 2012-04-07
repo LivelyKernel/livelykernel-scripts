@@ -54,7 +54,7 @@ if (options.defined('fromLkToWw')) { // lk -> ww
     async.series([
         function(next) {
             var cmd = ['rsync -v -ra --delete --filter=". ', options.filter, '" ',
-                       options.wwCore, ' ', options.lkCore];
+                       options.lkCore, ' ', options.wwCore];
             console.log(cmd);
             exec(cmd.join(''), next);
         },
