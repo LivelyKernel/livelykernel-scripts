@@ -25,7 +25,7 @@
     "forever": "~0.8.5",
     "qunit": "~0.2",
     "nodeunit": "~0.7",
-    "node-ffi": "https://github.com/rbranson/node-ffi/tarball/master"
+    "node-ffi": "0.5.0"
   },
   "devDependencies": {},
   "optionalDependencies": {}
