@@ -46,29 +46,33 @@ function publish(env, optionalVersion, repoDir) {
         function commitPackageJSON(next) {
             exec('git add package.json && git ci -m "version ' + newVersion + '"',
                  {cwd: repoDir}, function(code, out, err) {
-                     console.log(out + '\n' + err);
+                     console.log(out);
+                     if (err) console.log(err);
                      next(code);
                  });
         },
         function gitTag(next) {
             exec('git tag ' + newVersion, {cwd: repoDir}, function(code, out, err) {
-                console.log(out + '\n' + err);
+                console.log(out);
+                if (err) console.log(err);
                 next(code);
             });
         },
         function gitPush(next) {
             exec('git push && git push --tags', {cwd: repoDir}, function(code, out, err) {
-                console.log(out + '\n' + err);
+                console.log(out);
+                if (err) console.log(err);
                 next(code);
             });
         },
         function npmPublish(next) {
             exec('npm publish', {cwd: repoDir}, function(code, out, err) {
-                console.log(out + '\n' + err);
+                console.log(out);
+                if (err) console.log(err);
+                console.log('done publishing ' + newVersion);
                 next(code);
             });
         },
-        console.log.bind(console, 'done')
     ]);
 }
 
