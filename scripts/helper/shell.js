@@ -25,13 +25,15 @@ function callShowOutput(cmd, args, cb, options, verbose) {
         out, err;
 
     proc.stdout.on('data', function (data) {
-        out += data.toString();
-        console.log(data.toString());
+        var dataString = data.toString();
+        out += dataString;
+        process.stdout.write(dataString);
     });
 
     proc.stderr.on('data', function (data) {
-        err += data.toString();
-        console.log(data.toString());
+        var dataString = data.toString();
+        err += dataString;
+        process.stdout.write(dataString);
     });
 
     proc.on('exit', function (code) {
