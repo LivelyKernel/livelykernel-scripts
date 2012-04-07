@@ -92,18 +92,6 @@ function updatePackageJSON(fs, whenDone) {
 }
 
 // -=-=-=-=-=-=-=-=-=-=-
-// git helpers
-// -=-=-=-=-=-=-=-=-=-=-
-
-// var lastTag;
-// function findLastTag() {
-//     shell.runV('git tag', function(out) {
-//         lastTag = out.split('\n').sort().reverse()[0];
-//     }, {cwd: options.lkRepo});
-// }
-
-
-// -=-=-=-=-=-=-=-=-=-=-
 // generic helpers
 // -=-=-=-=-=-=-=-=-=-=-
 function execLogger(cmd) {
