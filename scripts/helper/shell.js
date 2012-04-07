@@ -37,6 +37,8 @@ function callShowOutput(cmd, args, cb, options, verbose) {
     });
 
     proc.on('exit', function (code) { cb && cb(code, out, err); });
+
+    return proc;
 }
 
 exports.callShowOutput = callShowOutput;

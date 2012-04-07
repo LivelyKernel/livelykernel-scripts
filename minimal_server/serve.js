@@ -2,6 +2,7 @@
 
 var express = require('express'),
     spawn = require('child_process').spawn,
+    shell = require('./../scripts/helper/shell'),
     defaultBrowser = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     defaultArgs =  ["--no-process-singleton-dialog",
                     "--user-data-dir=/tmp/", "--no-first-run",
@@ -68,17 +69,19 @@ var browserInterface = {
         if (this.process) {
             this.closeBrowser();
             setTimeout(function() {
-                    browserInterface.open(url, browserPath,
-                        browserArgs);
-                }, 200);
+                browserInterface.open(url, browserPath, browserArgs);
+            }, 200);
             return;
         }
         console.log('open ' + browserPath + ' on ' + url);
+        var options = {};
         if (display) {
-            this.process = spawn(browserPath, browserArgs.concat([url]), {env: {'DISPLAY' : display}});
-        } else {
-            this.process = spawn(browserPath, browserArgs.concat([url]));
+            options.env = {'DISPLAY' : display};
         }
+        this.process = shell.callShowOutput(
+            browserPath, browserArgs.concat([url]),
+            function(code) { console.log('Browser closed'); },
+            options);
     },
 
     closeBrowser: function(id) {
