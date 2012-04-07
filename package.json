@@ -25,7 +25,7 @@
     "forever": "~0.8.5",
     "qunit": "~0.2",
     "nodeunit": "~0.7",
-    "node-ffi": "0.5.0"
+    "node-ffi": "0.4.2"
   },
   "devDependencies": {},
   "optionalDependencies": {}
