@@ -20,7 +20,7 @@ function call(cmd, args, cb, options, verbose) {
 
 exports.call = call;
 
-function callWithExec(cmd, args, cb, options, verbose) {
+function callShowOutput(cmd, args, cb, options, verbose) {
     var proc = spawn(cmd, args, options),
         out, err;
 
@@ -39,7 +39,7 @@ function callWithExec(cmd, args, cb, options, verbose) {
     });
 }
 
-exports.callWithExec = callWithExec;
+exports.callShowOutput = callShowOutput;
 
 // ---------------------------------------------
 // stuff below is still WIP
