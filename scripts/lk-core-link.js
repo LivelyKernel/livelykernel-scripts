@@ -13,6 +13,7 @@
 
 
 var args           = require('./helper/args'),
+    path           = require('path'),
     fs             = require('fs'),
     shell          = require('./helper/shell'),
     exec           = require('child_process').exec,
@@ -57,12 +58,12 @@ if (calledDirectly) {
 }
 
 // those things are fixed for now
-options.lkCore             = options.lkDir + '/core/';
-options.changeLogFile      = options.lkDir + '/History.md';
-options.changeLogInputFile = options.lkDir + '/changes-' + options.tag + '.md';
-options.npmPackageFile     = options.lkDir + '/package.json';
-options.wwCore             = options.wwDir + '/core/';
-options.versionFile        = options.wwCore + 'coreVersion.json';
+options.lkCore             = path.join(options.lkDir, '/core/');
+options.changeLogFile      = path.join(options.lkCore, '/History.md');
+options.changeLogInputFile = path.join(options.lkDir, '/changes-' + options.tag + '.md');
+options.npmPackageFile     = path.join(options.lkDir, '/package.json');
+options.wwCore             = path.join(options.wwDir, '/core/');
+options.versionFile        = path.join(options.wwCore, 'coreVersion.json');
 
 
 // -=-=-=-=-=-=-=-=-=-=-
