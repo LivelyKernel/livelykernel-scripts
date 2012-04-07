@@ -1,16 +1,19 @@
-/*global QUnit, TestHandler, test, equal, same, raises*/
+/*global exports, require, JSON*/
 
 // continously run with:
 // nodemon --exec qunit --code ./minimal_server/serve.js --tests ./minimal_server/serve_test.js
 
-var handler, request, spawn, browserInterface;
+console.log(__dirname);
 
+var TestHandler = require('./serve').TestHandler,
+    testSuite = {};
 /*
  * requesting test run
  */
+var handler, request, spawn, browserInterface;
+testSuite.RequestHandlerTest = {
 
-QUnit.module('test request handler', {
-    setup: function() {
+    setUp: function(run) {
         browserInterface = {
             urls: [],
             open: function(url) { this.urls.push(url) }
@@ -20,46 +23,51 @@ QUnit.module('test request handler', {
             body: {testWorldPath: 'foo/bar.xhtml'},
             headers: {host: 'localhost:9001'}
         };
+        run();
     },
-    teardown: function() { TestHandler.resetTestData(); }
-});
 
-test("should construct test url for browser", function () {
-    var url = handler.urlForBrowser(request);
-    equal(url, 'http://localhost:9001/foo/bar.xhtml?testRunId=1', url);
-});
+    tearDown: function(run) { TestHandler.resetTestData(); run(); },
 
-test("should construct test url for loading script", function () {
-    request.body.loadScript = "run_tests.js";
-    var url = handler.urlForBrowser(request);
-    equal(url, 'http://localhost:9001/foo/bar.xhtml?testRunId=1&loadScript=run_tests.js');
-});
+    "should construct test url for browser": function(test) {
+        var url = handler.urlForBrowser(request);
+        test.equal(url, 'http://localhost:9001/foo/bar.xhtml?testRunId=1', url);
+        test.done();
+    },
 
-test('should open browser', function() {
-    var result = handler.handleTestRequest(request),
-        expectedURL = 'http://localhost:9001/foo/bar.xhtml?testRunId=1',
-        expectedData = {
-            result: 'browser started with ' + expectedURL,
-            testRunId: 1
-        };
-    same(browserInterface.urls, [expectedURL], browserInterface.urls);
-    same(result, expectedData, result);
-});
+    "should construct test url for loading script": function(test) {
+        request.body.loadScript = "run_tests.js";
+        var url = handler.urlForBrowser(request);
+        test.equal(url, 'http://localhost:9001/foo/bar.xhtml?testRunId=1&loadScript=run_tests.js');
+        test.done();
+    },
 
-test('should not open browser on invalid request', function() {
-    request.body = {};
-    raises(function() { handler.handleTestRequest(request) }, 'no error raised');
-    equal(browserInterface.urls.length, 0, 'browser open was called');
-});
+    "should open browser": function(test) {
+        var result = handler.handleTestRequest(request),
+            expectedURL = 'http://localhost:9001/foo/bar.xhtml?testRunId=1',
+            expectedData = {
+                result: 'browser started with ' + expectedURL,
+                testRunId: 1
+            };
+        test.deepEqual(browserInterface.urls, [expectedURL], browserInterface.urls);
+        test.deepEqual(result, expectedData, result);
+        test.done();
+    },
 
+    "should not open browser on invalid request": function(test) {
+        request.body = {};
+        test.throws(function() { handler.handleTestRequest(request) }, 'no error raised');
+        test.equal(browserInterface.urls.length, 0, 'browser open was called');
+        test.done();
+    }
+}
 
 /*
  * posting test run status, results
  */
-
 var reportRequest;
-QUnit.module('test status handling', {
-    setup: function() {
+testSuite.StatusHandlerTest = {
+
+    setUp: function(run) {
         browserInterface = {
             closeIds: [],
             closeBrowser: function(testRunId) { this.closeIds.push(testRunId) }
@@ -71,25 +79,24 @@ QUnit.module('test status handling', {
         reportRequest = {
             body: {testRunId: 1}
         };
+        run();
     },
-    teardown: function() { TestHandler.resetTestData(); }
-});
 
-test('handle result and report request', function() {
-    var result = handler.handleResultRequest(request);
-    same(result, {result: 'ok', testRunId: 1}, 'result');
-    var report = handler.handleReportRequest(reportRequest);
-    same(report, {testRunId: 1, state: 'done', result: "all ok"}, JSON.stringify(report));
-});
+    tearDown: function(run) { TestHandler.resetTestData(); run(); },
 
-test('should close browser on result request', function() {
-    handler.handleResultRequest(request);
-    same(browserInterface.closeIds, [1], 'browser not closed');
-});
+    "handle result and report request": function(test) {
+        var result = handler.handleResultRequest(request);
+        test.deepEqual(result, {result: 'ok', testRunId: 1}, 'result');
+        var report = handler.handleReportRequest(reportRequest);
+        test.deepEqual(report, {testRunId: 1, state: 'done', result: "all ok"}, JSON.stringify(report));
+        test.done();
+    },
 
-// test('handle report request', function() {
-//     var result = handler.handleResultRequest(request);
-//     same(result, {result: 'ok'}, 'result');
-//     var report = handler.handleReportRequest(reportRequest);
-//     same(report, {id: 1, state: 'done', result: "all ok"}, JSON.stringify(report));
-// });
+    "should close browser on result request": function(test) {
+        handler.handleResultRequest(request);
+        test.deepEqual(browserInterface.closeIds, [1], 'browser not closed');
+        test.done();
+    }
+}
+
+exports.testSuite = testSuite;
