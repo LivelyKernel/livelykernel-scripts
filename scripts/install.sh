@@ -53,21 +53,17 @@ else
   echo "" >&2
   echo "PATH=$PATH" >&2
   echo "" >&2
-  read -p "Install npm now? (y/n) " RESP
-  if [ "$RESP" = "y" ]; then
-      npm_install=`curl http://npmjs.org/install.sh | sh 2>&1`
-      ret=$?
-      if [ $ret -ne 0 ]; then
-          echo ""
-          echo "Failure installing npm, aborting" >&2
-          exit $ret
-      fi
-      npm=`which npm 2>&1`
-  else
-      echo "Cannot continue without npm, aborting..." >&2
+  echo "Trying to install npm now..." >&2
+  npm_install=`curl http://npmjs.org/install.sh | sh`
+  ret=$?
+  if [ $ret -ne 0 ]; then
+      echo ""
+      echo "Failure installing npm, aborting..." >&2
       exit $ret
   fi
+  npm=`which npm 2>&1`
 fi
+
 
 # livelykernel-scripts
 lk_cmd=`which lk 2>&1`
