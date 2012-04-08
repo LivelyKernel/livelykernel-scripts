@@ -1,3 +1,9 @@
+0.0.9 / 2012-04-08
+==================
+
+* first version of install.sh
+* getting rid of qunit
+
 0.0.8 / 2012-04-07
 ==================
 
