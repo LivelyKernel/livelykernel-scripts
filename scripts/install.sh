@@ -59,6 +59,8 @@ else
   if [ $ret -ne 0 ]; then
       echo ""
       echo "Failure installing npm, aborting..." >&2
+      echo "You may want to retry the installation as root, run" >&2
+      echo "curl http://lively-kernel.org/install.sh > lk-install.sh; sudo sh lk-install.sh"
       exit $ret
   fi
   npm=`which npm 2>&1`
