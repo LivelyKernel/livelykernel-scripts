@@ -9,7 +9,7 @@
     "url": "git@github.com:rksm/livelykernel-scripts.git"
   },
   "engines": {
-    "node": "~0.6.7"
+    "node": "0.6.x"
   },
   "bin" : {
     "lk" : "./bin/lk"
