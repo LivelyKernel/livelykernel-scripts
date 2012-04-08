@@ -17,6 +17,7 @@
 var optparse = require('optparse'),
     exec     = require('child_process').exec,
     fs       = require('fs'),
+    path     = require('path'),
     Seq      = require('seq'),
     env      = process.env;
 
@@ -86,7 +87,7 @@ function checkIfCoreCommit(thenDo) {
     function testIfCoreCommit(err, committedFiles) {
         var lines = committedFiles.split('\n'),
             pattern = 'core/',
-	          isCoreCommit = lines.some(function (line) { return line.indexOf(pattern) >= 0; });
+	    isCoreCommit = lines.some(function (line) { return line.indexOf(pattern) >= 0; });
 	    console.log(rev + ' is core commit: ' + isCoreCommit);
         svnInfo.changes = committedFiles;
 	    return isCoreCommit;
@@ -96,7 +97,7 @@ function checkIfCoreCommit(thenDo) {
 
 function updateWebwerkstattWorkingCopy() {
     run(['svn up', svnWc + '/core', '-r', rev].join(' '),
-	      function(err, out) { console.log('updated: ' + out); return true; }, this);
+	function(err, out) { console.log('updated: ' + out); return true; }, this);
 }
 
 function findSVNAuthor() {
@@ -114,25 +115,62 @@ function findSVNCommitMessage() {
 // -=-=-=-=-=-=-=-=-=-=-
 function runGitCmd(cmd, name, next) {
     exec(cmd, {env: process.env, cwd: gitRepoDir},
-	       function(code, err, out) {
-	           console.log(['== ' + name + ' ==', code, err, out].join('\n'));
-	           next(); });
+	       function(code, out, err) {
+	           console.log(['== ' + name + ' ==', code, out, err ? err : ''].join('\n'));
+	           next(code, out, err); });
 }
 
 function gitClean() {
     runGitCmd('git reset --hard && git clean --force -d', 'CLEAN', this);
 }
 
-var gitMirrorBranchName = 'ww-mirror';
+var coreVersion;
+function findCoreVersion(callback) {
+    function extractVersion(historyFileContent) {
+        var regexp = /[0-9]+\.[0-9]+\.[0-9]+/g,
+            match = historyFileContent.toString().match(regexp),
+            version = match && match[0];
+        return version;
+    }
+
+    var historyFile = path.join(svnWc, 'core/History.md'),
+        content = fs.readFileSync(historyFile);
+
+    coreVersion = extractVersion(content);
+    callback(null);
+}
+
+function mirrorBranchName() {
+    var name = 'ww-mirror';
+    if (coreVersion) {
+        name += "-" + coreVersion;
+    }
+    return name;
+}
+
 function gitPull() { // should not be necessary but just to be sure...
-    runGitCmd('git pull origin ' + gitMirrorBranchName, 'PULL', this);
+    runGitCmd('git pull --rebase origin ' + mirrorBranchName(), 'PULL', this);
+}
+
+function gitCheckoutBranch() { // should not be necessary but just to be sure...
+    var next = this,
+        branch = mirrorBranchName();
+    runGitCmd('git branch', 'branch read', function(code, out) {
+        var cmd = "git checkout ";
+        if (out.toString().indexOf(branch) == -1) {
+            cmd += '-b ' + branch + ' origin/' + branch;
+        } else {
+            cmd += branch;
+        }
+        runGitCmd(cmd, 'checkout branch', next);
+    });
 }
 
 function gitCommitAndPush() {
     var cmd = ['git commit --author="', svnInfo.author || 'webwerkstatt ghost',
                ' <lively-kernel@hpi.uni-potsdam.de>" ',
                '-am \'[mirror commit]\n', JSON.stringify(svnInfo, null, 2), '\'; ',
-	             'git push origin ', gitMirrorBranchName].join('');
+	             'git push origin ', mirrorBranchName()].join('');
     console.log(cmd);
     runGitCmd(cmd, 'PUSH', this);
 }
@@ -175,8 +213,10 @@ try {
         seq(checkIfCoreCommit).
         seq(findSVNAuthor).
         seq(findSVNCommitMessage).
+        seq(findCoreVersion).
         seq(gitClean).
         seq(gitPull).
+        seq(gitCheckoutBranch).
         seq(updateWebwerkstattWorkingCopy).
         seq(syncWithGit).
         seq(gitCommitAndPush).
