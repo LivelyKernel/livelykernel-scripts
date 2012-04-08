@@ -18,6 +18,7 @@ var args = require('./helper/args'),
 
 var options = {
     lkGitUrl: "git@github.com:rksm/LivelyKernel.git",
+    lkGitUrlReadOnly: "git://github.com/rksm/LivelyKernel.git",
     lkBranch: "master",
     wwSvnUrl: "http://lively-kernel.org/repository/webwerkstatt/"
 };
@@ -26,6 +27,7 @@ options = args.options([
     ['-h', '--help', 'show this help'],
     ['--remove', 'completely delete the workspace'],
     ['--reset', 'reset both the svn and git repositories if they exist but do not delete them'],
+    ['--github-write-access', 'Initialize the lk core git repo with commit access'],
     ['--checkout-ww', 'create ./workspace/ww/, checked out from ' + options.wwSvnUrl],
     ['--checkout-lk', 'create ./workspace/lk/, checked out from ' + options.lkGitUrl +
      ' on branch ' + options.lkBranch],
@@ -74,13 +76,15 @@ if (options.defined('reset')) {
 }
 
 if (options.defined('checkoutLk') || options.defined('init')) {
+    var gitURL = options.defined('githubWriteAccess') ?
+        options.lkGitUrl : options.lkGitUrlReadOnly;
     actions.push({
-        msg: 'git clone ' + options.lkGitUrl,
+        msg: 'git clone ' + gitURL,
         func: function(next) {
             Seq()
             .seq(exec, 'mkdir -p ' + env.WORKSPACE_DIR, shellOpts, Seq)
             .seq(exec, ['git clone -b ', options.lkBranch, ' -- ',
-                        options.lkGitUrl, ' ', env.WORKSPACE_LK].join(''),
+                        gitURL, ' ', env.WORKSPACE_LK].join(''),
                  shellOpts, next);
         }
     });
