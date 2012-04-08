@@ -137,7 +137,7 @@ function findCoreVersion(callback) {
         content = fs.readFileSync(historyFile);
 
     coreVersion = extractVersion(content);
-    callback(null);
+    callback && callback(null);
 }
 
 function mirrorBranchName() {
