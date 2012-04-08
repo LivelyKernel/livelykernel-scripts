@@ -150,7 +150,7 @@ function mirrorBranchName() {
 }
 
 function gitPull() { // should not be necessary but just to be sure...
-    runGitCmd('git pull --rebase origin ' + mirrorBranchName(), 'PULL', this);
+    runGitCmd('git pull origin ' + mirrorBranchName(), 'PULL', this);
 }
 
 function gitCheckoutBranch() { // should not be necessary but just to be sure...
