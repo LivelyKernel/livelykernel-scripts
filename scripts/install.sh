@@ -50,10 +50,10 @@ else
   echo "npm is required for the installation" >&2
   echo "but seems not to be installed." >&2
   echo "Note that running as sudo can change envs." >&2
-  echo ""
+  echo "" >&2
   echo "PATH=$PATH" >&2
-  echo ""
-  read -p "Install npm it now? (y/n) " RESP
+  echo "" >&2
+  read -p "Install npm now? (y/n) " RESP
   if [ "$RESP" = "y" ]; then
       npm_install=`curl http://npmjs.org/install.sh | sh 2>&1`
       ret=$?
