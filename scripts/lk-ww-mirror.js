@@ -125,7 +125,8 @@ function gitClean() {
 }
 
 var coreVersion;
-function findCoreVersion(callback) {
+function findCoreVersion() {
+    var next = this;
     function extractVersion(historyFileContent) {
         var regexp = /[0-9]+\.[0-9]+\.[0-9]+/g,
             match = historyFileContent.toString().match(regexp),
@@ -137,7 +138,7 @@ function findCoreVersion(callback) {
         content = fs.readFileSync(historyFile);
 
     coreVersion = extractVersion(content);
-    callback && callback(null);
+    next(null);
 }
 
 function mirrorBranchName() {
