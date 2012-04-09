@@ -163,6 +163,7 @@ var maxRequests = options.maxRequests, currentRequests = 0;
 function tryToGetReport(data) {
     if (currentRequests >= maxRequests) {
         console.log(colorize.ansify('#red[TIMEOUT]'));
+        process.exit(2);
         return;
     }
     if (data.state !== 'done') {
