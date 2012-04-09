@@ -2,7 +2,7 @@
   "author": "The Lively Kernel Team <lively-kernel@hpi.uni-potsdam.de>",
   "name": "livelykernel-scripts",
   "description": "Scripts and minimal server for running, testing and maintaining LivelyKernel",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "homepage": "http://lively-kernel.org",
   "repository": {
     "type": "git",
