@@ -26,4 +26,4 @@ if (options.defined('tag')) {
 var cmd     = cmdAndArgs[0],
     cmdArgs = cmdAndArgs.slice(1);
 
-shell.callShowOutput(cmd, cmdArgs, function(code) { process.exit(code); });
+shell.run(cmd, cmdArgs, function(code) { process.exit(code); });

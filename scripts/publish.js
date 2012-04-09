@@ -29,6 +29,7 @@ function publish(env, optionalVersion, repoDir) {
         function readPackageJSON(next) {
             fs.readFile(packageFile, function(code, data) {
                 packageContent = data.toString();
+                console.log('Reading ' + packageFile + ':\n' + packageContent);
                 next(code);
             });
         },
@@ -39,6 +40,10 @@ function publish(env, optionalVersion, repoDir) {
         },
         function checkHistoryFile(next) {
             checkHistoryMd(env.fs, repoDir, newVersion, next);
+        },
+        function output(next) {
+            console.log("Publishing new version " + newVersion);
+            next();
         },
         function writePackageJSON(next) {
             fs.writeFile(packageFile, newPackageContent, next);
@@ -83,7 +88,12 @@ function newPackageSrc(oldPackageContent, optVersion) {
 }
 
 function extractVersionFrom(src) {
-    return src.match(/"version":\s*"([^,]+)"/)[1];
+    var match = src.match(/"version":\s*"([^,]+)"/);
+    if (!match) {
+        console.error('Cannot extract version from ' + src);
+        process.exit(1);
+    }
+    return match[1];
 }
 
 function parseVersion(version, nullify) {
