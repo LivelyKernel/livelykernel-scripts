@@ -1,3 +1,9 @@
+0.0.10 / 2012-04-09
+===================
+
+* mirror script now uses branch of current version
+* fixed test exit code on timeout
+
 0.0.9 / 2012-04-08
 ==================
 
