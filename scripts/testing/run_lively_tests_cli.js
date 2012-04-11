@@ -4,8 +4,7 @@ var http     = require('http'),
     config   = require('./config'),
     optparse = require('optparse'),
     spawn    = require('child_process').spawn,
-    env      = process.env;
-
+    env      = require('../env');
 
 ////////////////////////////////////////////////////////
 // Parse the command line options and merge them with //
@@ -15,16 +14,16 @@ var http     = require('http'),
 // for option parser help see https://github.com/jfd/optparse-js
 var platformConf = config.platformConfigs[process.platform],
     supportedBrowsers = Object.keys(platformConf),
-    defaultBrowser = '"' + config.defaultBrowser + '"',
+    defaultBrowser = env.LK_TEST_BROWSER,
     switches = [
         ['-h', '--help', "Shows this help section."],
         ['-v', '--verbose', "Print progress and debug information."],
         ['-b', '--browser NAME', "Which browser to use. Options are \""
                                + supportedBrowsers.join('", "')
-                               + "\". If not specified then "
-                               + defaultBrowser + " is used."],
+                               + "\". If not specified then \""
+                               + defaultBrowser + "\" is used."],
         ['-n', '--notifier NAME', "Use a system notifier to output results. "
-                                + "Currently \"" + config.defaultNotifier
+                                + "Currently \"" + env.LK_TEST_NOTIFIER
                                 + "\" is supported."],
         ['-d', '--display NUMBER', 'Secify a display id for running chrome with xvfb'],
         ['-f', '--focus FILTER', "A filter is a string that can have three"
@@ -45,13 +44,13 @@ var platformConf = config.platformConfigs[process.platform],
 
 // Internal variable to store options.
 var options = {
-    browserName: config.defaultBrowser,
-    browserConf: platformConf[config.defaultBrowser],
+    browserName: defaultBrowser,
+    browserConf: platformConf[defaultBrowser],
     notifier: null,
     testScript: env.LK_TEST_WORLD_SCRIPT,
     testWorld: env.LK_TEST_WORLD,
     verbose: false,
-    maxRequests: config.timeout,
+    maxRequests: env.LK_TEST_TIMEOUT,
     testFilter: null,
     display: null
 };
@@ -71,7 +70,7 @@ parser.on("browser", function(name, value) {
 });
 
 parser.on("notifier", function(name, value) {
-    console.assert(config.defaultNotifier === value,
+    console.assert(env.LK_TEST_NOTIFIER === value,
                   "Unsupported notifier: " + value);
     options.notifier = value;
 });

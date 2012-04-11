@@ -2,7 +2,7 @@
 var args = require('./helper/args'),
     shell = require('./helper/shell'),
     path = require('path'),
-    env = process.env,
+    env = require('./env'),
 // FIXME best to refactor run_lively_tests_cli.js and its use of config
 // so we don't have to duplicate stuff here
     config = require('./testing/config');
@@ -13,17 +13,17 @@ var args = require('./helper/args'),
 
 var platformConf = config.platformConfigs[process.platform],
     supportedBrowsers = Object.keys(platformConf),
-    defaultBrowser = '"' + config.defaultBrowser + '"',
+    defaultBrowser = env.LK_TEST_BROWSER,
     options = args.options([
         ['-h', '--help', 'show this help'],
         ['-w', '--watch DIR', 'Run with nodemon and watch for file changes'],
         ['-v', '--verbose', "Print progress and debug information."],
         ['-b', '--browser NAME', "Which browser to use. Options are \""
                                + supportedBrowsers.join('", "')
-                               + "\". If not specified then "
-                               + defaultBrowser + " is used."],
+                               + "\". If not specified then \""
+                               + defaultBrowser + "\" is used."],
         ['-n', '--notifier NAME', "Use a system notifier to output results. "
-                                + "Currently \"" + config.defaultNotifier
+                                + "Currently \"" + env.LK_TEST_NOTIFIER 
                                 + "\" is supported."],
         ['-d', '--display NUMBER', 'Secify a display id for running chrome with xvfb'],
         ['-f', '--focus FILTER', "A filter is a string that can have three"

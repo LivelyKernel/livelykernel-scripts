@@ -35,6 +35,9 @@ env.LK_TEST_SCRIPT_DIR    = env.LK_SCRIPTS_DIR + '/testing';
 env.LK_TEST_STARTER       = env.LK_TEST_SCRIPT_DIR + '/run_lively_tests_cli.js';
 env.LK_TEST_WORLD         = "run_tests.xhtml";
 env.LK_TEST_WORLD_SCRIPT  = "run_tests.js";
+env.LK_TEST_BROWSER       = "chrome";
+env.LK_TEST_TIMEOUT       = 300;
+env.LK_TEST_NOTIFIER      = "growlnotify";
 
 /*
  * jshint
@@ -58,3 +61,7 @@ env.WORKSPACE_WW_EXISTS = path.existsSync(env.WORKSPACE_WW);
  */
 env.PARTSBIN_DIR     = env.PARTSBIN_DIR || lkScriptDir("/PartsBin");
 env.PARTSBIN_SVN_URL = "http://lively-kernel.org/repository/webwerkstatt/PartsBin/"
+
+
+
+module.exports = env;
