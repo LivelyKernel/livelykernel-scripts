@@ -43,11 +43,9 @@ function setupServer(testHandler) {
         });
     }
 
-    postHandler('/test-request', 'handleTestRequest');
     postHandler('/test-result', 'handleResultRequest');
     postHandler('/test-report', 'handleReportRequest');
 
-    postHandler('/debug-openbrowser', 'handleOpenBrowserRequest');
     postHandler('/debug-results', 'handleListResultRequest');
 
     return app;
@@ -77,16 +75,6 @@ TestHandler.prototype.urlForBrowser = function(req) {
     return url;
 };
 
-TestHandler.prototype.handleTestRequest = function(req) {
-    var url = this.urlForBrowser(req),
-        browser = req.body.browser,
-        args = req.body.browserArgs,
-        display = req.body.display;
-    if (!url) throw new Error('no url for browsing');
-    this.browserInterface.open(url, browser, args, display);
-    return {result: 'browser started with ' + url, testRunId: currentTestId};
-};
-
 // results
 
 TestHandler.prototype.handleResultRequest = function(req) {
@@ -94,7 +82,6 @@ TestHandler.prototype.handleResultRequest = function(req) {
         result = req.body.testResults;
     console.log('Getting result for test run ' + id);
     testResults[id] = {testRunId: id, state: 'done', result: result};
-    this.browserInterface.closeBrowser(id);
     return {result: 'ok', testRunId: id};
 };
 
