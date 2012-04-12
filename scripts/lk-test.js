@@ -153,13 +153,21 @@ function post(path, data, callback) {
     };
 
     var req = http.request(options, function(res) {
+        var data = '';
         log('STATUS: ' + res.statusCode);
         log('HEADERS: ' + JSON.stringify(res.headers));
         res.setEncoding('utf8');
         res.on('data', function (chunk) {
-            log('BODY: ' + chunk);
-            var body = JSON.parse(chunk);
-            if (callback) callback(body && body.result);
+            data += chunk;
+        });
+        res.on('end', function () {
+            log('BODY: ' + data);
+            try {
+                var body = JSON.parse(data);
+                if (callback) callback(body && body.result);
+            } catch (e) {
+                console.log('parse error: ' + data + '\n\n' + e);
+            }
         });
     });
 
