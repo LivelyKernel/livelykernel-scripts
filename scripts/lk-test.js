@@ -150,7 +150,7 @@ function getJson(path, callback) {
         path: path,
         method: 'GET'
     };
-
+    console.log('GET ' + path);
     var req = http.request(options, function(res) {
         var data = '';
         log('STATUS: ' + res.statusCode);
