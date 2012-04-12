@@ -4,7 +4,8 @@ var http     = require('http'),
     config   = require('./testing/config'),
     optparse = require('optparse'),
     spawn    = require('child_process').spawn,
-    env      = require('./env');
+    env      = require('./env'),
+    shell    = require('./helper/shell');
 
 ////////////////////////////////////////////////////////
 // Parse the command line options and merge them with //
@@ -95,6 +96,48 @@ function log(msg) {
 
 log(options);
 
+///////////////////////////////////////////////////////////
+// Start/stop browser                                    //
+///////////////////////////////////////////////////////////
+
+var browserInterface = {
+
+    open: function(url, options) {
+        var browserPath = options.browserConf.path,
+            browserArgs = options.browserConf.args;
+    
+        if (this.process) {
+            this.closeBrowser();
+            setTimeout(function() {
+                browserInterface.open(url, options);
+            }, 200);
+            return;
+        }
+        console.log('open ' + browserPath + ' on ' + url);
+     
+        if (options.display) {
+            options.env = {'DISPLAY' : display};
+        }
+        this.process = shell.callShowOutput(
+            browserPath, browserArgs.concat([url]),
+            function(code) { console.log('Browser closed'); },
+            options);
+    },
+
+    close: function() {
+        if (!this.process) return;
+        var self = this;
+        // give the browser some time to finish requests
+        setTimeout(function() {
+            if (self.process) { // sometimes process is already gone?!
+                self.process.kill("SIGKILL");
+            }
+            self.process = null;
+        }, 100);
+    }
+
+};
+
 
 ///////////////////////////////////////////////////////////
 // Define functions for server interaction and reporting //
@@ -102,8 +145,8 @@ log(options);
 
 function post(path, data, callback) {
     var options = {
-        host: 'localhost',
-        port: 9001,
+        host: env.MINISERVER_HOST,
+        port: env.MINISERVER_PORT,
         path: path,
         method: 'POST',
         headers: {'Content-Type':  'application/json'}
@@ -159,7 +202,7 @@ function notifyResult(testRunId, data) {
 // poll
 var maxRequests = options.maxRequests, currentRequests = 0;
 
-function tryToGetReport(data) {
+function pollReport(data) {
     if (currentRequests >= maxRequests) {
         console.log(colorize.ansify('#red[TIMEOUT]'));
         process.exit(2);
@@ -169,25 +212,32 @@ function tryToGetReport(data) {
         process.stdout.write('.');
         currentRequests++;
         setTimeout(function() {
-            post('/test-report', {testRunId: data.testRunId}, tryToGetReport);
+            post('/test-report', {testRunId: data.testRunId}, pollReport);
         }, 1000);
         return;
     }
     var result = JSON.parse(data.result);
     printResult(data.testRunId, result);
     notifyResult(data.testRunId, result);
+    browserInterface.close();
     process.exit(result.fails ? 1 : 0);
 }
 
+function randomId() {
+    return Math.floor(Math.random() * 1000);
+}
+
+function testWorldUrl(id) {
+    return 'http://' + env.MINISERVER_HOST + ':' + env.MINISERVER_PORT + '/' + options.testWorld +
+        '?testRunId=' + id +
+        (options.testScript ? "&loadScript=" + escape(options.testScript) : '') +
+        (options.testFilter ? "&testFilter=" + escape(options.testFilter) : '');
+}
+
 function startTests() {
-    post('/test-request', {
-        browser: options.browserConf.path,
-        browserArgs: options.browserConf.args,
-        display: options.display,
-        testWorldPath: options.testWorld,
-        loadScript: options.testScript,
-        testFilter: options.testFilter
-    }, tryToGetReport);
+    var id = randomId();
+    browserInterface.open(testWorldUrl(id) , options);
+    pollReport({testRunId: id});
 }
 
 startTests();

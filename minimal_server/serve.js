@@ -53,53 +53,8 @@ function setupServer(testHandler) {
     return app;
 }
 
-/*
- * handling requests
- */
 
-var browserInterface = {
-
-    open: function(url, browserPath, browserArgs, display) {
-        if (!browserPath) {
-            browserPath = defaultBrowser;
-        }
-        if (!browserArgs) {
-            browserArgs = defaultArgs;
-        }
-        if (this.process) {
-            this.closeBrowser();
-            setTimeout(function() {
-                browserInterface.open(url, browserPath, browserArgs);
-            }, 200);
-            return;
-        }
-        console.log('open ' + browserPath + ' on ' + url);
-        var options = {};
-        if (display) {
-            options.env = {'DISPLAY' : display};
-        }
-        this.process = shell.callShowOutput(
-            browserPath, browserArgs.concat([url]),
-            function(code) { console.log('Browser closed'); },
-            options);
-    },
-
-    closeBrowser: function(id) {
-        if (!this.process) return;
-        var self = this;
-        // give the browser some time to finish requests
-        setTimeout(function() {
-            if (self.process) { // sometimes process is already gone?!
-                self.process.kill("SIGKILL");
-            }
-            self.process = null;
-        }, 100);
-    }
-
-};
-
-
-function TestHandler(browserInterface) { this.browserInterface = browserInterface; }
+function TestHandler() {}
 
 var currentTestId, testResults;
 TestHandler.resetTestData = function() {
@@ -161,7 +116,7 @@ TestHandler.prototype.handleListResultRequest = function(req) {
  * startup or export
  */
 if (port && !isNaN(port)) {
-    setupServer(new TestHandler(browserInterface)).listen(port);
+    setupServer(new TestHandler()).listen(port);
 } else {
     exports.TestHandler = TestHandler;
 }

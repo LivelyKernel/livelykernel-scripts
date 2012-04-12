@@ -26,6 +26,7 @@ env.FOREVER         = env.FOREVER     || env.NODEMODULES + "/forever/bin/forever
 env.MINISERVER_DIR  = env.MINISERVER_DIR  || env.LK_SCRIPTS_ROOT + "/minimal_server";
 env.MINISERVER_PORT = env.MINISERVER_PORT || 9001;
 env.MINISERVER      = env.MINISERVER_DIR + "/serve.js";
+env.MINISERVER_HOST = "localhost";
 
 /*
  * tests
