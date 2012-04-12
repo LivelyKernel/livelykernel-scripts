@@ -32,9 +32,9 @@ testSuite.StatusHandlerTest = {
     tearDown: function(run) { TestHandler.resetTestData(); run(); },
 
     "handle result and report request": function(test) {
-        var result = handler.handleResultRequest(request);
+        var result = handler.postResult(request.body.testRunId, request.body.testResults);
         test.deepEqual(result, {result: 'ok', testRunId: 1}, 'result');
-        var report = handler.handleReportRequest(reportRequest);
+        var report = handler.getResult(reportRequest.body.testRunId);
         test.deepEqual(report, {testRunId: 1, state: 'done', result: "all ok"}, JSON.stringify(report));
         test.done();
     },
