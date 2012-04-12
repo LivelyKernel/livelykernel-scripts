@@ -150,7 +150,7 @@ function getJson(path, callback) {
         path: path,
         method: 'GET'
     };
-    console.log('GET ' + path);
+    log('GET ' + path);
     var req = http.request(options, function(res) {
         var data = '';
         log('STATUS: ' + res.statusCode);
@@ -160,10 +160,9 @@ function getJson(path, callback) {
             data += chunk;
         });
         res.on('end', function () {
-            log('BODY: ' + data);
             try {
                 var body = JSON.parse(data);
-                if (callback) callback(body && body.result);
+                if (callback) callback(body);
             } catch (e) {
                 log('getJson on ' + path);
                 log('parse error: ' + data + '\n\n' + e);
