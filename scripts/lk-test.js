@@ -143,13 +143,12 @@ var browserInterface = {
 // Define functions for server interaction and reporting //
 ///////////////////////////////////////////////////////////
 
-function post(path, data, callback) {
+function getJson(path, callback) {
     var options = {
         host: env.MINISERVER_HOST,
         port: env.MINISERVER_PORT,
         path: path,
-        method: 'POST',
-        headers: {'Content-Type':  'application/json'}
+        method: 'GET'
     };
 
     var req = http.request(options, function(res) {
@@ -166,7 +165,8 @@ function post(path, data, callback) {
                 var body = JSON.parse(data);
                 if (callback) callback(body && body.result);
             } catch (e) {
-                console.log('parse error: ' + data + '\n\n' + e);
+                log('getJson on ' + path);
+                log('parse error: ' + data + '\n\n' + e);
             }
         });
     });
@@ -175,7 +175,6 @@ function post(path, data, callback) {
         log('problem with request: ' + e.message);
     });
 
-    req.write(JSON.stringify(data));
     req.end();
 }
 
@@ -220,7 +219,7 @@ function pollReport(data) {
         process.stdout.write('.');
         currentRequests++;
         setTimeout(function() {
-            post('/test-report', {testRunId: data.testRunId}, pollReport);
+            getJson('/test-report', {testRunId: data.testRunId}, pollReport);
         }, 1000);
         return;
     }
