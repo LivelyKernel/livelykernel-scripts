@@ -54,26 +54,11 @@ function setupServer(testHandler) {
 
 function TestHandler() {}
 
-var currentTestId, testResults;
+var testResults;
 TestHandler.resetTestData = function() {
-    currentTestId = 0;
     testResults = {};
 };
 TestHandler.resetTestData();
-
-TestHandler.prototype.newId = function() { return ++currentTestId; };
-
-TestHandler.prototype.urlForBrowser = function(req) {
-    var host = req.headers.host,
-        worldPath = req.body.testWorldPath,
-        scriptPath = req.body.loadScript,
-        testFilter = req.body.testFilter;
-    if (!host || !worldPath) return null;
-    var url = "http://" + host + '/' + worldPath + '?testRunId=' + this.newId();
-    url += scriptPath ? "&loadScript=" + escape(scriptPath) : '';
-    url += testFilter ? "&testFilter=" + escape(testFilter) : '';
-    return url;
-};
 
 // results
 
