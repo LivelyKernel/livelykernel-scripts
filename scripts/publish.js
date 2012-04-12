@@ -8,6 +8,7 @@ var path = require('path'),
  * This function publishes the livelykernel-scripts project.
  * It runs the following steps:
  * 1. update package json
+ * 2. check if the new version is in History.md
  * 2. git add && git ci
  * 3. git tag
  * 4. git push

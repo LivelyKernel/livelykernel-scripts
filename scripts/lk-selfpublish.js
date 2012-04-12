@@ -12,7 +12,17 @@ var env = process.env,
         ['-h', '--help', 'Show this help'],
         ['-t', '--tag TAG', 'New version tag, in the form of x.y.z.']],
         {},
-        "Publish a new version of livelykernel-sripts");
+        "This function publishes the livelykernel-scripts project.\n" +
+        "It runs the following steps:\n" +
+        "1. update package json\n" +
+        "2. check if the new version is in History.md\n" +
+        "2. git add && git ci\n" +
+        "3. git tag\n" +
+        "4. git push\n" +
+        "5. git tag push\n" +
+        "6. npm publish\n" +
+        "optionalVersion can either be a version in the format x.y.z (a string)\n" +
+        "or null. If null, the existing minor version (z) is increased\n");
 
 
 // -=-=-=-=-=-=-=-=-=-=-
