@@ -116,7 +116,7 @@ var browserInterface = {
         console.log('open ' + browserPath + ' on ' + url);
      
         if (options.display) {
-            options.env = {'DISPLAY' : display};
+            options.env = {'DISPLAY' : options.display};
         }
         this.process = shell.callShowOutput(
             browserPath, browserArgs.concat([url]),
