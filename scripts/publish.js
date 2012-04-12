@@ -30,12 +30,12 @@ function publish(env, optionalVersion, repoDir) {
         function readPackageJSON(next) {
             fs.readFile(packageFile, function(code, data) {
                 packageContent = data.toString();
-                console.log('Reading ' + packageFile + ':\n' + packageContent);
+                console.log('Reading ' + packageFile);
                 next(code);
             });
         },
         function createNewPackageContent(next) {
-            newPackageContent = newPackageSrc(packageContent);
+            newPackageContent = newPackageSrc(packageContent, optionalVersion);
             newVersion = extractVersionFrom(newPackageContent);
             next();
         },
@@ -50,12 +50,19 @@ function publish(env, optionalVersion, repoDir) {
             fs.writeFile(packageFile, newPackageContent, next);
         },
         function commitPackageJSON(next) {
-            exec('git add package.json && git ci -m "version ' + newVersion + '"',
-                 {cwd: repoDir}, function(code, out, err) {
-                     console.log(out);
-                     if (err) console.log(err);
-                     next(code);
-                 });
+            exec('git st package.json --porcelain', {cwd: repoDir}, function(code, out) {
+                var packgeJSONChanged = out.length > 0;
+                if (!packgeJSONChanged) {
+                    next(null);
+                    return;
+                }
+                exec('git add package.json && git ci -m "version ' + newVersion + '"',
+                     {cwd: repoDir}, function(code, out, err) {
+                         console.log(out);
+                         if (err) console.log(err);
+                         next(code);
+                     });
+            });
         },
         function gitTag(next) {
             exec('git tag ' + newVersion, {cwd: repoDir}, function(code, out, err) {
@@ -65,6 +72,9 @@ function publish(env, optionalVersion, repoDir) {
             });
         },
         function gitPush(next) {
+            // TODO do a
+            // git tag -d <version> && git push origin :refs/tags/<version>
+            // if tag already exists
             exec('git push && git push --tags', {cwd: repoDir}, function(code, out, err) {
                 console.log(out);
                 if (err) console.log(err);
