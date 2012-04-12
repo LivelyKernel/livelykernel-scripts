@@ -219,7 +219,7 @@ function pollReport(data) {
         process.stdout.write('.');
         currentRequests++;
         setTimeout(function() {
-            getJson('/test-report', {testRunId: data.testRunId}, pollReport);
+            getJson('/test-result/' + data.testRunId, pollReport);
         }, 1000);
         return;
     }

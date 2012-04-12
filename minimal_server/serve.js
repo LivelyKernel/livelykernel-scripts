@@ -31,22 +31,24 @@ function setupServer(testHandler) {
     app.use(express.errorHandler({dumpExceptions: true, showStack: true}));
     app.use(express.bodyParser());
 
-    function postHandler(path, handlerName) {
-        app.post(path, function(req, res) {
-            var result;
-            try {
-                result = testHandler[handlerName](req);
-            } catch(e) {
-                result = {result: String(e), error: true, requestedData: req.body};
-            }
-            res.send({result: result});
-        });
-    }
+    app.post('/test-result/:id', function(req, res) {
+        var id = req.params.id,
+            result = req.body.testResults;
+        try {
+            result = testHandler.postResult(id, result);
+        } catch(e) {
+            result = {result: String(e), error: true, requestedData: req.body};
+        }
+        res.send({result: result});
+    });
 
-    postHandler('/test-result', 'handleResultRequest');
-    postHandler('/test-report', 'handleReportRequest');
+    app.get('/test-result/:id', function(req, res) {
+        res.send(testHandler.getResult(req.params.id));
+    });
 
-    postHandler('/debug-results', 'handleListResultRequest');
+    app.get('/test-result', function (req, res) {
+        res.send(testHandler.listResults());
+    });
 
     return app;
 }
@@ -62,25 +64,17 @@ TestHandler.resetTestData();
 
 // results
 
-TestHandler.prototype.handleResultRequest = function(req) {
-    var id = req.body.testRunId,
-        result = req.body.testResults;
+TestHandler.prototype.postResult = function(id, result) {
     console.log('Getting result for test run ' + id);
     testResults[id] = {testRunId: id, state: 'done', result: result};
     return {result: 'ok', testRunId: id};
 };
 
-TestHandler.prototype.handleReportRequest = function(req) {
-    var id = req.body.testRunId;
+TestHandler.prototype.getResult = function(id) {
     return testResults[id] || {testRunId: id, state: 'no result'};
 };
 
-TestHandler.prototype.handleOpenBrowserRequest = function(req) {
-    this.browserInterface.open('htttp://google.com');
-    return {result: 'ok'};
-};
-
-TestHandler.prototype.handleListResultRequest = function(req) {
+TestHandler.prototype.listResults = function(req) {
     return {result: JSON.stringify(testResults)};
 };
 
