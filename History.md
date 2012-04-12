@@ -1,3 +1,8 @@
+0.0.12 / 2012-04-12
+===================
+
+* refactored the 'lk test' implementation and the test server interaction
+
 0.0.10 / 2012-04-09
 ===================
 
