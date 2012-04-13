@@ -107,7 +107,7 @@ var browserInterface = {
             browserArgs = options.browserConf.args;
     
         if (this.process) {
-            this.closeBrowser();
+            this.close();
             setTimeout(function() {
                 browserInterface.open(url, options);
             }, 200);
@@ -125,7 +125,6 @@ var browserInterface = {
     },
 
     close: function() {
-        if (!this.process) return;
         var self = this;
         // give the browser some time to finish requests
         setTimeout(function() {
@@ -226,7 +225,9 @@ function pollReport(data) {
     printResult(data.testRunId, result);
     notifyResult(data.testRunId, result);
     browserInterface.close();
-    process.exit(result.fails ? 1 : 0);
+    setTimeout(function() {
+        process.exit(result.fails ? 1 : 0);
+    }, 200); // 200ms to send SIGKILL to browser
 }
 
 function randomId() {
