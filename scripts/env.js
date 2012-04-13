@@ -33,7 +33,7 @@ env.MINISERVER_HOST = "localhost";
  */
 env.MINISERVER_TEST_FILES = env.MINISERVER_DIR + '/*_test.js';
 env.LK_TEST_SCRIPT_DIR    = env.LK_SCRIPTS_DIR + '/testing';
-env.LK_TEST_STARTER       = env.LK_TEST_SCRIPT_DIR + '/run_lively_tests_cli.js';
+env.LK_TEST_STARTER       = env.LK_TEST_SCRIPT_DIR + '/lively_test.js';
 env.LK_TEST_WORLD         = "run_tests.xhtml";
 env.LK_TEST_WORLD_SCRIPT  = "run_tests.js";
 env.LK_TEST_BROWSER       = "chrome";
