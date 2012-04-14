@@ -3,7 +3,8 @@ var http     = require('http'),
     colorize = require('colorize'),
     config   = require('./config'),
     optparse = require('optparse'),
-    spawn    = require('child_process').spawn,
+    path     = require('path'),
+    exec     = require('child_process').exec,
     env      = require('../env'),
     shell    = require('../helper/shell');
 
@@ -105,7 +106,7 @@ var browserInterface = {
     open: function(url, options) {
         var browserPath = options.browserConf.path,
             browserArgs = options.browserConf.args;
-    
+
         if (this.process) {
             this.close();
             setTimeout(function() {
@@ -113,15 +114,29 @@ var browserInterface = {
             }, 200);
             return;
         }
-        console.log('open ' + browserPath + ' on ' + url);
-     
+
+        if (options.browserConf.tmpDir && path.existsSync(options.browserConf.tmpDir)) {
+            exec('rm -rfd ' + options.browserConf.tmpDir, function() {
+                console.log('Browser temp dir removed');
+                browserInterface.open(url, options);
+            });
+            return;
+        }
+
         if (options.display) {
             options.env = {'DISPLAY' : options.display};
         }
+
+        console.log('open ' + browserPath + ' on ' + url);
         this.process = shell.callShowOutput(
             browserPath, browserArgs.concat([url]),
-            function(code) { console.log('Browser closed'); },
+            function(code) {
+                console.log('Browser closed');
+            },
             options);
+        this.process.on('exit', function() {
+            exec()
+        })
     },
 
     close: function() {
@@ -129,7 +144,7 @@ var browserInterface = {
         // give the browser some time to finish requests
         setTimeout(function() {
             if (self.process) { // sometimes process is already gone?!
-                self.process.kill("SIGKILL");
+                self.process.kill();
             }
             self.process = null;
         }, 100);
@@ -199,9 +214,9 @@ function notifyResult(testRunId, data) {
     var msg = (data.fails ? "FAILURE" : 'SUCCCESS') + "\n"
             + data.runs + " tests run, " + data.fails + " failures"
             + "\n" + data.failedTestNames.join("\n");
-    spawn(options.notifier, ["--message", msg,
-                             "--identifier", "LivelyCoreTests" + options.testScript,
-                             "--image", "core/media/lively_logo.png"]);
+    shell.callShowOutput(options.notifier, ["--message", msg,
+                                            "--identifier", "LivelyCoreTests" + options.testScript,
+                                            "--image", "core/media/lively_logo.png"]);
 }
 
 // poll

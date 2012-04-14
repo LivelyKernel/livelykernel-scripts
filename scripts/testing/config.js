@@ -1,12 +1,17 @@
 /*globals */
 // see http://peter.sh/experiments/chromium-command-line-switches/
-var chromeArgs =   ["--no-process-singleton-dialog",
-                    "--user-data-dir=/tmp/", "--no-first-run",
+var chromeTmpDir = '/tmp/chrom-for-lively/',
+    chromeArgs =   ["--no-process-singleton-dialog",
+                    "--user-data-dir=" + chromeTmpDir,
+                    "--no-first-run",
                     "--disable-default-apps",
-                    //"--no-startup-window",
+                    // "--no-startup-window",
                     "--disable-history-quick-provider",
                     "--disable-history-url-provider",
                     "--disable-breakpad",
+                    "--disable-restore-session-state",
+                    "--disable-restore-background-contents",
+                    "--disable-tab-closeable-state-watcher",
                     "--disable-background-mode",
                     "--disable-background-networking",
                     "--disable-preconnect", "--disabled"],
@@ -18,7 +23,8 @@ var Config = {
         "darwin": {
             "chrome": {
                 path: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-                args: chromeArgs
+                args: chromeArgs,
+                tmpDir: chromeTmpDir
             },
             "firefox": {
                 path: "/Applications/Firefox.app/Contents/MacOS/firefox",
@@ -28,7 +34,8 @@ var Config = {
         "linux": {
             "chrome": {
                 path: "/usr/bin/chromium-browser",
-                args: chromeArgs
+                args: chromeArgs,
+                tmpDir: chromeTmpDir
             },
             "firefox": {
                 path: "/usr/bin/firefox",
