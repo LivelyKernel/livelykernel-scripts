@@ -236,6 +236,7 @@ if (!env.LK_SCRIPT_TEST_RUN) {
             fs.writeFile.expect(
                 {file: this.packageFile, data: this.packageJSONSrcWithMinorInc});
             var exec = testHelper.execForTest(test).expect(
+                {cmd: 'git st package.json --porcelain', cwd: 'foo/bar', out: 'modified: package.json'},
                 {cmd: 'git add package.json && git ci -m "version 0.0.7"', cwd: 'foo/bar'},
                 {cmd: 'git tag 0.0.7', cwd: 'foo/bar'},
                 {cmd: 'git push && git push --tags', cwd: 'foo/bar'},
