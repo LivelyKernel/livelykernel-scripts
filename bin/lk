@@ -1,15 +1,15 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 # ln -s $LIVELY/bin/lk /usr/local/bin/lk
 # rm /usr/local/bin/lk
 
 # check if we are directly invoked or using a symlink
 # since we need to find out what the real directory is
-LK_SCRIPT_PATH=$(readlink $0)
-if [[ $LK_SCRIPT_PATH ]]; then
-  LK_SCRIPT_PATH=$(dirname $0)/$LK_SCRIPT_PATH
+LK_SCRIPT_BIN_NO_LINK=$(readlink $0)
+if [[ $LK_SCRIPT_BIN_NO_LINK ]]; then
+  LK_SCRIPT_BIN_PATH=$(dirname $LK_SCRIPT_BIN_NO_LINK)
 else
-  LK_SCRIPT_PATH=$0
+  LK_SCRIPT_BIN_PATH=$(dirname $0)
 fi
-DIR=$(dirname $LK_SCRIPT_PATH)
-node $DIR/../scripts/lk.js "$@"
+LK_SCRIPTS_DIR=$LK_SCRIPT_BIN_PATH/../scripts
+node $LK_SCRIPTS_DIR/lk.js "$@"
