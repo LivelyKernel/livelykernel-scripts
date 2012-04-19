@@ -6,10 +6,17 @@
 # check if we are directly invoked or using a symlink
 # since we need to find out what the real directory is
 LK_SCRIPT_BIN_NO_LINK=$(readlink $0)
+
 if [[ $LK_SCRIPT_BIN_NO_LINK ]]; then
-  LK_SCRIPT_BIN_PATH=$(dirname $LK_SCRIPT_BIN_NO_LINK)
+    # in case we have a relative link path we make a absolute out of it
+    if [[ ! $LK_SCRIPT_BIN_NO_LINK = /* ]]; then
+        LK_SCRIPT_BIN_NO_LINK=$(dirname $0)/$LK_SCRIPT_BIN_NO_LINK
+    fi
+    # get the bin dir
+    LK_SCRIPT_BIN_PATH=$(dirname $LK_SCRIPT_BIN_NO_LINK)
 else
-  LK_SCRIPT_BIN_PATH=$(dirname $0)
+    LK_SCRIPT_BIN_PATH=$(dirname $0)
 fi
+
 LK_SCRIPTS_DIR=$LK_SCRIPT_BIN_PATH/../scripts
 node $LK_SCRIPTS_DIR/lk.js "$@"
