@@ -16,7 +16,11 @@ var express = require('express'),
                     "--disable-background-networking",
                     "--disable-preconnect", "--disabled"];
 
-// start with "nodemon minimal_server/serve.js" for development
+/*
+ * start with
+ * nodemon minimal_server/serve.js 9001 $LIVELY --verbose
+ * for development
+ */
 
 var args = process.argv.slice(2),
     port = args[0] && parseInt(args[0], 10),
@@ -61,7 +65,7 @@ TestHandler.prototype.registerWith = function(app) {
         var id = req.params.id,
             result = req.body.testResults;
         try {
-            result = this.postResult(id, result);
+            result = handler.postResult(id, result);
         } catch(e) {
             result = {result: String(e), error: true, requestedData: req.body};
         }
