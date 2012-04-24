@@ -161,12 +161,14 @@ WorkspaceHandler.prototype.getLog = function(fromRef, howMany, whenDone) {
 /*
  * startup or export
  */
-if (port && !isNaN(port)) {
+if (require.main === module) {
     if (!lkDir) {
         throw new Error('Cannot start server without LK core directory '
                        + 'for serving files from!');
     }
-
+    if (port && isNaN(port)) {
+        throw new Error('port must be a number');
+    }
     setupServer(new TestHandler(), new WorkspaceHandler({exec: exec}, lkDir)).listen(port);
 } else {
     exports.TestHandler = TestHandler;
