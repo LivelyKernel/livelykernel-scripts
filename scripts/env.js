@@ -22,11 +22,16 @@ env.FOREVER         = env.FOREVER     || env.NODEMODULES + "/forever/bin/forever
 
 /*
  * server related stuff
+ * life_star will use miniserver settings
  */
-env.MINISERVER_DIR  = env.MINISERVER_DIR  || env.LK_SCRIPTS_ROOT + "/minimal_server";
-env.MINISERVER_PORT = env.MINISERVER_PORT || 9001;
-env.MINISERVER      = env.MINISERVER_DIR + "/serve.js";
-env.MINISERVER_HOST = "localhost";
+env.MINISERVER_DIR      = env.MINISERVER_DIR  || env.LK_SCRIPTS_ROOT + "/minimal_server";
+env.MINISERVER_PORT     = env.MINISERVER_PORT || 9001;
+env.MINISERVER          = env.MINISERVER_DIR + "/serve.js";
+env.MINISERVER_HOST     = "localhost";
+env.LIFE_STAR_DIR       = env.LIFE_STAR_DIR || env.LK_SCRIPTS_ROOT + "/life_star";
+env.LIFE_STAR           = env.LIFE_STAR_DIR + "/serve.js";
+env.LIFE_STAR_TESTING   = "testing"; // replace with "notesting" to disable test runner interface on server
+env.LIFE_STAR_LOG_LEVEL = "debug";   // be very chatty about what is going on
 
 /*
  * tests
