@@ -23,8 +23,9 @@ var platformConf = config.platformConfigs[process.platform],
                                + "\". If not specified then \""
                                + defaultBrowser + "\" is used."],
         ['-n', '--notifier NAME', "Use a system notifier to output results. "
-                                + "Currently \"" + env.LK_TEST_NOTIFIER 
+                                + "Currently \"" + env.LK_TEST_NOTIFIER
                                 + "\" is supported."],
+        ['-m', '--modules NAMES', "Additional modules to load, comma separated"],
         ['-d', '--display NUMBER', 'Secify a display id for running chrome with xvfb'],
         ['-f', '--focus FILTER', "A filter is a string that can have three"
                                + "parts separated by \"|\". All parts define"
@@ -54,7 +55,7 @@ if (options.watch) {
 // nodemon needs it relative...
 argList.push([path.relative(env.PWD, env.LK_TEST_STARTER)]);
 
-['verbose', 'browser', 'notfier', 'display', 'focus', 'testScript'].forEach(function(option) {
+['verbose', 'browser', 'notfier', 'display', 'focus', 'testScript', 'modules'].forEach(function(option) {
     if (!options.defined(option)) return;
     argList.push(options.dasherize(option));
     if (options.hasValue(option)) {

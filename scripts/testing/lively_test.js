@@ -27,6 +27,7 @@ var platformConf = config.platformConfigs[process.platform],
         ['-n', '--notifier NAME', "Use a system notifier to output results. "
                                 + "Currently \"" + env.LK_TEST_NOTIFIER
                                 + "\" is supported."],
+        ['-m', '--modules NAMES', "Additional modules to load, comma separated"],
         ['-d', '--display NUMBER', 'Secify a display id for running chrome with xvfb'],
         ['-f', '--focus FILTER', "A filter is a string that can have three"
                                + "parts separated by \"|\". All parts define"
@@ -87,6 +88,10 @@ parser.on("focus", function(name, value) {
 
 parser.on("display", function(name, value) {
     options.display = value;
+});
+
+parser.on("modules", function(name, value) {
+    options.modules = value;
 });
 
 parser.parse(process.argv);
@@ -253,7 +258,8 @@ function testWorldUrl(id) {
     return 'http://' + env.MINISERVER_HOST + ':' + env.MINISERVER_PORT + '/' + options.testWorld +
         '?testRunId=' + id +
         (options.testScript ? "&loadScript=" + escape(options.testScript) : '') +
-        (options.testFilter ? "&testFilter=" + escape(options.testFilter) : '');
+        (options.testFilter ? "&testFilter=" + escape(options.testFilter) : '') +
+        (options.modules ? "&additionalModules=" + escape(options.modules) : '');
 }
 
 function startTests() {
