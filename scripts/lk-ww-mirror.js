@@ -170,7 +170,7 @@ function gitCheckoutBranch() { // should not be necessary but just to be sure...
 function gitCommitAndPush() {
     var cmd = ['git commit --author="', svnInfo.author || 'webwerkstatt ghost',
                ' <lively-kernel@hpi.uni-potsdam.de>" ',
-               '-am \'[mirror commit]\n', JSON.stringify(svnInfo, null, 2), '\'; ',
+               '-am \'[mirror commit][ci skip]\n', JSON.stringify(svnInfo, null, 2), '\'; ',
 	             'git push origin ', mirrorBranchName()].join('');
     console.log(cmd);
     runGitCmd(cmd, 'PUSH', this);
