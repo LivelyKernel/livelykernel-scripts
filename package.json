@@ -2,7 +2,7 @@
   "author": "The Lively Kernel Team <lively-kernel@hpi.uni-potsdam.de>",
   "name": "livelykernel-scripts",
   "description": "Scripts and minimal server for running, testing and maintaining LivelyKernel",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "homepage": "http://lively-kernel.org",
   "repository": {
     "type": "git",
@@ -24,7 +24,7 @@
     "jshint": "~0.5",
     "forever": "~0.8.5",
     "nodeunit": "~0.7",
-    "life_star": "https://github.com/fbornhofen/life_star/tarball/master"
+    "life_star": "https://github.com/fbornhofen/life_star/tarball/0.0.2"
   },
   "devDependencies": {},
   "optionalDependencies": {}
