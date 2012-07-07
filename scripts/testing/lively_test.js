@@ -120,7 +120,7 @@ var browserInterface = {
             return;
         }
 
-        if (options.browserConf.tmpDir && path.existsSync(options.browserConf.tmpDir)) {
+        if (options.browserConf.tmpDir && fs.existsSync(options.browserConf.tmpDir)) {
             exec('rm -rfd ' + options.browserConf.tmpDir, function() {
                 console.log('Browser temp dir removed');
                 browserInterface.open(url, options);
