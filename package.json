@@ -23,7 +23,8 @@
     "jshint": "~0.5",
     "forever": "0.10.0",
     "nodeunit": "~0.7",
-    "life_star": "https://github.com/fbornhofen/life_star/tarball/0.0.3"
+    "life_star": "https://github.com/fbornhofen/life_star/tarball/0.0.3",
+    "express": "3.x"
   },
   "devDependencies": {},
   "optionalDependencies": {}
