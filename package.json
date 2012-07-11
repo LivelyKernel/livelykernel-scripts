@@ -9,22 +9,21 @@
     "url": "git@github.com:rksm/livelykernel-scripts.git"
   },
   "engines": {
-    "node": "0.6.x"
+    "node": "0.8.x"
   },
   "bin" : {
     "lk" : "./bin/lk"
   },
   "dependencies": {
-    "express": "2.x",
     "colorize": "0.1.0",
     "nodemon": "~0.6",
     "optparse": "~1.0",
     "seq": "https://github.com/dsc/node-seq/tarball/master",
     "async": "0.1",
     "jshint": "~0.5",
-    "forever": "~0.8.5",
+    "forever": "0.10.0",
     "nodeunit": "~0.7",
-    "life_star": "https://github.com/fbornhofen/life_star/tarball/0.0.2"
+    "life_star": "https://github.com/fbornhofen/life_star/tarball/0.0.3"
   },
   "devDependencies": {},
   "optionalDependencies": {}
