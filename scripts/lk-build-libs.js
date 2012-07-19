@@ -7,9 +7,7 @@
 
 var args  = require('./helper/args'),
     fs    = require('fs'),
-    shell = require('./helper/shell'),
     async = require('async'),
-    exec  = require('child_process').exec,
     path  = require('path'),
     http  = require('http'),
     https = require('https'),
