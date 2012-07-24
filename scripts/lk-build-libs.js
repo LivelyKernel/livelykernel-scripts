@@ -73,7 +73,8 @@ function downloadAndModify(urlString, modifyFunc, thenDo) {
 }
 
 var comment = "/*\n"
-            + " * This file was compiled on " + new Date().toUTCString() + " with the libs:\n",
+            + " * This file was compiled with \"lk build-libs\" on "
+            + new Date().toUTCString() + " with the libs:\n",
     downloads = [
         download.bind(global, "http://code.jquery.com/jquery-1.7.2.min.js"),
         download.bind(global, "https://raw.github.com/kriskowal/es5-shim/v1.2.10/es5-shim.min.js")],
