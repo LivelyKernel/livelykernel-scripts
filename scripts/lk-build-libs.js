@@ -77,7 +77,8 @@ var comment = "/*\n"
     downloads = [
         download.bind(global, "http://code.jquery.com/jquery-1.7.2.min.js"),
         download.bind(global, "https://raw.github.com/kriskowal/es5-shim/v1.2.10/es5-shim.min.js")],
-    localLibs = [copyLocal.bind(global, "resources/pre-lib/requestAnimationFrame.js")];
+    localLibs = [copyLocal.bind(global, "resources/pre-lib/requestAnimationFrame.js"),
+                 copyLocal.bind(global, "resources/pre-lib/IE-fixes.js")];
 
 async.series(
     downloads.concat(localLibs),
