@@ -7,9 +7,9 @@
 # since we need to find out what the real directory is
 LK_SCRIPT_BIN_NO_LINK=$(readlink $0)
 
-if [[ $LK_SCRIPT_BIN_NO_LINK ]]; then
+if [ -n "$LK_SCRIPT_BIN_NO_LINK" ]; then
     # in case we have a relative link path we make a absolute out of it
-    if [[ ! $LK_SCRIPT_BIN_NO_LINK = /* ]]; then
+    if [ ${LK_SCRIPT_BIN_NO_LINK:0:1} != "/" ]; then
         LK_SCRIPT_BIN_NO_LINK=$(dirname $0)/$LK_SCRIPT_BIN_NO_LINK
     fi
     # get the bin dir
