@@ -6,9 +6,6 @@ var fs = require('fs'),
     shell = require('./helper/shell'),
     async = require('async');
 
-var colorize = lazyRequire("colorize");
-if (colorize) global.console = colorize.console;
-
 // -=-=-=-=-=-=-=-=-=-=-
 // Subcommand class
 // -=-=-=-=-=-=-=-=-=-=-
@@ -42,7 +39,7 @@ function printHelpForAllSubComamndsAndExit(nextArg) {
     var asMarkDown = nextArg === "--markdown";
     async.forEachSeries(subcommands, function(subcommand, next) {
         var name = 'lk ' + subcommand.name(),
-            msg = asMarkDown ? "### " + name + '\n' : '#underline[' + name + ']';
+            msg = asMarkDown ? "### " + name + '\n' : '-= ' + name + ' =-';
         console.log(msg);
         subcommand.showHelp(function() {
             console.log("\n");
