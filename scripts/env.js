@@ -59,8 +59,8 @@ env.WORKSPACE_DIR = env.WORKSPACE_DIR || lkScriptDir('/workspace');
 env.WORKSPACE_LK  = env.WORKSPACE_LK  || lkScriptDir('/workspace/lk');
 env.WORKSPACE_WW  = env.WORKSPACE_WW  || lkScriptDir('/workspace/ww');
 
-env.WORKSPACE_LK_EXISTS = path.existsSync(env.WORKSPACE_LK);
-env.WORKSPACE_WW_EXISTS = path.existsSync(env.WORKSPACE_WW);
+env.WORKSPACE_LK_EXISTS = fs.existsSync(env.WORKSPACE_LK);
+env.WORKSPACE_WW_EXISTS = fs.existsSync(env.WORKSPACE_WW);
 
 /*
  * PartsBin

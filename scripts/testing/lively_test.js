@@ -3,7 +3,7 @@ var http     = require('http'),
     colorize = require('colorize'),
     config   = require('./config'),
     optparse = require('optparse'),
-    path     = require('path'),
+    fs       = require('fs'),
     exec     = require('child_process').exec,
     env      = require('../env'),
     shell    = require('../helper/shell');
@@ -120,7 +120,7 @@ var browserInterface = {
             return;
         }
 
-        if (options.browserConf.tmpDir && path.existsSync(options.browserConf.tmpDir)) {
+        if (options.browserConf.tmpDir && fs.existsSync(options.browserConf.tmpDir)) {
             exec('rm -rfd ' + options.browserConf.tmpDir, function() {
                 console.log('Browser temp dir removed');
                 browserInterface.open(url, options);
