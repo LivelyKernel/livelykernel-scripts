@@ -1,3 +1,20 @@
+0.0.17 / 2012-08-18
+===================
+
+* running on node 0.8
+* script for compiling Lively's core libs
+* making colorize, jshint, nodeunit, forever, express, nodemon dependencies optional
+
+0.0.16 / 2012-06-26
+===================
+
+* life_star integration
+
+0.0.15 / 2012-04-13
+===================
+
+* lively_test.js
+
 0.0.14 / 2012-04-13
 ===================
 
