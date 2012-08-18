@@ -1,9 +1,8 @@
 /*global require, process*/
 var args = require('./helper/args'),
     shell = require('./helper/shell'),
-    path = require('path');
-
-var env = process.env,
+    path = require('path'),
+    env = require('./env'),
     cmdAndArgs = [];
 
 // -=-=-=-=-=-=-=-=-=-=-

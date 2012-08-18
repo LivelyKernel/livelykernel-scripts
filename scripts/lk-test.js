@@ -3,8 +3,8 @@ var args = require('./helper/args'),
     shell = require('./helper/shell'),
     path = require('path'),
     env = require('./env'),
-// FIXME best to refactor run_lively_tests_cli.js and its use of config
-// so we don't have to duplicate stuff here
+    // FIXME best to refactor run_lively_tests_cli.js and its use of config
+    // so we don't have to duplicate stuff here
     config = require('./testing/config');
 
 // -=-=-=-=-=-=-=-=-=-=-
