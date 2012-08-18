@@ -16,15 +16,15 @@
   },
   "dependencies": {
     "life_star": "https://github.com/fbornhofen/life_star/tarball/0.0.3",
+    "forever": "0.10.0",
+    "colorize": "0.1.0",
     "optparse": "~1.0",
     "seq": "https://github.com/dsc/node-seq/tarball/master",
     "async": "0.1"
   },
   "devDependencies": {
-    "colorize": "0.1.0",
     "jshint": "~0.5",
     "nodeunit": "~0.7",
-    "forever": "0.10.0",
     "express": "3.x",
     "nodemon": "~0.6"
   },
