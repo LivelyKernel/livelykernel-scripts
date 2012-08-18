@@ -25,8 +25,8 @@ if (!options.lkDir && env.WORKSPACE_LK_EXISTS) {
   options.lkDir = env.WORKSPACE_LK;
 }
 
-if (!options.defined('lifeStar') && 
-    !options.defined('miniServer') || 
+if (!options.defined('lifeStar') &&
+    !options.defined('miniServer') ||
     !options.defined('lkDir')) {
   options.showHelpAndExit();
 }
@@ -38,10 +38,12 @@ if (!options.defined('lifeStar') &&
 // TODO add logfile param for forever
 // TODO add forever stop since forever automatically starts daemonized
 if (options.defined('forever')) {
+  if (!lkDevDependencyExist(env.FOREVER)) process.exit(1);
   cmdAndArgs = [env.FOREVER, 'start', '--spinSleepTime', '800'/*ms*/];
 }
 
 if (options.defined('watch')) {
+  if (!lkDevDependencyExist(env.NODEMON)) process.exit(1);
   cmdAndArgs.push(env.NODEMON);
   if (options.defined('forever')) {
     cmdAndArgs.push('--exitcrash');

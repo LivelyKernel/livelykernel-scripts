@@ -70,4 +70,21 @@ env.PARTSBIN_SVN_URL = "http://lively-kernel.org/repository/webwerkstatt/PartsBi
 
 
 
+var installCmd = "cd " + env.LK_SCRIPTS_ROOT + "; npm install";
+
+global.lkDevDependencyExist = function lkDevDependencyExist(path) {
+    if (fs.existsSync(path)) return true;
+    console.warn("The dev dependency " + path + " was not found, please run\n\n" + installCmd);
+    return false;
+}
+
+global.lazyRequire = function lazyRequire(path) {
+    try {
+        return require(path);
+    } catch(e) {
+        console.warn("module " + path + " not installed, install it by running\n\n" + installCmd);
+        return null;
+    }
+}
+
 module.exports = env;

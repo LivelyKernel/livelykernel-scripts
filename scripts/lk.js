@@ -4,9 +4,10 @@ var fs = require('fs'),
     path = require('path'),
     lkEnv = require('./env'),
     shell = require('./helper/shell'),
-    console = require('colorize').console,
     async = require('async');
 
+var colorize = lazyRequire("colorize");
+if (colorize) global.console = colorize.console;
 
 // -=-=-=-=-=-=-=-=-=-=-
 // Subcommand class

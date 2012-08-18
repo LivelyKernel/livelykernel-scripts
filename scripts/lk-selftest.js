@@ -3,7 +3,9 @@ var args = require('./helper/args'),
     shell = require('./helper/shell'),
     path = require('path'),
     async = require('async'),
-    env = process.env;
+    env = require("./env.js");
+
+if (!lkDevDependencyExist(env.NODEUNIT)) process.exit(1);
 
 // -=-=-=-=-=-=-=-=-=-=-
 // script options

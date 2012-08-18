@@ -11,17 +11,17 @@
  *
  */
 
-
 var args           = require('./helper/args'),
     path           = require('path'),
     fs             = require('fs'),
     shell          = require('./helper/shell'),
     exec           = require('child_process').exec,
-    colorize       = require('colorize'),
-    console        = colorize.console,
     Seq            = require('seq'),
     env            = process.env,
     calledDirectly = require.main === module;
+
+var colorize = lazyRequire("colorize");
+if (colorize) global.console = colorize.console;
 
 // -=-=-=-=-=-=-=-=-=-=-
 // script options

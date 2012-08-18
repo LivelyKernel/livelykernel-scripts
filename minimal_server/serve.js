@@ -1,7 +1,10 @@
 /*global escape, require, process, console, setTimeout, JSON, __dirname*/
 
-var express = require('express'),
-    spawn = require('child_process').spawn,
+require("../scripts/env");
+var express = global.lazyRequire('express');
+if (!express) process.exit(1);
+
+var spawn = require('child_process').spawn,
     shell = require('./../scripts/helper/shell'),
     defaultBrowser = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     defaultArgs =  ["--no-process-singleton-dialog",

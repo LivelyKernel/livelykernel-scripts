@@ -1,12 +1,14 @@
 /*global require, console, process, JSON, setTimeout*/
 var http     = require('http'),
-    colorize = require('colorize'),
     config   = require('./config'),
     optparse = require('optparse'),
     fs       = require('fs'),
     exec     = require('child_process').exec,
     env      = require('../env'),
     shell    = require('../helper/shell');
+
+var colorize = lazyRequire("colorize");
+if (!colorize) colorize = {ansify: function(string) { return string }};
 
 ////////////////////////////////////////////////////////
 // Parse the command line options and merge them with //

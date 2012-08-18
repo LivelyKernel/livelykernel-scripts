@@ -74,17 +74,17 @@ if [ $ret -eq 0 ] && [ -x "$lk_cmd" ]; then
   (exit 0)
 else
   echo "Installing livelykernel-scripts using npm..." >&2
-  lkscript_install=`$npm install -g livelykernel-scripts@latest`
+  lkscript_install=`$npm install --production -g livelykernel-scripts@latest`
   ret=$?
   if [ $ret -ne 0 ]; then
       echo ""
-      echo "Failure during 'npm install -g livelykernel-scripts'" >&2
+      echo "Failure during 'npm install --production -g livelykernel-scripts'" >&2
       echo "Try installing it as root..." >&2
-      lkscript_install=`sudo $npm install -g livelykernel-scripts@latest`
+      lkscript_install=`sudo $npm install --production -g livelykernel-scripts@latest`
       ret=$?
       if [ $ret -ne 0 ]; then
           echo ""
-          echo "Failure during 'sudo npm install -g livelykernel-scripts'" >&2
+          echo "Failure during 'sudo npm install --production -g livelykernel-scripts'" >&2
           echo "Aborting..." >&2
           exit $ret
       fi
