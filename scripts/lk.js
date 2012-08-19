@@ -1,3 +1,4 @@
+
 /*global exports, require, module, console, process, __dirname*/
 
 var fs = require('fs'),
@@ -148,7 +149,7 @@ if (calledDirectly || !process.env.LK_SCRIPT_TEST_RUN) {
 } else {
 
     // Test code
-    var fsMock, testScriptDir = '/foo/bar';
+    var fsMock, testScriptDir = path.join('/foo/', 'bar/');
 
     exports.SubcommandTests = {
         setUp: function(run) {
@@ -178,7 +179,7 @@ if (calledDirectly || !process.env.LK_SCRIPT_TEST_RUN) {
                 spawnSpec = cmd.spawnCmdAndArgs(['--foo']);
             test.deepEqual({
                 cmd: process.env.NODE_BIN,
-                args: [testScriptDir + '/lk-foo.js', '--foo']
+                args: [path.join(testScriptDir, 'lk-foo.js'), '--foo']
             }, spawnSpec);
             test.done();
         },
@@ -186,7 +187,7 @@ if (calledDirectly || !process.env.LK_SCRIPT_TEST_RUN) {
         "should get spawn args sh": function(test) {
             var cmd = lk.getSubcommand('bar-baz'),
                 spawnSpec = cmd.spawnCmdAndArgs(['--foo']);
-            test.deepEqual({cmd: testScriptDir + '/lk-bar-baz.sh', args: ['--foo']}, spawnSpec);
+            test.deepEqual({cmd: path.join(testScriptDir, 'lk-bar-baz.sh'), args: ['--foo']}, spawnSpec);
             test.done();
         }
 

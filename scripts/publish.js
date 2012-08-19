@@ -190,9 +190,9 @@ if (!env.LK_SCRIPT_TEST_RUN) {
                 "  \"dependencies\": {}\n" +
                 "}";
             this.packageJSONSrcWithMinorInc = this.packageJSONSrc.replace('0.0.6', '0.0.7');
-            this.scriptDir = 'foo/bar';
-            this.packageFile = this.scriptDir + '/package.json';
-            this.historyFile = this.scriptDir + '/History.md';
+            this.scriptDir = path.join('foo/', 'bar');
+            this.packageFile = path.join(this.scriptDir, 'package.json');
+            this.historyFile = path.join(this.scriptDir, 'History.md');
             callback();
         },
 
@@ -235,12 +235,13 @@ if (!env.LK_SCRIPT_TEST_RUN) {
                                              + "  * ...\n"});
             fs.writeFile.expect(
                 {file: this.packageFile, data: this.packageJSONSrcWithMinorInc});
+	    var cwd = path.join('foo/', 'bar');
             var exec = testHelper.execForTest(test).expect(
-                {cmd: 'git st package.json --porcelain', cwd: 'foo/bar', out: 'modified: package.json'},
-                {cmd: 'git add package.json && git ci -m "version 0.0.7"', cwd: 'foo/bar'},
-                {cmd: 'git tag 0.0.7', cwd: 'foo/bar'},
-                {cmd: 'git push && git push --tags', cwd: 'foo/bar'},
-                {cmd: 'npm publish', cwd: 'foo/bar'});
+                {cmd: 'git st package.json --porcelain', cwd: cwd, out: 'modified: package.json'},
+                {cmd: 'git add package.json && git ci -m "version 0.0.7"', cwd: cwd},
+                {cmd: 'git tag 0.0.7', cwd: cwd},
+                {cmd: 'git push && git push --tags', cwd: cwd},
+                {cmd: 'npm publish', cwd: cwd});
 
             publish({fs: fs, exec: exec}, null, this.scriptDir);
             fs.readFile.assertAllCalled();

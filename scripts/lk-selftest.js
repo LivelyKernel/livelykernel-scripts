@@ -1,6 +1,6 @@
 /*global require, process, console*/
 var args = require('./helper/args'),
-    shell = require('./helper/shell'),
+    spawn = require('child_process').spawn,
     path = require('path'),
     async = require('async'),
     env = require("./env");
@@ -17,7 +17,10 @@ var options = args.options([
 
 function nodeunit(target) {
     return function(callback) {
-        shell.run(env.NODEUNIT, [target], callback, {cwd: env.LK_SCRIPTS_ROOT});
+        var proc = spawn(env.NODE_BIN,
+              [env.NODEUNIT, target],
+              {stdio: 'inherit', cwd: env.LK_SCRIPTS_ROOT});
+        proc.on('exit', callback);
     }
 }
 
