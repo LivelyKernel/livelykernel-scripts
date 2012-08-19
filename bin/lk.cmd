@@ -2,7 +2,7 @@
 @echo off
 
 set scriptdir=%~dp0
-set node="%scriptdir%..\..\..\node.exe"
+set NODE_BIN="%scriptdir%..\..\..\node.exe"
 set lkjs="%scriptdir%..\scripts\lk.js"
 
-@%node% %lkjs% %*
+@%NODE_BIN% %lkjs% %*

@@ -50,7 +50,7 @@ if (options.watch) {
     argList.push('--watch');
     argList.push(options.watch);
 } else {
-    cmd = 'node';
+    cmd = env.NODE_BIN;
 }
 
 // nodemon needs it relative...
