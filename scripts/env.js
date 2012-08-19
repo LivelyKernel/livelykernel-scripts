@@ -99,7 +99,9 @@ set("WORKSPACE_WW_EXISTS", [fs.existsSync(env.WORKSPACE_WW)], {notFs: true});
 /*
  * PartsBin
  */
-set("PARTSBIN_DIR",     [lkScriptDir("/PartsBin")], {useLastIfNothingIsValid: true});
+set("PARTSBIN_DIR",     [path.join(env.WORKSPACE_LK, 'PartsBin/'),
+                         path.join(env.LIVELY, 'PartsBin/'),
+                         lkScriptDir("PartsBin/")], {useLastIfNothingIsValid: true});
 set("PARTSBIN_SVN_URL", ["http://lively-kernel.org/repository/webwerkstatt/PartsBin/"], {notFs: true});
 
 
@@ -110,6 +112,13 @@ global.lkDevDependencyExist = function lkDevDependencyExist(path) {
     if (fs.existsSync(path)) return true;
     console.warn("The dev dependency " + path + " was not found, please run\n\n" + installCmd);
     return false;
+}
+
+global.svnRequired = function svnRequired() {
+    if (which('svn')) return;
+    console.warn("Subversion cannot be found. Please install Subversion and repeat "
+                 + "this command.\n See http://subversion.apache.org/packages.html");
+    process.exit(1);
 }
 
 global.lazyRequire = function lazyRequire(path) {
