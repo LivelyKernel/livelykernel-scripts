@@ -4,6 +4,7 @@ var fs = require('fs'),
     path = require('path'),
     lkEnv = require('./env'),
     shell = require('./helper/shell'),
+    spawn = require('child_process').spawn,
     async = require('async');
 
 // -=-=-=-=-=-=-=-=-=-=-
@@ -28,7 +29,8 @@ Subcommand.prototype.spawnCmdAndArgs = function(args) {
 
 Subcommand.prototype.spawn = function(args, onExit) {
     var spawnSpec = this.spawnCmdAndArgs(args);
-    shell.callShowOutput(spawnSpec.cmd, spawnSpec.args, onExit);
+    var proc = spawn(spawnSpec.cmd, spawnSpec.args, { stdio: 'inherit' });
+    onExit && proc.on('exit', function (code) { onExit(code); });
 };
 
 Subcommand.prototype.showHelp = function(thenDo) {

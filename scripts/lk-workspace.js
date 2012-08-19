@@ -1,14 +1,14 @@
 /*global require, process, __dirname, console*/
 var args = require('./helper/args'),
-    shell = require('./helper/shell'),
-    exec = require('child_process').exec,
-    Seq = require('seq'),
+    async = require('async'),
+    readline = require('readline'),
     path = require('path'),
-    env = process.env;
+    env = require('./env');
 
+require('shelljs/global');
 
 /*
- * Script for automatically managing wokring copies of webwerkstatt and lively core
+ * Script for automatically managing working copies of webwerkstatt and lively core
  */
 
 
@@ -25,84 +25,86 @@ var options = {
 
 options = args.options([
     ['-h', '--help', 'show this help'],
-    ['--remove', 'completely delete the workspace'],
-    ['--reset', 'reset both the svn and git repositories if they exist but do not delete them'],
-    ['--github-write-access', 'Initialize the lk core git repo with commit access'],
-    ['--checkout-ww', 'create ./workspace/ww/, checked out from ' + options.wwSvnUrl],
-    ['--checkout-lk', 'create ./workspace/lk/, checked out from ' + options.lkGitUrl +
-     ' on branch ' + options.lkBranch],
-    ['--init', 'Do both --checkout-ww and --checkout-lk']], options,
+    [      '--remove', 'completely delete the workspace'],
+    ['-u', '--update', 'update the svn and git repositories with remote changes if they exist'],
+    ['-r', '--reset', 'reset the svn and git repositories if they exist but do not delete them'],
+    [      '--github-write-access', 'Initialize the lk core git repo with commit access'],
+    [      '--checkout-ww', 'create ./workspace/ww/, checked out from ' + options.wwSvnUrl],
+    [      '--checkout-lk', 'create ./workspace/lk/, checked out from ' + options.lkGitUrl +
+           ' on branch ' + options.lkBranch],
+    [      '--init', 'Do both --checkout-ww and --checkout-lk']], options,
     "Script that manages local copies of the LivelyKernel core "
     + "and webwerksatt repository in " + env.WORKSPACE_DIR + '/');
 
-var actions = [],
-    shellOpts = {cwd: env.LK_SCRIPTS_ROOT, env: process.env};
-
+var wwCoreDir = path.join(env.WORKSPACE_WW, 'core');
 
 if (options.defined('remove')) {
-    actions.push({
-        msg: 'clean',
-        func: function(next) {
-            shell.callShowOutput('rm', ['-rfv', env.WORKSPACE_DIR], next);
-        }
-    });
-}
-
-function svnReset(next) {
-    return function() {
-        var dir = env.WORKSPACE_WW;
-        exec(['if [[ -d ', dir, ' ]]; then cd ', dir, '; svn revert -R .; fi'].join(''),
-             shellOpts, next);
-    };
-}
-
-function gitReset(next) {
-    return function() {
-        var dir = env.WORKSPACE_LK;
-        exec(['if [[ -d ', dir, ' ]]; then cd ', dir, '; ',
-              'git reset --hard; git clean -d -f; fi'].join(''),
-             shellOpts, next);
-    };
+    echo('Removing ' + env.WORKSPACE_DIR);
+    rm('-rf', env.WORKSPACE_DIR);
 }
 
 if (options.defined('reset')) {
-    actions.push({
-        msg: 'reset',
-        func: function(next) {
-            Seq()
-            .seq(svnReset(gitReset(next))); // hmmm
-        }
-    });
+    var rl = readline.createInterface({input: process.stdin, output: process.stdout});
+
+    function interactiveReset(dir, cmd, thenDo) {
+        if (!test('-d', dir)) return;
+        var q = "Do you really want to reset " + dir + '?\n'
+              + 'Resetting the workspace means that all uncommitted changes '
+              + 'will be lost.\nThe command that will be run is: ' + cmd
+              + '\nProceed with "yes".\n\n'
+        rl.question(q, function(answer) {
+            if (answer === 'yes') {
+                echo("Resetting " + dir);
+                var oldPwd = pwd();
+                cd(dir);
+                echo(exec(cmd).output);
+                cd(oldPwd);
+            }
+            thenDo && thenDo();
+        });
+    }
+
+    var resetCore = interactiveReset.bind(
+            global, env.WORKSPACE_LK, 'git reset --hard; git clean -d -f'),
+        resetWW = interactiveReset.bind(
+            global, path.join(env.WORKSPACE_WW, 'core'), 'svn revert -R .');
+
+    async.series([resetCore, resetWW], function() { rl.close() });
 }
 
 if (options.defined('checkoutLk') || options.defined('init')) {
-    var gitURL = options.defined('githubWriteAccess') ?
-        options.lkGitUrl : options.lkGitUrlReadOnly;
-    actions.push({
-        msg: 'git clone ' + gitURL,
-        func: function(next) {
-            Seq()
-            .seq(exec, 'mkdir -p ' + env.WORKSPACE_DIR, shellOpts, Seq)
-            .seq(exec, ['git clone -b ', options.lkBranch, ' -- ',
-                        gitURL, ' ', env.WORKSPACE_LK].join(''),
-                 shellOpts, next);
-        }
-    });
+    var gitURL = options.defined('githubWriteAccess') ? options.lkGitUrl : options.lkGitUrlReadOnly;
+    if (test('-d', env.WORKSPACE_LK)) {
+        echo('LivelyKernel core workspace already exists at ' + env.WORKSPACE_LK);
+    } else {
+        echo('Retrieving LivelyKernel-core repository...');
+        mkdir('-p', env.WORKSPACE_DIR);
+        exec(['git clone -b ', options.lkBranch, ' -- ',
+              gitURL, ' ', env.WORKSPACE_LK].join(''));
+    }
 }
 
 if (options.defined('checkoutWw') || options.defined('init')) {
-    actions.push({
-        msg: 'svn co ' + options.wwSvnUrl,
-        func: function(next) {
-            Seq()
-            .seq(exec, 'mkdir -p ' + env.WORKSPACE_DIR, shellOpts, Seq)
-            .seq(exec, ['svn co ', options.wwSvnUrl + '/core', env.WORKSPACE_WW + '/core'].join(' '),
-                 shellOpts, next);
-        }
-    });
+    if (test('-d', wwCoreDir)) {
+        echo('Webwerkstatt core directory already exists at ' + wwCoreDir);
+    } else {
+        echo('Retrieving webwerkstatt core, this may take a while...');
+        mkdir('-p', wwCoreDir);
+        exec(['svn co ', options.wwSvnUrl + '/core', wwCoreDir].join(' '));
+    }
 }
 
-var s = Seq();
-actions.forEach(function(action) {
-    s.seq(function() { console.log('== ' + action.msg + ' =='); action.func(this); });
-});
+if (options.defined('update')) {
+    if (test('-d', env.WORKSPACE_LK)) {
+        echo('Pulling changes for LivelyKernel-core ...');
+        var oldPwd = pwd();
+        cd(env.WORKSPACE_LK);
+        echo(exec('git pull --rebase origin', {silent:true}).output);
+        cd(oldPwd);
+    }
+
+    if (test('-d', wwCoreDir)) {
+        echo('Updating webwerkstatt core ...');
+        echo(exec('svn up ' + wwCoreDir, {silent:true}).output);
+    }
+}
