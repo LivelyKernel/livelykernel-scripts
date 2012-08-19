@@ -79,7 +79,7 @@ if (options.defined('checkoutLk') || options.defined('init')) {
             echo('Retrieving LivelyKernel-core repository...');
             mkdir('-p', env.WORKSPACE_DIR);
             exec(['git clone -b ', options.lkBranch, ' -- ',
-                  gitURL, ' ', env.WORKSPACE_LK].join(''), {async: true}, next);
+                  gitURL, ' "', env.WORKSPACE_LK, '"'].join(''), {async: true}, next);
         });
     }
 }
@@ -91,7 +91,8 @@ if (options.defined('checkoutWw') || options.defined('init')) {
         actions.push(function(next) {
             echo('Retrieving webwerkstatt core, this may take a while...');
             mkdir('-p', wwCoreDir);
-            exec(['svn co ', options.wwSvnUrl + '/core', wwCoreDir].join(' '), {async: true}, next);
+            exec(['svn co ', options.wwSvnUrl + '/core ', '"', wwCoreDir, '"'].join(''),
+                 {async: true}, next);
         });
     }
 }
@@ -102,17 +103,14 @@ if (options.defined('update')) {
         actions.push(function(next) {
             var oldPwd = pwd();
             cd(env.WORKSPACE_LK);
-            exec('git pull --rebase origin', {async: true}, function() {
-                cd(oldPwd);
-                next();
-            });
+            exec('git pull --rebase origin', {async: true}, function() { cd(oldPwd); next(); });
         });
     }
 
     if (test('-d', wwCoreDir)) {
         actions.push(function(next) {
             echo('Updating webwerkstatt core ...');
-            exec('svn up ' + wwCoreDir, {async: true}, next);
+            exec('svn up "' + wwCoreDir + '"', {async: true}, next);
         });
     }
 }
