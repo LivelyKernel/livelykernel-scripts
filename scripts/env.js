@@ -30,6 +30,7 @@ set("NODEMODULES",	   [lkScriptDir("/node_modules")]);
 set("NODEUNIT",		   [env.NODEMODULES + "/nodeunit/bin/nodeunit", which('nodeunit')]);
 set("NODEMON",		   [env.NODEMODULES + "/nodemon/nodemon.js"], which('nodemon'));
 set("FOREVER",		   [env.NODEMODULES + "/forever/bin/forever", which('forever')]);
+set("TEMP_DIR",		   [env.TMP, env.TEMP, env.TEMPDIR, '/tmp'], {useLastIfNothingIsValid: true});
 
 /*
  * server related stuff
@@ -57,6 +58,19 @@ set("LK_TEST_WORLD_SCRIPT",  ["run_tests.js"], {notFs: true});
 set("LK_TEST_BROWSER",       ["chrome"], {notFs: true});
 set("LK_TEST_TIMEOUT",       [300], {notFs: true});
 set("LK_TEST_NOTIFIER",      ["growlnotify"], {notFs: true});
+
+/*
+ * web-browser related
+ */
+set("CHROME_BIN",            [which('chrome'), which('chromium-browser'),
+                              "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+                              "/usr/bin/chromium-browser",
+                              path.join(env.LOCALAPPDATA, 'Google/Chrome/Application/chrome.exe')]);
+set("FIREFOX_BIN",            [which('firefox'),
+                              "/Applications/Firefox.app/Contents/MacOS/firefox",
+                              "/usr/bin/firefox",
+                               path.join(env['ProgramFiles(x86)'], 'Mozilla Firefox', 'firefox.exe'),
+                               path.join(env.ProgramFiles, 'Mozilla Firefox', 'firefox.exe')]);
 
 /*
  * jshint
