@@ -10,10 +10,20 @@ function lkScriptDir(dirInRoot) {
     return path.normalize(env.LK_SCRIPTS_ROOT + dirInRoot);
 }
 
+function set(varName, choices, notFs) {
+    var isValid = notFs ? function(c) { return !!c; } : fs.existsSync;
+    choices.shift(env[varName]); // already set?
+    for (var i = 0; i < choices.length; i++) {
+	var choice = choices[i];
+	if (isValid(choice[i])) { return env[varName] = choice[i]; }
+    }
+    return undefined;
+}
+
 /*
  * general stuff
  */
-env.LK_SCRIPTS_ROOT = path.normalize(__dirname + '/..');
+set('LK_SCRIPTS_ROOT', [path.normalize(__dirname + '/..')]);
 env.LK_SCRIPTS_DIR  = lkScriptDir("/scripts");
 env.NODE_BIN        = env.NODE_BIN    || shelljs.which('node') || shelljs.which('node.exe');
 env.NODEMODULES     = env.NODEMODULES || lkScriptDir("/node_modules");
