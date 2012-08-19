@@ -1,8 +1,9 @@
 /*global require, process*/
 var args = require('./helper/args'),
-    shell = require('./helper/shell'),
-    path = require('path');
+    fs = require('fs'),
+    spawn = require('child_process').spawn;
 
+global.svnRequired();
 
 // -=-=-=-=-=-=-=-=-=-=-
 // script options
@@ -10,25 +11,19 @@ var args = require('./helper/args'),
 var env = process.env,
     options = args.options([
         ['-h', '--help', 'Show this help.'],
-        ['-i', '--install DIR', 'Install the PartsBin from ' + env.PARTSBIN_SVN_URL
-             + 'into DIR or ' + env.PARTSBIN_DIR + ' if no DIR given'],
-        ['-u', '--update', 'Update the PartsBin']],
+        ['-d', '--dir DIR', 'Use DIR to install or update the PartsBin from '
+                          + env.PARTSBIN_SVN_URL
+                          + '. If DIR is not specified  use ' + env.PARTSBIN_DIR + '.']],
         {},
         "Installs and updates the webwerkstatt PartsBin");
-
 
 // -=-=-=-=-=-=-=-=-=-=-
 // the real thing
 // -=-=-=-=-=-=-=-=-=-=-
-var argList = [];
-if (options.defined('install')) {
-    var dir = options.install || env.PARTSBIN_DIR;
-    argList.push('co', env.PARTSBIN_SVN_URL, dir);
-} else if (options.defined('update')) {
-    argList.push('up', env.PARTSBIN_SVN_URL);
-} else {
-    options.showHelpAndExit();
-}
+var argList = [], dir = options.dir || env.PARTSBIN_DIR,
+    isInstalled = fs.existsSync(dir);
 
-shell.callShowOutput('svn', argList,
-           function(code) { process.exit(code); });
+var proc = isInstalled ?
+    spawn('svn', ['up'], {cwd: dir, stdio: "inherit"}) :
+    spawn('svn', ['co', env.PARTSBIN_SVN_URL, dir], {stdio: "inherit"});
+proc.on('exit', function(code) { process.exit(code); });
