@@ -9,6 +9,7 @@ require('shelljs/global');
 
 /*
  * Script for automatically managing working copies of webwerkstatt and lively core
+ *
  */
 
 
@@ -36,14 +37,19 @@ options = args.options([
     "Script that manages local copies of the LivelyKernel core "
     + "and webwerksatt repository in " + env.WORKSPACE_DIR + '/');
 
-var wwCoreDir = path.join(env.WORKSPACE_WW, 'core'),
-    actions = [];
+var wwCoreDir = path.join(env.WORKSPACE_WW, 'core'), actions = [];
 
+// -=-=-=-=-=-=-
+// remove
+// -=-=-=-=-=-=-
 if (options.defined('remove')) {
     echo('Removing ' + env.WORKSPACE_DIR);
     rm('-rf', env.WORKSPACE_DIR);
 }
 
+// -=-=-=-=-=-=-
+// reset
+// -=-=-=-=-=-=-
 if (options.defined('reset')) {
     var rl = readline.createInterface({input: process.stdin, output: process.stdout});
 
@@ -70,6 +76,9 @@ if (options.defined('reset')) {
     actions = actions.concat(resetCore, resetWW, function(next) { rl.close(); next() });
 }
 
+// -=-=-=-=-=-=-
+// checkout core
+// -=-=-=-=-=-=-
 if (options.defined('checkoutLk') || options.defined('init')) {
     var gitURL = options.defined('githubWriteAccess') ? options.lkGitUrl : options.lkGitUrlReadOnly;
     if (test('-d', env.WORKSPACE_LK)) {
@@ -84,6 +93,9 @@ if (options.defined('checkoutLk') || options.defined('init')) {
     }
 }
 
+// -=-=-=-=-=-=-
+// checkout ww
+// -=-=-=-=-=-=-
 if (options.defined('checkoutWw') || options.defined('init')) {
     if (test('-d', wwCoreDir)) {
         echo('Webwerkstatt core directory already exists at ' + wwCoreDir);
@@ -97,6 +109,9 @@ if (options.defined('checkoutWw') || options.defined('init')) {
     }
 }
 
+// -=-=-=-=-=-=-=-=-=-
+// update core && ww
+// -=-=-=-=-=-=-=-=-=-
 if (options.defined('update')) {
     if (test('-d', env.WORKSPACE_LK)) {
         echo('Pulling changes for LivelyKernel-core ...');
@@ -115,4 +130,7 @@ if (options.defined('update')) {
     }
 }
 
+// -=-=-=-=-=-=-
+// run it!
+// -=-=-=-=-=-=-
 async.series(actions);
