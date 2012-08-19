@@ -3,6 +3,7 @@
 var fs = require('fs'),
     path = require('path'),
     Seq = require('seq'),
+    shelljs = require('shelljs'),
     env = process.env;
 
 function lkScriptDir(dirInRoot) {
@@ -14,6 +15,7 @@ function lkScriptDir(dirInRoot) {
  */
 env.LK_SCRIPTS_ROOT = path.normalize(__dirname + '/..');
 env.LK_SCRIPTS_DIR  = lkScriptDir("/scripts");
+env.NODE_BIN        = env.NODE_BIN    || shelljs.which('node') || shelljs.which('node.exe');
 env.NODEMODULES     = env.NODEMODULES || lkScriptDir("/node_modules");
 env.QUNIT           = env.QUNIT       || env.NODEMODULES + "/qunit/bin/cli.js";
 env.NODEUNIT        = env.NODEUNIT    || env.NODEMODULES + "/nodeunit/bin/nodeunit";
