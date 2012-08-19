@@ -46,7 +46,8 @@ var platformConf = config.platformConfigs[process.platform],
 var cmd, argList = [];
 if (options.watch) {
     if (!global.lkDevDependencyExist(env.NODEMON)) process.exit(1);
-    cmd = env.NODEMON;
+    cmd = env.NODE_BIN;
+    argList.push(env.NODEMON);
     argList.push('--watch');
     argList.push(options.watch);
 } else {
