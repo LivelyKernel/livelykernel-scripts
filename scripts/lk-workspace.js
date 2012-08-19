@@ -36,7 +36,8 @@ options = args.options([
     "Script that manages local copies of the LivelyKernel core "
     + "and webwerksatt repository in " + env.WORKSPACE_DIR + '/');
 
-var wwCoreDir = path.join(env.WORKSPACE_WW, 'core');
+var wwCoreDir = path.join(env.WORKSPACE_WW, 'core'),
+    actions = [];
 
 if (options.defined('remove')) {
     echo('Removing ' + env.WORKSPACE_DIR);
@@ -46,21 +47,18 @@ if (options.defined('remove')) {
 if (options.defined('reset')) {
     var rl = readline.createInterface({input: process.stdin, output: process.stdout});
 
-    function interactiveReset(dir, cmd, thenDo) {
-        if (!test('-d', dir)) return;
+    function interactiveReset(dir, cmd, next) {
+        if (!test('-d', dir)) { next(); return };
         var q = "Do you really want to reset " + dir + '?\n'
               + 'Resetting the workspace means that all uncommitted changes '
               + 'will be lost.\nThe command that will be run is: ' + cmd
               + '\nProceed with "yes".\n\n'
         rl.question(q, function(answer) {
-            if (answer === 'yes') {
-                echo("Resetting " + dir);
-                var oldPwd = pwd();
-                cd(dir);
-                echo(exec(cmd).output);
-                cd(oldPwd);
-            }
-            thenDo && thenDo();
+            if (answer !== 'yes') { next(); return }
+            echo("Resetting " + dir);
+            var oldPwd = pwd();
+            cd(dir);
+            exec(cmd, {async: true}, function() { cd(oldPwd); next(); });
         });
     }
 
@@ -69,7 +67,7 @@ if (options.defined('reset')) {
         resetWW = interactiveReset.bind(
             global, path.join(env.WORKSPACE_WW, 'core'), 'svn revert -R .');
 
-    async.series([resetCore, resetWW], function() { rl.close() });
+    actions = actions.concat(resetCore, resetWW, function(next) { rl.close(); next() });
 }
 
 if (options.defined('checkoutLk') || options.defined('init')) {
@@ -77,10 +75,12 @@ if (options.defined('checkoutLk') || options.defined('init')) {
     if (test('-d', env.WORKSPACE_LK)) {
         echo('LivelyKernel core workspace already exists at ' + env.WORKSPACE_LK);
     } else {
-        echo('Retrieving LivelyKernel-core repository...');
-        mkdir('-p', env.WORKSPACE_DIR);
-        exec(['git clone -b ', options.lkBranch, ' -- ',
-              gitURL, ' ', env.WORKSPACE_LK].join(''));
+        actions.push(function(next) {
+            echo('Retrieving LivelyKernel-core repository...');
+            mkdir('-p', env.WORKSPACE_DIR);
+            exec(['git clone -b ', options.lkBranch, ' -- ',
+                  gitURL, ' ', env.WORKSPACE_LK].join(''), {async: true}, next);
+        });
     }
 }
 
@@ -88,23 +88,33 @@ if (options.defined('checkoutWw') || options.defined('init')) {
     if (test('-d', wwCoreDir)) {
         echo('Webwerkstatt core directory already exists at ' + wwCoreDir);
     } else {
-        echo('Retrieving webwerkstatt core, this may take a while...');
-        mkdir('-p', wwCoreDir);
-        exec(['svn co ', options.wwSvnUrl + '/core', wwCoreDir].join(' '));
+        actions.push(function(next) {
+            echo('Retrieving webwerkstatt core, this may take a while...');
+            mkdir('-p', wwCoreDir);
+            exec(['svn co ', options.wwSvnUrl + '/core', wwCoreDir].join(' '), {async: true}, next);
+        });
     }
 }
 
 if (options.defined('update')) {
     if (test('-d', env.WORKSPACE_LK)) {
         echo('Pulling changes for LivelyKernel-core ...');
-        var oldPwd = pwd();
-        cd(env.WORKSPACE_LK);
-        echo(exec('git pull --rebase origin', {silent:true}).output);
-        cd(oldPwd);
+        actions.push(function(next) {
+            var oldPwd = pwd();
+            cd(env.WORKSPACE_LK);
+            exec('git pull --rebase origin', {async: true}, function() {
+                cd(oldPwd);
+                next();
+            });
+        });
     }
 
     if (test('-d', wwCoreDir)) {
-        echo('Updating webwerkstatt core ...');
-        echo(exec('svn up ' + wwCoreDir, {silent:true}).output);
+        actions.push(function(next) {
+            echo('Updating webwerkstatt core ...');
+            exec('svn up ' + wwCoreDir, {async: true}, next);
+        });
     }
 }
+
+async.series(actions);
