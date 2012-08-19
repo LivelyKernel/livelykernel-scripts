@@ -8,16 +8,19 @@ var fs = require('fs'),
     env = process.env;
 
 function lkScriptDir(dirInRoot) {
-    return path.normalize(env.LK_SCRIPTS_ROOT + dirInRoot);
+    return path.normalize(path.join(env.LK_SCRIPTS_ROOT, dirInRoot));
 }
 
 function set(varName, choices, options) {
     var isValid = options && options.notFs ? function(c) { return !!c; } : fs.existsSync;
-    choices.unshift(env[varName]); // already set?
+    if (env[varName]) choices.unshift(env[varName]); // already set?
     for (var i = 0; i < choices.length; i++) {
-	    if (isValid(choices[i])) { return env[varName] = choices[i]; }
+        if (isValid(choices[i])) { return env[varName] = choices[i]; }
     }
-    return env[varName] = options && options.useLastIfNothingIsValid ? choices.pop() : undefined;
+    if (options && options.useLastIfNothingIsValid && choices.length > 0) {
+        env[varName] = choices[choices.length-1];
+    }
+    return env[varName];
 }
 
 /*
@@ -25,12 +28,16 @@ function set(varName, choices, options) {
  */
 set("LK_SCRIPTS_ROOT", [path.normalize(__dirname + '/..')]);
 set("LK_SCRIPTS_DIR",  [lkScriptDir("/scripts")]);
-set("NODE_BIN",		   [which('node'), shelljs.which('node.exe')]);
-set("NODEMODULES",	   [lkScriptDir("/node_modules")]);
-set("NODEUNIT",		   [env.NODEMODULES + "/nodeunit/bin/nodeunit", which('nodeunit')]);
-set("NODEMON",		   [env.NODEMODULES + "/nodemon/nodemon.js"], which('nodemon'));
-set("FOREVER",		   [env.NODEMODULES + "/forever/bin/forever", which('forever')]);
-set("TEMP_DIR",		   [env.TMP, env.TEMP, env.TEMPDIR, '/tmp'], {useLastIfNothingIsValid: true});
+set("NODE_BIN",            [which('node'), which('node.exe'), process.execPath]);
+set("NODEMODULES",         [lkScriptDir("/node_modules"),
+                            path.join(env.LK_SCRIPTS_ROOT, '..')]);
+set("NODEUNIT",            [path.join(env.NODEMODULES, "nodeunit/bin/nodeunit"),
+                            which('nodeunit')]);
+set("NODEMON",             [path.join(env.NODEMODULES, "nodemon/nodemon.js"),
+                            which('nodemon')]);
+set("FOREVER",             [path.join(env.NODEMODULES, "forever/bin/forever"),
+                            which('forever')]);
+set("TEMP_DIR",            [env.TMP, env.TEMP, env.TEMPDIR, '/tmp'], {useLastIfNothingIsValid: true});
 
 /*
  * server related stuff
@@ -83,7 +90,7 @@ set("JSHINT_CONFIG", [env.LK_SCRIPTS_ROOT + "/jshint.config"]);
  * workspace
  */
 set("WORKSPACE_DIR", [lkScriptDir('/workspace')], {useLastIfNothingIsValid: true});
-set("WORKSPACE_LK",  [lkScriptDir('/workspace/lk'), {useLastIfNothingIsValid: true}]);
+set("WORKSPACE_LK",  [lkScriptDir('/workspace/lk')], {useLastIfNothingIsValid: true});
 set("WORKSPACE_WW",  [lkScriptDir('/workspace/ww')], {useLastIfNothingIsValid: true});
 
 set("WORKSPACE_LK_EXISTS", [fs.existsSync(env.WORKSPACE_LK)], {notFs: true});
