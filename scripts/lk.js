@@ -176,7 +176,10 @@ if (calledDirectly || !process.env.LK_SCRIPT_TEST_RUN) {
         "should get spawn args js": function(test) {
             var cmd = lk.getSubcommand('foo'),
                 spawnSpec = cmd.spawnCmdAndArgs(['--foo']);
-            test.deepEqual({cmd: 'node', args: [testScriptDir + '/lk-foo.js', '--foo']}, spawnSpec);
+            test.deepEqual({
+                cmd: process.env.NODE_BIN,
+                args: [testScriptDir + '/lk-foo.js', '--foo']
+            }, spawnSpec);
             test.done();
         },
 
