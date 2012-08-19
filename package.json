@@ -20,7 +20,8 @@
     "colorize": "0.1.0",
     "optparse": "~1.0",
     "seq": "https://github.com/dsc/node-seq/tarball/master",
-    "async": "0.1"
+    "async": "0.1",
+    "shelljs": "0.0.6"
   },
   "devDependencies": {
     "jshint": "~0.5",
