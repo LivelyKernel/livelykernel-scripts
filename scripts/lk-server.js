@@ -28,10 +28,9 @@ if (!options.lkDir && env.WORKSPACE_LK_EXISTS) {
   options.lkDir = env.WORKSPACE_LK;
 }
 
-if (!options.defined('lifeStar') &&
-    !options.defined('miniServer') ||
-    !options.defined('lkDir')) {
-  options.showHelpAndExit();
+if (!options.defined('lkDir')) {
+    console.log("Cannot find the Lively core repository. "
+               + "Please start the server with --lk-dir PATH/TO/LK-REPO")
 }
 
 // -=-=-=-=-=-=-=-=-=-=-
