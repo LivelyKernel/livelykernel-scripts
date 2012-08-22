@@ -73,7 +73,7 @@ if (options.defined('lifeStar')) {
   cmdAndArgs.push(env.LIFE_STAR_LOG_LEVEL);
 }
 
+console.log("Server is now running at " + "http://localhost:" + port);
+console.log("Serving files from " + options.lkDir);
 
-console.log("Starting server from " + options.lkDir + ". " + "http://localhost:" + port);
-
-shell.callShowOutput(cmdAndArgs[0], cmdAndArgs.slice(1));
+spawn(cmdAndArgs[0], cmdAndArgs.slice(1), {stdio: 'inherit'}).on('exit', function(code) { process.exit(code); });

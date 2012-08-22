@@ -29,5 +29,4 @@ var dir = options.dir || env.PARTSBIN_DIR,
     'Downloading PartsBin to ' + dir + '. This may take a minute...';
 
 console.log(msg);
-var proc = spawn(cmd, spawnArgs, spawnOptions);
-proc.on('exit', function(code) { process.exit(code); });
+spawn(cmd, spawnArgs, spawnOptions).on('exit', function(code) { process.exit(code); });
