@@ -1,3 +1,28 @@
+0.1.0 / 2012-08-22
+==================
+
+This is the first release of lk-scripts. Version 0.1 features:
+
+* Install a Lively Kernel server and workspace on your machine, tested on Mac
+  OS, Linux, Windows
+
+* Test runner
+
+* tools for diffing and syncing webwerkstatt and core
+
+* compiling libs for Lively
+
+
+Changes since 0.0.18:
+
+* scripts are running on windows
+
+* source for creating a windows installer
+
+* shelljs is used for cleaner scripting
+
+* some general cleanup
+
 0.0.18 / 2012-08-18
 ===================
 
