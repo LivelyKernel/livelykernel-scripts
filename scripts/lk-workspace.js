@@ -1,8 +1,9 @@
 /*global require, process, __dirname, console*/
 var args = require('./helper/args'),
+    spawn = require('child_process').spawn,
     async = require('async'),
-    readline = require('readline'),
     path = require('path'),
+    readline = require('readline'),
     env = require('./env');
 
 require('shelljs/global');
@@ -33,7 +34,8 @@ options = args.options([
     [      '--checkout-ww', 'create ./workspace/ww/, checked out from ' + options.wwSvnUrl],
     [      '--checkout-lk', 'create ./workspace/lk/, checked out from ' + options.lkGitUrl +
            ' on branch ' + options.lkBranch],
-    [      '--init', 'Do both --checkout-ww and --checkout-lk']], options,
+    [      '--init', 'Do both a --checkout-lk and download the PartsBin with "lk partsbin '
+                     + '-d ' + env.WORKSPACE_LK + '"']], options,
     "Script that manages local copies of the LivelyKernel core "
     + "and webwerksatt repository in " + env.WORKSPACE_DIR + '/');
 
@@ -82,7 +84,9 @@ if (options.defined('reset')) {
 if (options.defined('checkoutLk') || options.defined('init')) {
     var gitURL = options.defined('githubWriteAccess') ? options.lkGitUrl : options.lkGitUrlReadOnly;
     if (test('-d', env.WORKSPACE_LK)) {
-        echo('LivelyKernel core workspace already exists at ' + env.WORKSPACE_LK);
+        echo('LivelyKernel core workspace already exists at ' + env.WORKSPACE_LK
+            + " and will be updated");
+        options.update = true;
     } else {
         actions.push(function(next) {
             echo('Retrieving LivelyKernel-core repository...');
@@ -96,9 +100,10 @@ if (options.defined('checkoutLk') || options.defined('init')) {
 // -=-=-=-=-=-=-
 // checkout ww
 // -=-=-=-=-=-=-
-if (options.defined('checkoutWw') || options.defined('init')) {
+if (options.defined('checkoutWw')) {
     if (test('-d', wwCoreDir)) {
-        echo('Webwerkstatt core directory already exists at ' + wwCoreDir);
+        echo('Webwerkstatt core directory already exists at ' + wwCoreDir
+            + " and will be updated");
     } else {
         actions.push(function(next) {
             echo('Retrieving webwerkstatt core, this may take a while...');
@@ -128,6 +133,15 @@ if (options.defined('update')) {
             exec('svn up "' + wwCoreDir + '"', {async: true}, next);
         });
     }
+}
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+// download the PartsBin
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+if (options.defined('init')) {
+    actions.push(
+        spawn.bind(global, 'lk', ['partsbin', '--dir', path.join(env.WORKSPACE_LK, 'PartsBin/')],
+                   {stdio: 'inherit'}));
 }
 
 // -=-=-=-=-=-=-
