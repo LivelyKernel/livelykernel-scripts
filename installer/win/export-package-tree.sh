@@ -14,9 +14,9 @@ mkdir -p $TARGET_DIR
 # git repos emacs auto-saves, workspace, installer package source
     # --include="livelykernel-scripts/.git" \
 rsync -av \
-    --exclude="*.git" \
+    --exclude=".git" \
     --exclude="*~" --exclude=".#*" \
-    --exclude="livelykernel-scripts/workspace/" \
+    --exclude="livelykernel-scripts/workspace" \
     --exclude="livelykernel-scripts/bin/lk" \
     --exclude="npm-debug.log" \
     --exclude="*.aip" --exclude "livelykernel-scripts-create-msi-cache" \
