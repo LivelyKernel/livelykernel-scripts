@@ -1,7 +1,7 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 # copy only the necessary into a new dir used by the msi creator
-# ./export-package-tree.sh ~/Public/win7-vm/livelyinstall-test ~/Public/win7-vm/export
+# ./export-package-tree.sh ~/Public/win7-vm/lk-scripts_windows-source-package ~/Public/win7-vm/lk-scripts_win-package
 
 SOURCE_DIR=$1
 TARGET_DIR=$2
