@@ -1,6 +1,7 @@
 /*global require, process*/
 var args = require('./helper/args'),
     shell = require('./helper/shell'),
+    spawn = require('child_process').spawn,
     path = require('path'),
     env = require('./env'),
     cmdAndArgs = [];
@@ -19,6 +20,9 @@ var options = args.options([
     [      '--lk-dir DIR', 'The directory of the Lively Kernel core repository (git) ']],
     {},
     "Start a server to be used for running the tests. Either -m or -s must be given.");
+
+// life_star is the default server
+if (options.defined('miniServer')) options.lifeStar = true;
 
 if (!options.lkDir && env.WORKSPACE_LK_EXISTS) {
   options.lkDir = env.WORKSPACE_LK;
