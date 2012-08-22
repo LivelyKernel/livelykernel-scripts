@@ -49,6 +49,7 @@ set("MINISERVER",          [env.MINISERVER_DIR + "/serve.js"]);
 set("MINISERVER_HOST",     ["localhost"], {notFs: true});
 set("LIFE_STAR_DIR",       [env.LK_SCRIPTS_ROOT + "/life_star"]);
 set("LIFE_STAR",           [env.LIFE_STAR_DIR + "/serve.js"]);
+set("LIFE_STAR_HOST",           ["localhost"], {notFs: true});
 // replace with "notesting" to disable test runner interface on server
 set("LIFE_STAR_TESTING",   ["testing"], {notFs: true});
 // be very chatty about what is going on
