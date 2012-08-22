@@ -65,13 +65,19 @@ env.WORKSPACE_WW_EXISTS = fs.existsSync(env.WORKSPACE_WW);
 /*
  * PartsBin
  */
-env.PARTSBIN_DIR     = env.PARTSBIN_DIR || lkScriptDir("/PartsBin");
-env.PARTSBIN_SVN_URL = "http://lively-kernel.org/repository/webwerkstatt/PartsBin/"
+set("PARTSBIN_DIR",     [path.join(env.WORKSPACE_LK, 'PartsBin/'),
+                         path.join(env.LIVELY, 'PartsBin/'),
+                         lkScriptDir("PartsBin/")], {useLastIfNothingIsValid: true});
+set("WW_USERS_DIR",     [path.normalize(path.join(env.PARTSBIN_DIR, '../users'))], {useLastIfNothingIsValid: true});
+set("WW_SVN_URL", ["http://lively-kernel.org/repository/webwerkstatt/"], {notFs: true});
+set("PARTSBIN_SVN_URL", [env.WW_SVN_URL + 'PartsBin/'], {notFs: true});
+set("USERS_DIR_SVN_URL", [env.WW_SVN_URL + 'users/'], {notFs: true});
 
 
-
-var installCmd = "cd " + env.LK_SCRIPTS_ROOT + "; npm install";
-
+/*
+ * This is used to test prerequisites and show warnings
+ */
+var installCmd = "cd " + env.LK_SCRIPTS_ROOT + " && npm install";
 global.lkDevDependencyExist = function lkDevDependencyExist(path) {
     if (fs.existsSync(path)) return true;
     console.warn("The dev dependency " + path + " was not found, please run\n\n" + installCmd);
