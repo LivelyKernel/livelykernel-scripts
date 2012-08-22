@@ -38,7 +38,7 @@ Subcommand.prototype.showHelp = function(thenDo) {
     this.spawn(['--help'], thenDo);
 };
 
-function printHelpForAllSubComamndsAndExit(nextArg) {
+function printHelpForAllSubCommandsAndExit(nextArg) {
     var asMarkDown = nextArg === "--markdown";
     async.forEachSeries(subcommands, function(subcommand, next) {
         var name = 'lk ' + subcommand.name(),
@@ -81,12 +81,16 @@ var lk = {
     },
 
     showUsage: function() {
+        var usage = "usage: lk [--version] [help] [help <subcommand>]\n"
+                  + "          <subcommand> [<args>]\n";
+        console.log(usage);
         var names = subcommands.map(function(ea) { return ea.name(); });
         console.log('Available subcommands:\n  ' + names.join('\n  '));
-        console.log('Run \'lk help SUBCOMMAND\' to get more information about '
+        console.log('\nRun \'lk help <subcommand>\' to get more information about '
                     + 'the specific subcommand.\n'
                     + 'Run \'lk help --all\' to get a complete overview '
-                    + 'for all subcommands');
+                    + 'for all subcommands.\n'
+                    + 'lk --version prints the current version of the lk-scripts');
     }
 
 };
@@ -112,13 +116,24 @@ function processArgs(args) {
         var subCmdName = cmdArgs[0],
             subCmd = lk.getSubcommand(subCmdName);
         if (subCmdName == "--all") {
-            printHelpForAllSubComamndsAndExit(cmdArgs[1]);
+            printHelpForAllSubCommandsAndExit(cmdArgs[1]);
         } else if (subCmd) {
             subCmd.showHelp(function() { process.exit(0); });
         } else {
             lk.showUsage();
             process.exit();
         }
+        return;
+    }
+
+    if (cmdName == '--version' || cmdName == '-v') {
+        var packagePath = path.join(process.env.LK_SCRIPTS_ROOT, 'package.json');
+        fs.readFile(packagePath, function(err, out) {
+            var json = JSON.parse(out.toString()),
+            msg = "livelykernel-scripts version " + json.version;
+            console.log(msg);
+            process.exit(0);
+        });
         return;
     }
 
