@@ -91,8 +91,8 @@ set("JSHINT_CONFIG", [env.LK_SCRIPTS_ROOT + "/jshint.config"]);
  * workspace
  */
 set("WORKSPACE_DIR", [lkScriptDir('/workspace')], {useLastIfNothingIsValid: true});
-set("WORKSPACE_LK",  [lkScriptDir('/workspace/lk')], {useLastIfNothingIsValid: true});
-set("WORKSPACE_WW",  [lkScriptDir('/workspace/ww')], {useLastIfNothingIsValid: true});
+set("WORKSPACE_LK",  [env.LIVELY, lkScriptDir('/workspace/lk')], {useLastIfNothingIsValid: true});
+set("WORKSPACE_WW",  [env.WEBWERKSTATT, lkScriptDir('/workspace/ww')], {useLastIfNothingIsValid: true});
 
 set("WORKSPACE_LK_EXISTS", [fs.existsSync(env.WORKSPACE_LK)], {notFs: true});
 set("WORKSPACE_WW_EXISTS", [fs.existsSync(env.WORKSPACE_WW)], {notFs: true});
@@ -100,9 +100,8 @@ set("WORKSPACE_WW_EXISTS", [fs.existsSync(env.WORKSPACE_WW)], {notFs: true});
 /*
  * PartsBin
  */
-set("PARTSBIN_DIR",     [path.join(env.WORKSPACE_LK, 'PartsBin/'),
-                         path.join(env.LIVELY, 'PartsBin/'),
-                         lkScriptDir("PartsBin/")], {useLastIfNothingIsValid: true});
+set("PARTSBIN_DIR",     [path.join(env.LIVELY, 'PartsBin/'),
+                         path.join(env.WORKSPACE_LK, 'PartsBin/')], {useLastIfNothingIsValid: true});
 set("WW_USERS_DIR",     [path.normalize(path.join(env.PARTSBIN_DIR, '../users'))], {useLastIfNothingIsValid: true});
 set("WW_SVN_URL", ["http://lively-kernel.org/repository/webwerkstatt/"], {notFs: true});
 set("PARTSBIN_SVN_URL", [env.WW_SVN_URL + 'PartsBin/'], {notFs: true});
