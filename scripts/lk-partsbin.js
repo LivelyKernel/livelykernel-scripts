@@ -1,15 +1,15 @@
 /*global require, process*/
 var args = require('./helper/args'),
     fs = require('fs'),
-    spawn = require('child_process').spawn;
+    spawn = require('child_process').spawn,
+    env = require('./env');
 
 global.svnRequired();
 
 // -=-=-=-=-=-=-=-=-=-=-
 // script options
 // -=-=-=-=-=-=-=-=-=-=-
-var env = process.env,
-    options = args.options([
+var options = args.options([
         ['-h', '--help', 'Show this help.'],
         ['-d', '--dir DIR', 'Use DIR to install or update the PartsBin from '
                           + env.PARTSBIN_SVN_URL
@@ -20,7 +20,7 @@ var env = process.env,
 // -=-=-=-=-=-=-=-=-=-=-
 // the real thing
 // -=-=-=-=-=-=-=-=-=-=-
-var argList = [], dir = options.dir || env.PARTSBIN_DIR,
+var dir = options.dir || env.PARTSBIN_DIR,
     isInstalled = fs.existsSync(dir);
 
 var proc = isInstalled ?

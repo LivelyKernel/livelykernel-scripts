@@ -1,7 +1,10 @@
 /*globals */
+var path = require('path'),
+    env = require('../env');
+
 // see http://peter.sh/experiments/chromium-command-line-switches/
-var chromeTmpDir = '/tmp/chrom-for-lively/',
-    chromeArgs =   ["--no-process-singleton-dialog",
+var chromeTmpDir = path.join(env.TEMP_DIR, 'chrome-for-lively/'),
+    chromeArgs   = ["--no-process-singleton-dialog",
                     "--user-data-dir=" + chromeTmpDir,
                     "--no-first-run",
                     "--disable-default-apps",
@@ -18,30 +21,40 @@ var chromeTmpDir = '/tmp/chrom-for-lively/',
     firefoxArgs =  [];
 
 var Config = {
-
     platformConfigs: {
         "darwin": {
             "chrome": {
-                path: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+                path: env.CHROME_BIN,
                 args: chromeArgs,
                 tmpDir: chromeTmpDir
             },
             "firefox": {
-                path: "/Applications/Firefox.app/Contents/MacOS/firefox",
+                path: env.FIREFOX_BIN,
                 args: firefoxArgs
             }
         },
         "linux": {
             "chrome": {
-                path: "/usr/bin/chromium-browser",
+                path: env.CHROME_BIN,
                 args: chromeArgs,
                 tmpDir: chromeTmpDir
             },
             "firefox": {
-                path: "/usr/bin/firefox",
+                path: env.FIREFOX_BIN,
                 args: firefoxArgs
             }
-        }
+        },
+	"win32": {
+	    "chrome": {
+		path: env.CHROME_BIN,
+		args: chromeArgs,
+		tmpDir: chromeTmpDir
+	    },
+            "firefox": {
+                path: env.FIREFOX_BIN,
+                args: firefoxArgs
+            }
+	}
     }
 };
 

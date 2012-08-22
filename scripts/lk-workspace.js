@@ -69,7 +69,7 @@ if (options.defined('reset')) {
     }
 
     var resetCore = interactiveReset.bind(
-            global, env.WORKSPACE_LK, 'git reset --hard; git clean -d -f'),
+            global, env.WORKSPACE_LK, 'git reset --hard && git clean -d -f'),
         resetWW = interactiveReset.bind(
             global, path.join(env.WORKSPACE_WW, 'core'), 'svn revert -R .');
 

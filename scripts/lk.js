@@ -1,3 +1,4 @@
+
 /*global exports, require, module, console, process, __dirname*/
 
 var fs = require('fs'),
@@ -19,7 +20,7 @@ Subcommand.prototype.name = function() {
 Subcommand.prototype.spawnCmdAndArgs = function(args) {
     var isJs = /.js$/.test(this.filename),
         cmdPath = path.join(this.dir, this.filename),
-        cmd = isJs ? 'node' : cmdPath;
+        cmd = isJs ? process.env.NODE_BIN : cmdPath;
     var spawnArgs = args;
     if (isJs) {
         spawnArgs = [cmdPath].concat(spawnArgs);
@@ -28,8 +29,8 @@ Subcommand.prototype.spawnCmdAndArgs = function(args) {
 };
 
 Subcommand.prototype.spawn = function(args, onExit) {
-    var spawnSpec = this.spawnCmdAndArgs(args);
-    var proc = spawn(spawnSpec.cmd, spawnSpec.args, { stdio: 'inherit' });
+    var spawnSpec = this.spawnCmdAndArgs(args),
+        proc = spawn(spawnSpec.cmd, spawnSpec.args, { stdio: 'inherit' });
     onExit && proc.on('exit', function (code) { onExit(code); });
 };
 
@@ -148,7 +149,7 @@ if (calledDirectly || !process.env.LK_SCRIPT_TEST_RUN) {
 } else {
 
     // Test code
-    var fsMock, testScriptDir = '/foo/bar';
+    var fsMock, testScriptDir = path.join('/foo/', 'bar/');
 
     exports.SubcommandTests = {
         setUp: function(run) {
@@ -176,14 +177,17 @@ if (calledDirectly || !process.env.LK_SCRIPT_TEST_RUN) {
         "should get spawn args js": function(test) {
             var cmd = lk.getSubcommand('foo'),
                 spawnSpec = cmd.spawnCmdAndArgs(['--foo']);
-            test.deepEqual({cmd: 'node', args: [testScriptDir + '/lk-foo.js', '--foo']}, spawnSpec);
+            test.deepEqual({
+                cmd: process.env.NODE_BIN,
+                args: [path.join(testScriptDir, 'lk-foo.js'), '--foo']
+            }, spawnSpec);
             test.done();
         },
 
         "should get spawn args sh": function(test) {
             var cmd = lk.getSubcommand('bar-baz'),
                 spawnSpec = cmd.spawnCmdAndArgs(['--foo']);
-            test.deepEqual({cmd: testScriptDir + '/lk-bar-baz.sh', args: ['--foo']}, spawnSpec);
+            test.deepEqual({cmd: path.join(testScriptDir, 'lk-bar-baz.sh'), args: ['--foo']}, spawnSpec);
             test.done();
         }
 

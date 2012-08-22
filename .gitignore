@@ -14,3 +14,7 @@ PartsBin
 
 # npm #
 npm-debug.log
+
+# emacs #
+#*
+*~

@@ -5,6 +5,7 @@ var http     = require('http'),
     fs       = require('fs'),
     exec     = require('child_process').exec,
     env      = require('../env'),
+    shelljs  = require('shelljs'),
     shell    = require('../helper/shell');
 
 var colorize = lazyRequire("colorize");
@@ -123,11 +124,8 @@ var browserInterface = {
         }
 
         if (options.browserConf.tmpDir && fs.existsSync(options.browserConf.tmpDir)) {
-            exec('rm -rfd ' + options.browserConf.tmpDir, function() {
-                console.log('Browser temp dir removed');
-                browserInterface.open(url, options);
-            });
-            return;
+	    shelljs.rm('-rf', options.browserConf.tmpDir);
+            console.log('Browser temp dir removed');
         }
 
         if (options.display) {

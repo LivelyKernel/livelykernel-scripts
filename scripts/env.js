@@ -3,64 +3,98 @@
 var fs = require('fs'),
     path = require('path'),
     Seq = require('seq'),
+    shelljs = require('shelljs'),
+    which = shelljs.which,
     env = process.env;
 
 function lkScriptDir(dirInRoot) {
-    return path.normalize(env.LK_SCRIPTS_ROOT + dirInRoot);
+    return path.normalize(path.join(env.LK_SCRIPTS_ROOT, dirInRoot));
+}
+
+function set(varName, choices, options) {
+    var isValid = options && options.notFs ? function(c) { return !!c; } : fs.existsSync;
+    if (env[varName]) choices.unshift(env[varName]); // already set?
+    for (var i = 0; i < choices.length; i++) {
+        if (isValid(choices[i])) { return env[varName] = choices[i]; }
+    }
+    if (options && options.useLastIfNothingIsValid && choices.length > 0) {
+        env[varName] = choices[choices.length-1];
+    }
+    return env[varName];
 }
 
 /*
  * general stuff
  */
-env.LK_SCRIPTS_ROOT = path.normalize(__dirname + '/..');
-env.LK_SCRIPTS_DIR  = lkScriptDir("/scripts");
-env.NODEMODULES     = env.NODEMODULES || lkScriptDir("/node_modules");
-env.QUNIT           = env.QUNIT       || env.NODEMODULES + "/qunit/bin/cli.js";
-env.NODEUNIT        = env.NODEUNIT    || env.NODEMODULES + "/nodeunit/bin/nodeunit";
-env.NODEMON         = env.NODEMON     || env.NODEMODULES + "/nodemon/nodemon.js";
-env.FOREVER         = env.FOREVER     || env.NODEMODULES + "/forever/bin/forever";
+set("LK_SCRIPTS_ROOT", [path.normalize(__dirname + '/..')]);
+set("LK_SCRIPTS_DIR",  [lkScriptDir("/scripts")]);
+set("NODE_BIN",            [which('node'), which('node.exe'), process.execPath]);
+set("NODEMODULES",         [lkScriptDir("/node_modules"),
+                            path.join(env.LK_SCRIPTS_ROOT, '..')]);
+set("NODEUNIT",            [path.join(env.NODEMODULES, "nodeunit/bin/nodeunit"),
+                            which('nodeunit')]);
+set("NODEMON",             [path.join(env.NODEMODULES, "nodemon/nodemon.js"),
+                            which('nodemon')]);
+set("FOREVER",             [path.join(env.NODEMODULES, "forever/bin/forever"),
+                            which('forever')]);
+set("TEMP_DIR",            [env.TMP, env.TEMP, env.TEMPDIR, '/tmp'], {useLastIfNothingIsValid: true});
 
 /*
  * server related stuff
  * life_star will use miniserver settings
  */
-env.MINISERVER_DIR      = env.MINISERVER_DIR  || env.LK_SCRIPTS_ROOT + "/minimal_server";
-env.MINISERVER_PORT     = env.MINISERVER_PORT || 9001;
-env.MINISERVER          = env.MINISERVER_DIR + "/serve.js";
-env.MINISERVER_HOST     = "localhost";
-env.LIFE_STAR_DIR       = env.LIFE_STAR_DIR || env.LK_SCRIPTS_ROOT + "/life_star";
-env.LIFE_STAR           = env.LIFE_STAR_DIR + "/serve.js";
-env.LIFE_STAR_TESTING   = "testing"; // replace with "notesting" to disable test runner interface on server
-env.LIFE_STAR_LOG_LEVEL = "debug";   // be very chatty about what is going on
+set("MINISERVER_DIR",      [env.LK_SCRIPTS_ROOT + "/minimal_server"]);
+set("MINISERVER_PORT",     [9001], {notFs: true});
+set("MINISERVER",          [env.MINISERVER_DIR + "/serve.js"]);
+set("MINISERVER_HOST",     ["localhost"], {notFs: true});
+set("LIFE_STAR_DIR",       [env.LK_SCRIPTS_ROOT + "/life_star"]);
+set("LIFE_STAR",           [env.LIFE_STAR_DIR + "/serve.js"]);
+// replace with "notesting" to disable test runner interface on server
+set("LIFE_STAR_TESTING",   ["testing"], {notFs: true});
+// be very chatty about what is going on
+set("LIFE_STAR_LOG_LEVEL", ["debug"], {notFs: true});
 
 /*
  * tests
  */
-env.MINISERVER_TEST_FILES = env.MINISERVER_DIR + '/*_test.js';
-env.LK_TEST_SCRIPT_DIR    = env.LK_SCRIPTS_DIR + '/testing';
-env.LK_TEST_STARTER       = env.LK_TEST_SCRIPT_DIR + '/lively_test.js';
-env.LK_TEST_WORLD         = "run_tests.xhtml";
-env.LK_TEST_WORLD_SCRIPT  = "run_tests.js";
-env.LK_TEST_BROWSER       = "chrome";
-env.LK_TEST_TIMEOUT       = 300;
-env.LK_TEST_NOTIFIER      = "growlnotify";
+set("MINISERVER_TEST_FILES", [env.MINISERVER_DIR + '/*_test.js'], {notFs: true});
+set("LK_TEST_SCRIPT_DIR",    [env.LK_SCRIPTS_DIR + '/testing']);
+set("LK_TEST_STARTER",       [env.LK_TEST_SCRIPT_DIR + '/lively_test.js']);
+set("LK_TEST_WORLD",         ["run_tests.xhtml"], {notFs: true});
+set("LK_TEST_WORLD_SCRIPT",  ["run_tests.js"], {notFs: true});
+set("LK_TEST_BROWSER",       ["chrome"], {notFs: true});
+set("LK_TEST_TIMEOUT",       [300], {notFs: true});
+set("LK_TEST_NOTIFIER",      ["growlnotify"], {notFs: true});
+
+/*
+ * web-browser related
+ */
+set("CHROME_BIN",            [which('chrome'), which('chromium-browser'),
+                              "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+                              "/usr/bin/chromium-browser",
+                              path.join(env.LOCALAPPDATA, 'Google/Chrome/Application/chrome.exe')]);
+set("FIREFOX_BIN",            [which('firefox'),
+                              "/Applications/Firefox.app/Contents/MacOS/firefox",
+                              "/usr/bin/firefox",
+                               path.join(env['ProgramFiles(x86)'], 'Mozilla Firefox', 'firefox.exe'),
+                               path.join(env.ProgramFiles, 'Mozilla Firefox', 'firefox.exe')]);
 
 /*
  * jshint
  */
-env.JSHINT        = env.JSHINT        || env.LK_SCRIPTS_ROOT + "/node_modules/jshint/bin/hint";
-env.JSHINT_CONFIG = env.JSHINT_CONFIG || env.LK_SCRIPTS_ROOT + "/jshint.config";
+set("JSHINT",        [env.LK_SCRIPTS_ROOT + "/node_modules/jshint/bin/hint", which('jshint')]);
+set("JSHINT_CONFIG", [env.LK_SCRIPTS_ROOT + "/jshint.config"]);
 
 
 /*
  * workspace
  */
-env.WORKSPACE_DIR = env.WORKSPACE_DIR || lkScriptDir('/workspace');
-env.WORKSPACE_LK  = env.WORKSPACE_LK  || lkScriptDir('/workspace/lk');
-env.WORKSPACE_WW  = env.WORKSPACE_WW  || lkScriptDir('/workspace/ww');
+set("WORKSPACE_DIR", [lkScriptDir('/workspace')], {useLastIfNothingIsValid: true});
+set("WORKSPACE_LK",  [lkScriptDir('/workspace/lk')], {useLastIfNothingIsValid: true});
+set("WORKSPACE_WW",  [lkScriptDir('/workspace/ww')], {useLastIfNothingIsValid: true});
 
-env.WORKSPACE_LK_EXISTS = fs.existsSync(env.WORKSPACE_LK);
-env.WORKSPACE_WW_EXISTS = fs.existsSync(env.WORKSPACE_WW);
+set("WORKSPACE_LK_EXISTS", [fs.existsSync(env.WORKSPACE_LK)], {notFs: true});
+set("WORKSPACE_WW_EXISTS", [fs.existsSync(env.WORKSPACE_WW)], {notFs: true});
 
 /*
  * PartsBin
@@ -82,6 +116,13 @@ global.lkDevDependencyExist = function lkDevDependencyExist(path) {
     if (fs.existsSync(path)) return true;
     console.warn("The dev dependency " + path + " was not found, please run\n\n" + installCmd);
     return false;
+}
+
+global.svnRequired = function svnRequired() {
+    if (which('svn')) return;
+    console.warn("Subversion cannot be found. Please install Subversion and repeat "
+                 + "this command.\n See http://subversion.apache.org/packages.html");
+    process.exit(1);
 }
 
 global.lazyRequire = function lazyRequire(path) {
