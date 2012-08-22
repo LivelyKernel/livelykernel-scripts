@@ -5,7 +5,8 @@ var fs = require('fs'),
     Seq = require('seq'),
     shelljs = require('shelljs'),
     which = shelljs.which,
-    env = process.env;
+    env = process.env,
+    isWindows = /^win/i.test(process.platform);
 
 function lkScriptDir(dirInRoot) {
     return path.normalize(path.join(env.LK_SCRIPTS_ROOT, dirInRoot));
@@ -27,17 +28,18 @@ function set(varName, choices, options) {
  * general stuff
  */
 set("LK_SCRIPTS_ROOT", [path.normalize(__dirname + '/..')]);
+set("LK_BIN",          [path.join(env.LK_SCRIPTS_ROOT, isWindows ? 'bin/lk.cmd' : 'bin/lk')]);
 set("LK_SCRIPTS_DIR",  [lkScriptDir("/scripts")]);
-set("NODE_BIN",            [which('node'), which('node.exe'), process.execPath]);
-set("NODEMODULES",         [lkScriptDir("/node_modules"),
+set("NODE_BIN",        [which('node'), which('node.exe'), process.execPath]);
+set("NODEMODULES",     [lkScriptDir("/node_modules"),
                             path.join(env.LK_SCRIPTS_ROOT, '..')]);
-set("NODEUNIT",            [path.join(env.NODEMODULES, "nodeunit/bin/nodeunit"),
+set("NODEUNIT",        [path.join(env.NODEMODULES, "nodeunit/bin/nodeunit"),
                             which('nodeunit')]);
-set("NODEMON",             [path.join(env.NODEMODULES, "nodemon/nodemon.js"),
+set("NODEMON",         [path.join(env.NODEMODULES, "nodemon/nodemon.js"),
                             which('nodemon')]);
-set("FOREVER",             [path.join(env.NODEMODULES, "forever/bin/forever"),
+set("FOREVER",         [path.join(env.NODEMODULES, "forever/bin/forever"),
                             which('forever')]);
-set("TEMP_DIR",            [env.TMP, env.TEMP, env.TEMPDIR, '/tmp'], {useLastIfNothingIsValid: true});
+set("TEMP_DIR",        [env.TMP, env.TEMP, env.TEMPDIR, '/tmp'], {useLastIfNothingIsValid: true});
 
 /*
  * server related stuff

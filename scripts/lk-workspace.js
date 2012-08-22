@@ -140,7 +140,7 @@ if (options.defined('update')) {
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 if (options.defined('init')) {
     actions.push(
-        spawn.bind(global, 'lk', ['partsbin', '--dir', path.join(env.WORKSPACE_LK, 'PartsBin/')],
+        spawn.bind(global, env.LK_BIN, ['partsbin', '--dir', path.join(env.WORKSPACE_LK, 'PartsBin/')],
                    {stdio: 'inherit'}));
 }
 
