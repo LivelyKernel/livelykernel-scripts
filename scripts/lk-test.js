@@ -49,7 +49,9 @@ if (options.watch) {
     cmd = env.NODE_BIN;
     argList.push(env.NODEMON);
     argList.push('--watch');
-    argList.push(options.watch);
+    var watchDir = typeof options.watch === "string" ? options.watch : env.WORKSPACE_LK;
+    console.log("Watching " + watchDir);
+    argList.push(watchDir);
 } else {
     cmd = env.NODE_BIN;
 }
