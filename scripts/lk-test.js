@@ -16,7 +16,7 @@ var platformConf = config.platformConfigs[process.platform],
     defaultBrowser = env.LK_TEST_BROWSER,
     options = args.options([
         ['-h', '--help', 'show this help'],
-        ['-w', '--watch DIR', 'Run with nodemon and watch for file changes'],
+        ['-w', '--watch [DIR]', 'Run with nodemon and watch for file changes'],
         ['-v', '--verbose', "Print progress and debug information."],
         ['-b', '--browser NAME', "Which browser to use. Options are \""
                                + supportedBrowsers.join('", "')
@@ -44,7 +44,7 @@ var platformConf = config.platformConfigs[process.platform],
         "Run the core tests.");
 
 var cmd, argList = [];
-if (options.watch) {
+if (options.defined("watch")) {
     if (!global.lkDevDependencyExist(env.NODEMON)) process.exit(1);
     cmd = env.NODE_BIN;
     argList.push(env.NODEMON);
