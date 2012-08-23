@@ -4,6 +4,7 @@ var args = require('./helper/args'),
     async = require('async'),
     path = require('path'),
     readline = require('readline'),
+    util = require('util'),
     env = require('./env');
 
 require('shelljs/global');
@@ -139,9 +140,11 @@ if (options.defined('update')) {
 // download the PartsBin
 // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 if (options.defined('init')) {
-    actions.push(
-        spawn.bind(global, env.LK_BIN, ['partsbin', '--dir', path.join(env.WORKSPACE_LK, 'PartsBin/')],
-                   {stdio: 'inherit'}));
+    actions.push(function() {
+        exec(util.format('"%s" partsbin', env.LK_BIN), {async: true}, function() {
+            console.log('PartsBin downloaded');
+        });
+    });
 }
 
 // -=-=-=-=-=-=-
