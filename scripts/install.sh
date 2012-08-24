@@ -106,16 +106,17 @@ else
 fi
 
 # lk scripts-dir should be owner by user
-chown -R $USER:$GROUP `$lk_cmd scripts-dir`
+scripts_dir=`$lk_cmd scripts-dir`
+chown_cmd=`chown -R $USER:$GROUP $scripts_dir`
 ret=$?
 if [ $ret -ne 0 ]; then
     # try as root
-    sudo chown -R $USER:$GROUP `$lk_cmd scripts-dir`
+    chown_cmd=`sudo chown -R $USER:$GROUP $scripts_dir`
     ret=$?
     if [ $ret -ne 0 ]; then
         echo ""
         echo "${RED_B}${WHITE_F}Failure while changing the owner of the workspace:${NORM}" >&2
-        echo "chown -R $USER:$GROUP `$lk_cmd scripts-dir` failed" >&2
+        echo "chown -R $USER:$GROUP $scripts_dir failed" >&2
         echo "Sorry but checking out the workspace will probably not work..." >&2
     fi
 fi
