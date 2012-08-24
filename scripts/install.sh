@@ -107,6 +107,8 @@ fi
 
 # lk scripts-dir should be owner by user
 scripts_dir=`$lk_cmd scripts-dir`
+echo ""
+echo "Changing the owner of $scripts_dir to $USER"
 chown -R $USER:$GROUP $scripts_dir > /dev/null 2>&1
 ret=$?
 if [ $ret -ne 0 ]; then
