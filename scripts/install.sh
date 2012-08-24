@@ -13,13 +13,25 @@ if [ "x$0" = "xsh" ]; then
   exit $ret
 fi
 
+# We all love colors :)
+INVT="\033[7m"; NORM="\033[0m"; BOLD="\033[1m"; BLINK="\033[5m"
+UNDR="\033[4m"; EOL="\033[0K"; EOD="\033[0J" SOD="\033[1;1f"
+BLACK_F="\033[30m"; BLACK_B="\033[40m"
+RED_F="\033[31m"; RED_B="\033[41m"
+GREEN_F="\033[32m"; GREEN_B="\033[42m"
+YELLOW_F="\033[33m"; YELLOW_B="\033[43m"
+BLUE_F="\033[34m"; BLUE_B="\033[44m"
+MAGENTA_F="\033[35m"; MAGENTA_B="\033[45m"
+CYAN_F="\033[36m"; CYAN_B="\033[46m"
+WHITE_F="\033[37m"; WHITE_B="\033[47m"
+
 # make sure that node exists
 node=`which node 2>&1`
 ret=$?
 if [ $ret -eq 0 ] && [ -x "$node" ]; then
   (exit 0)
 else
-  echo "Lively Kernel cannot be installed without nodejs." >&2
+  echo "${RED_B}${WHITE_F}Error: Lively Kernel cannot be installed without nodejs.${NORM}" >&2
   echo "Install node first, and then try again." >&2
   echo "" >&2
   echo "Maybe node is installed, but not in the PATH?" >&2
@@ -35,8 +47,9 @@ ret=$?
 if [ $ret -eq 0 ] && [ -x "$git" ]; then
   (exit 0)
 else
-  echo "Git is not installed." >&2
+  echo "${RED_B}${WHITE_F}Git is not installed.${NORM}" >&2
   echo "Install git first, and then try again." >&2
+  echo "See ${UNDR}http://git-scm.com/${NORM} for more information." >&2
   exit $ret
 fi
 
@@ -47,7 +60,7 @@ ret=$?
 if [ $ret -eq 0 ] && [ -x "$npm" ]; then
   (exit 0)
 else
-  echo "npm is required for the installation" >&2
+  echo "${RED_B}${WHITE_F}npm is required for the installation${NORM}" >&2
   echo "but seems not to be installed." >&2
   echo "Note that running as sudo can change envs." >&2
   echo "" >&2
@@ -73,7 +86,7 @@ ret=$?
 if [ $ret -eq 0 ] && [ -x "$lk_cmd" ]; then
   (exit 0)
 else
-  echo "Installing livelykernel-scripts using npm..." >&2
+  echo "${BOLD}Installing livelykernel-scripts using npm...${NORM}" >&2
   lkscript_install=`$npm install --production -g livelykernel-scripts@latest`
   ret=$?
   if [ $ret -ne 0 ]; then
@@ -84,12 +97,27 @@ else
       ret=$?
       if [ $ret -ne 0 ]; then
           echo ""
-          echo "Failure during 'sudo npm install --production -g livelykernel-scripts'" >&2
+          echo "${RED_B}${WHITE_F}Failure during 'sudo npm install --production -g livelykernel-scripts'${NORM}" >&2
           echo "Aborting..." >&2
           exit $ret
       fi
   fi
   lk_cmd=`which lk 2>&1`
+fi
+
+# lk scripts-dir should be owner by user
+chown -R $USER:$GROUP `$lk_cmd scripts-dir`
+ret=$?
+if [ $ret -ne 0 ]; then
+    # try as root
+    sudo chown -R $USER:$GROUP `$lk_cmd scripts-dir`
+    ret=$?
+    if [ $ret -ne 0 ]; then
+        echo ""
+        echo "${RED_B}${WHITE_F}Failure while changing the owner of the workspace:${NORM}" >&2
+        echo "chown -R $USER:$GROUP `$lk_cmd scripts-dir` failed" >&2
+        echo "Sorry but checking out the workspace will probably not work..." >&2
+    fi
 fi
 
 # Init the workspace if it does not exist
@@ -107,12 +135,15 @@ else
         echo "Failure while initializing the LivelyKernel core repo" >&2
         exit $ret
     fi
+    echo "... done." >&2
 fi
 
 echo ""
-echo "Lively Kernel installation finished successfully" >&2
-echo "You can now start the lively kernel server with" >&2
-echo "lk server --lk-dir $workspace" >&2
-echo "Visit http://localhost:9001/blank.xhtml for opening a minimal world." >&2
-echo "You can optionally download the PartsBin of http://lively-kernel.org/repository/webwerkstatt/ with"  >&2
-echo "lk partsbin --dir $workspace/PartsBin" >&2
+echo ""
+echo "${GREEN_B}${WHITE_F}Yay! Lively Kernel installation finished successfully!${NORM}" >&2
+echo "1. Start the Lively Kernel server with" >&2
+echo "  ${BOLD}lk server --lk-dir $workspace${NORM}" >&2
+echo "2. Visit ${UNDR}http://localhost:9001/blank.xhtml${NORM} for opening a minimal world." >&2
+echo ""
+echo "You can optionally download the Webwerkstatt PartsBin with"  >&2
+echo "  ${BOLD}lk partsbin --dir $workspace/PartsBin${NORM}" >&2
