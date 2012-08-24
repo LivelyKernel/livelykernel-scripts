@@ -107,11 +107,11 @@ fi
 
 # lk scripts-dir should be owner by user
 scripts_dir=`$lk_cmd scripts-dir`
-chown_cmd=`chown -R $USER:$GROUP $scripts_dir`
+chown -R $USER:$GROUP $scripts_dir > /dev/null 2>&1
 ret=$?
 if [ $ret -ne 0 ]; then
     # try as root
-    chown_cmd=`sudo chown -R $USER:$GROUP $scripts_dir`
+    sudo chown -R $USER:$GROUP $scripts_dir > /dev/null 2>&1
     ret=$?
     if [ $ret -ne 0 ]; then
         echo ""
