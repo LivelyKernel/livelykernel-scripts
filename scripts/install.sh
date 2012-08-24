@@ -93,7 +93,8 @@ else
 fi
 
 # Init the workspace if it does not exist
-workspace="`$lk_cmd scripts-dir`/workspace/lk"
+workspace=$WORKSPACE_LK
+[ -z "$workspace" ] && workspace="`$lk_cmd scripts-dir`/workspace/lk"
 if [ -d $workspace ] || [ -L $workspace ]; then
     (exit 0)
 else
@@ -111,5 +112,7 @@ fi
 echo ""
 echo "Lively Kernel installation finished successfully" >&2
 echo "You can now start the lively kernel server with" >&2
-echo "$lk_cmd server" >&2
+echo "lk server --lk-dir $workspace" >&2
 echo "Visit http://localhost:9001/blank.xhtml for opening a minimal world." >&2
+echo "You can optionally download the PartsBin of http://lively-kernel.org/repository/webwerkstatt/ with"  >&2
+echo "lk partsbin --dir $workspace/PartsBin" >&2
