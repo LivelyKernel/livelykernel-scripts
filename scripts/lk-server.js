@@ -23,7 +23,9 @@ var options = args.options([
     [      '--lk-dir DIR', 'The directory of the Lively Kernel core repository (git) '],
     [      '--info', 'Print whether there is a running server on '
                    + 'the specified port or ' + env.MINISERVER_PORT
-                   + ' and the process pid']],
+                   + ' and the process pid'],
+    [      '--kill', 'Stop the server process for the specified port or ' + env.MINISERVER_PORT
+                   + ' if there exist one.']],
     {},
     "Start a server to be used for running the tests. Either -m or -s must be given.");
 
@@ -77,11 +79,7 @@ function processExists(pid, callback) {
     });
 }
 
-// -=-=-=-=-=-=-=-=-=-=-=-=-
-// This is where we do stuff
-// -=-=-=-=-=-=-=-=-=-=-=-=-
-
-if (options.defined('info')) {
+function getServerInfo(callback) {
     // FIXME! this does not yet work for servers that are started with
     // forever!!!
     async.waterfall([
@@ -89,8 +87,31 @@ if (options.defined('info')) {
         processExists
     ], function(err, isAlive, pid) {
         if (err) isAlive = false;
-        console.log(JSON.stringify({alive: isAlive, pid: String(pid)}));
+        var info = {alive: isAlive, pid: String(pid)};
+        callback(null, info);
     });
+}
+
+function killOldServer(infoAboutOldServer, callback) {
+    // Note: this does not work with forever...
+    // since forever is daemonized the starting process will exit anyway
+    if (infoAboutOldServer.alive) {
+        console.log('Stopping lk server process with pid ' + infoAboutOldServer.pid);
+        try { process.kill(infoAboutOldServer.pid) } catch(e) {}
+    }
+    callback();
+}
+
+// -=-=-=-=-=-=-=-=-=-=-=-=-
+// This is where we do stuff
+// -=-=-=-=-=-=-=-=-=-=-=-=-
+
+if (options.defined('info')) {
+    getServerInfo(function(err, info) {
+        console.log(info ? JSON.stringify(info) : '{}');
+    });
+} else if (options.defined('kill')) {
+    async.waterfall([getServerInfo, killOldServer]);
 } else {
 
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -136,16 +157,6 @@ if (options.defined('info')) {
     // -=-=-=-=-=-=-=-=-=-
     // Server start logic
     // -=-=-=-=-=-=-=-=-=-
-    function killServer(pid, callback) {
-        // Note: this does not work with forever...
-        // since forever is daemonized the starting process will exit anyway
-        if (pid) {
-            console.log('Old server process still alive? Trying to kill...');
-            try { process.kill(pid) } catch(e) {}
-        }
-        callback();
-    }
-
     function startServer(callback) {
         var child = spawn(cmdAndArgs[0], cmdAndArgs.slice(1), {stdio: 'inherit'});
         console.log("Server with pid %s is now running at http://%s:%s", child.pid, host, port);
@@ -155,8 +166,8 @@ if (options.defined('info')) {
 
     // let it fly!
     async.waterfall([
-        readPid,
-        killServer, // Ensure that only one server for the given port is running
+        getServerInfo,
+        killOldServer, // Ensure that only one server for the given port is running
         startServer,
         writePid
     ]);
