@@ -1,2 +1,3 @@
 /*global require, process*/
-console.log(process.env.LK_SCRIPTS_ROOT.toString());
+var env = require('./env');
+console.log(env.LK_SCRIPTS_ROOT.toString());
