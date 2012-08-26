@@ -99,6 +99,8 @@ set("WORKSPACE_WW",  [env.WEBWERKSTATT, lkScriptDir('/workspace/ww')], {useLastI
 set("WORKSPACE_LK_EXISTS", [fs.existsSync(env.WORKSPACE_LK)], {notFs: true});
 set("WORKSPACE_WW_EXISTS", [fs.existsSync(env.WORKSPACE_WW)], {notFs: true});
 
+set("SERVER_PID_DIR", [env.WORKSPACE_DIR], {useLastIfNothingIsValid: true});
+
 /*
  * PartsBin
  */
