@@ -1,8 +1,10 @@
 /*global require, process*/
 var args = require('./helper/args'),
     shell = require('./helper/shell'),
+    async = require('async'),
     spawn = require('child_process').spawn,
     path = require('path'),
+    fs = require('fs'),
     env = require('./env'),
     cmdAndArgs = [];
 
@@ -33,9 +35,9 @@ if (!options.defined('lkDir')) {
                + "Please start the server with --lk-dir PATH/TO/LK-REPO")
 }
 
-// -=-=-=-=-=-=-=-=-=-=-
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 // Start the mini server & how to do that
-// -=-=-=-=-=-=-=-=-=-=-
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 // TODO add logfile param for forever
 // TODO add forever stop since forever automatically starts daemonized
@@ -73,7 +75,45 @@ if (options.defined('lifeStar')) {
   cmdAndArgs.push(env.LIFE_STAR_LOG_LEVEL);
 }
 
-console.log("Server is now running at " + "http://localhost:" + port);
-console.log("Serving files from " + options.lkDir);
 
-spawn(cmdAndArgs[0], cmdAndArgs.slice(1), {stdio: 'inherit'}).on('exit', function(code) { process.exit(code); });
+// -=-=-=-=-=-=-=-=-=-
+// Server start logic
+// -=-=-=-=-=-=-=-=-=-
+var pidFile = path.join(env.LK_SCRIPTS_ROOT, 'server.' + port + '.pid');
+
+function removePidFile() {
+    try { fs.unlink(pidFile) } catch(e) {}
+}
+
+function writePid(process, callback) {
+    if (process.pid) { fs.writeFileSync(pidFile, String(process.pid)); }
+    callback();
+}
+
+function readPid(callback) {
+    fs.readFile(pidFile, function(err, data) { callback(null, data); });
+}
+
+function killServer(pid, callback) {
+    if (pid) {
+        console.log('Old server process still alive? Trying to kill...');
+        try { process.kill(pid) } catch(e) {}
+    }
+    callback();
+}
+
+function startServer(callback) {
+    var child = spawn(cmdAndArgs[0], cmdAndArgs.slice(1), {stdio: 'inherit'});
+    child.on('exit', removePidFile);
+    console.log("Server is now running at " + "http://localhost:" + port);
+    console.log("Serving files from " + options.lkDir);
+    callback(null, child);
+}
+
+// let it fly!
+async.waterfall([
+    readPid,
+    killServer, // Ensure that only one server for the given port is running
+    startServer,
+    writePid
+]);
