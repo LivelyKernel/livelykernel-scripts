@@ -52,7 +52,7 @@ function removePidFile() {
 }
 
 function writePid(proc, callback) {
-    shelljs.mkdir(env.SERVER_PID_DIR, '-p');
+    shelljs.mkdir('-p', env.SERVER_PID_DIR);
     if (proc.pid) { fs.writeFileSync(pidFile, String(proc.pid)); }
     callback();
 }
@@ -148,7 +148,6 @@ if (options.defined('info')) {
 
     function startServer(callback) {
         var child = spawn(cmdAndArgs[0], cmdAndArgs.slice(1), {stdio: 'inherit'});
-        child.on('exit', removePidFile);
         console.log("Server with pid %s is now running at http://%s:%s", child.pid, host, port);
         console.log("Serving files from " + options.lkDir);
         callback(null, child);
