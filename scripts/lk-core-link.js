@@ -17,7 +17,7 @@ var args           = require('./helper/args'),
     shell          = require('./helper/shell'),
     exec           = require('child_process').exec,
     Seq            = require('seq'),
-    env            = process.env,
+    env            = require('./env'),
     calledDirectly = require.main === module;
 
 var colorize = lazyRequire("colorize");

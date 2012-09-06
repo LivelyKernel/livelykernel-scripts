@@ -43,6 +43,10 @@ function printHelpForAllSubCommandsAndExit(nextArg) {
     async.forEachSeries(subcommands, function(subcommand, next) {
         var name = 'lk ' + subcommand.name(),
             msg = asMarkDown ? "### " + name + '\n' : '-= ' + name + ' =-';
+        if (asMarkDown) {
+            msg = msg.replace(/Available options:(\n[\s\n]+\-.*)+/g,
+                              function(match) { return match.split('\n').collect(function(ea) { return '    ' + ea }).join('\n'); })
+        }
         console.log(msg);
         subcommand.showHelp(function() {
             console.log("\n");

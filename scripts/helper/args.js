@@ -38,7 +38,17 @@ function switchOptions(switches, defaultOptions, banner) {
     options.defined = function(name) { return this[name] !== undefined; };
     // Note: hasValue !== defined !
     options.hasValue = function(name) { return !!this[name]; };
-    options.showHelpAndExit = function() { console.log(parser.toString()); process.exit(0); };
+    options.showHelpAndExit = function() {
+        var isMarkdown = process.argv.indexOf("--markdown") > -1,
+            helpString = parser.toString();
+        if (isMarkdown) {
+            helpString = helpString.replace(
+                /Available options:(\n[\s\n]+\-.*)+/g,
+                function(match) { return match.split('\n').map(function(ea) { return '    ' + ea }).join('\n'); })
+        }
+        console.log(helpString);
+        process.exit(0);
+    };
     options.dasherize = dasherize;
     parser.on('help', options.showHelpAndExit); // overwrite help
     delete options.help;
