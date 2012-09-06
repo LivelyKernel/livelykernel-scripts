@@ -123,7 +123,7 @@ if [ $ret -ne 0 ]; then
     fi
 fi
 
-# Init the workspace if it does not exist
+# Init the workspace's lk-repo if it does not exist
 workspace=$WORKSPACE_LK
 [ -z "$workspace" ] && workspace="`$lk_cmd scripts-dir`/workspace/lk"
 if [ -d $workspace ] || [ -L $workspace ]; then
@@ -141,12 +141,34 @@ else
     echo "... done." >&2
 fi
 
+# Init the PartsBin if it does not exist
+[ -z "$partsbin_dir" ] && partsbin_dir="$workspace/../PartsBin"
+[ -z "$partsbin_in_lkcore_dir" ] && partsbin_in_lkcore_dir="$workspace/PartsBin"
+if [ -d $partsbin_dir ] || [ -L $partsbin_dir ]; then
+    (exit 0)
+else
+    # partsbin already in lk-core?
+    echo ""  >&2
+    echo "Installing PartsBin" >&2
+    if [ -d $partsbin_in_lkcore_dir ] || [ -L $partsbin_in_lkcore_dir ]; then
+        echo "PartsBin exist in $partsbin_in_lkcore_dir already" >&2
+        echo "linking $partsbin_dir to $partsbin_in_lkcore_dir" >&2
+        ln -s $partsbin_in_lkcore_dir $partsbin_dir
+    else
+        partsbin_remote_location="http://lively-kernel.org/other/lively-core-install"
+        partsbin_version_name="PartsBin.2012-09-05.tar.gz"
+        partsbin_pkg_url="$partsbin_remote_location/$partsbin_version_name"
+        echo "Downloading PartsBin from $partsbin_pkg_url" >&2
+        curl -0 $partsbin_pkg_url | tar -zx
+        mv PartsBin $partsbin_dir
+        ln -s $partsbin_dir $partsbin_in_lkcore_dir
+        echo "PartsBin installed in $partsbin_dir and linked to $partsbin_in_lkcore_dir" >&2
+    fi
+fi
+
 echo ""
 echo ""
 echo "${GREEN_F}Yay! Lively Kernel installation finished successfully!${NORM}" >&2
 echo "1. Start the Lively Kernel server with" >&2
-echo "  ${BOLD}lk server --lk-dir $workspace${NORM}" >&2
-echo "2. Visit ${UNDR}http://localhost:9001/blank.xhtml${NORM} for opening a minimal world." >&2
-echo ""
-echo "You can optionally download the Webwerkstatt PartsBin with"  >&2
-echo "  ${BOLD}lk partsbin --dir $workspace/PartsBin${NORM}" >&2
+echo "  ${BOLD}lk server" >&2
+echo "2. Visit ${UNDR}http://localhost:9001/welcome.xhtml${NORM} for opening a Lively world." >&2
