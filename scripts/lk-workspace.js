@@ -28,10 +28,12 @@ var options = {
 
 options = args.options([
     ['-h', '--help', 'show this help'],
-    [      '--remove', 'completely delete the workspace'],
     ['-u', '--update', 'update the svn and git repositories with remote changes if they exist'],
     ['-r', '--reset', 'reset the svn and git repositories if they exist but do not delete them'],
-    [      '--github-write-access', 'Initialize the lk core git repo with commit access'],
+    [      '--github-write-access [URL]', 'Initialize the lk core git repo with commit access'
+                                        + ' to either the given URL or when not specified to '
+                                        + '' + options.lkGitUrl],
+    [      '--remove', 'completely delete the workspace'],
     [      '--checkout-ww', 'create ./workspace/ww/, checked out from ' + options.wwSvnUrl],
     [      '--checkout-lk', 'create ./workspace/lk/, checked out from ' + options.lkGitUrl +
            ' on branch ' + options.lkBranch],
@@ -83,7 +85,14 @@ if (options.defined('reset')) {
 // checkout core
 // -=-=-=-=-=-=-
 if (options.defined('checkoutLk') || options.defined('init')) {
-    var gitURL = options.defined('githubWriteAccess') ? options.lkGitUrl : options.lkGitUrlReadOnly;
+    var gitURL;
+    if (!options.defined('githubWriteAccess')) {
+        gitURL = options.lkGitUrlReadOnly;
+    } else if (typeof options.githubWriteAccess === 'string') {
+        gitURL = options.githubWriteAccess;
+    } else {
+        gitURL = options.lkGitUrl;
+    }
     if (test('-d', env.WORKSPACE_LK)) {
         echo('LivelyKernel core workspace already exists at ' + env.WORKSPACE_LK
             + " and will be updated");
