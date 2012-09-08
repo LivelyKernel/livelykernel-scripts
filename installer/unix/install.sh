@@ -160,9 +160,19 @@ else
         partsbin_pkg_url="$partsbin_remote_location/$partsbin_version_name"
         echo "Downloading PartsBin from $partsbin_pkg_url" >&2
         curl -0 $partsbin_pkg_url | tar -zx
+        svn_cmd=`which svn 2>&1`
+        if [ -n "$svn_cmd" ]; then
+            echo "Updating the PartsBin snapshot" >&2
+            $svn_cmd update PartsBin/
+        else
+            echo "Looks like you don't have subversion installed" >&2
+            echo "You can use Lively anyway but will not be able to" >&2
+            echo "update or commit to the PartsBin." >&2
+        fi
         mv PartsBin $partsbin_dir
         ln -s $partsbin_dir $partsbin_in_lkcore_dir
-        echo "PartsBin installed in $partsbin_dir and linked to $partsbin_in_lkcore_dir" >&2
+        echo "PartsBin installed in ${BOLD}$partsbin_dir{NORM}" >&2
+        echo "and linked to ${BOLD}$partsbin_in_lkcore_dir{NORM}" >&2
     fi
 fi
 
@@ -170,5 +180,5 @@ echo ""
 echo ""
 echo "${GREEN_F}Yay! Lively Kernel installation finished successfully!${NORM}" >&2
 echo "1. Start the Lively Kernel server with" >&2
-echo "  ${BOLD}lk server" >&2
+echo "   ${BOLD}lk server{NORM}" >&2
 echo "2. Visit ${UNDR}http://localhost:9001/welcome.xhtml${NORM} for opening a Lively world." >&2
