@@ -104,11 +104,17 @@ set("SERVER_PID_DIR", [env.WORKSPACE_DIR], {useLastIfNothingIsValid: true});
 /*
  * PartsBin
  */
-set("PARTSBIN_DIR",     [path.join(env.LIVELY, 'PartsBin/'),
-                         path.join(env.WORKSPACE_LK, 'PartsBin/')], {useLastIfNothingIsValid: true});
-set("WW_USERS_DIR",     [path.normalize(path.join(env.PARTSBIN_DIR, '../users'))], {useLastIfNothingIsValid: true});
-set("WW_SVN_URL", ["http://lively-kernel.org/repository/webwerkstatt/"], {notFs: true});
-set("PARTSBIN_SVN_URL", [env.WW_SVN_URL + 'PartsBin/'], {notFs: true});
+set("PARTSBIN_DIR",      [path.join(env.WORKSPACE, 'PartsBin/'),
+                          path.join(env.WORKSPACE_WW, 'PartsBin/'),
+                          path.join(env.WORKSPACE_LK, 'PartsBin/'),
+                          path.join(env.WEBWERKSTATT, 'PartsBin/'),
+                          path.join(env.LIVELY, 'PartsBin/'),
+                          path.join(env.WORKSPACE, 'PartsBin/')], {useLastIfNothingIsValid: true});
+set("WW_USERS_DIR",      [path.normalize(path.join(env.WORKSPACE_LK, '../users')),
+                          path.normalize(path.join(env.WORKSPACE_WW, '../users')),
+                          path.normalize(path.join(env.WORKSPACE_LK, '../users'))], {useLastIfNothingIsValid: true});
+set("WW_SVN_URL",        ["http://lively-kernel.org/repository/webwerkstatt/"], {notFs: true});
+set("PARTSBIN_SVN_URL",  [env.WW_SVN_URL + 'PartsBin/'], {notFs: true});
 set("USERS_DIR_SVN_URL", [env.WW_SVN_URL + 'users/'], {notFs: true});
 
 
