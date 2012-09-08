@@ -110,19 +110,30 @@ if (options.defined('checkoutLk') || options.defined('init')) {
 // -=-=-=-=-=-=-
 // checkout ww
 // -=-=-=-=-=-=-
-if (options.defined('checkoutWw')) {
+function setupCheckoutWw(options) {
     if (test('-d', wwCoreDir)) {
         echo('Webwerkstatt core directory already exists at ' + wwCoreDir
             + " and will be updated");
-    } else {
-        actions.push(function(next) {
-            echo('Retrieving webwerkstatt core, this may take a while...');
-            mkdir('-p', wwCoreDir);
-            exec(['svn co ', options.wwSvnUrl + '/core ', '"', wwCoreDir, '"'].join(''),
-                 {async: true}, next);
-        });
+        options.update = true;
+        return;
     }
-}
+
+    // checkout
+    actions.push(function(next) {
+        echo('Retrieving webwerkstatt core, this may take a while...');
+        mkdir('-p', wwCoreDir);
+        exec(util.format('svn co %s/core "%s"', options.wwSvnUrl, wwCoreDir),
+             {async: true}, next);
+    });
+
+    // linking partsbin to ww workspace if necessary
+    var wwPartsBinDir = path.join(wwCoreDir, '../PartsBin');
+    if (test('-d', wwPartsBinDir) || !test('-d', env.PARTSBIN_DIR)) return;
+    actions.push(function(next) {
+        exec(util.format('ln -s %s %s', env.PARTSBIN_DIR, wwPartsBinDir), {async: true}, next)
+    });
+};
+if (options.defined('checkoutWw')) setupCheckoutWw(options);
 
 // -=-=-=-=-=-=-=-=-=-
 // update core && ww
@@ -156,7 +167,52 @@ if (options.defined('init')) {
     });
 }
 
-// -=-=-=-=-=-=-
-// run it!
-// -=-=-=-=-=-=-
-async.series(actions);
+function run() { async.series(actions); }
+
+if (!process.env.LK_SCRIPT_TEST_RUN) {
+
+    // = = = =
+    // run it!
+    // = = = =
+    run();
+
+} else {
+
+    // = = = =
+    // Test it
+    // = = = =
+
+    var testHelper = require('./helper/test-helper');
+
+    module.exports = {
+        setUp: function (callback) {
+            // this.mergeSpec = "foo...bar\nbaz...zork\nboing, test commit\nsecond line";
+            options = {
+                defined: function(name) { return !!options[name]; },
+                wwSvnUrl: "http://svn.foo.bar"
+            }
+            env.PARTSBIN_DIR = '/foo/PartsBin';
+            actions = [];
+            callback();
+        },
+
+        testWWCheckoutLinksPartsBinIfExisting: function (t) {
+            var shelljs = testHelper.shelljs(t).beGlobal(),
+                wwCoreDir = path.join(env.WORKSPACE_WW, 'core'),
+                wwPartsBinDir = path.join(wwCoreDir, '../PartsBin');
+
+            echo.ignoreUnexpected();
+            test.expect({flags: '-d', arg: wwCoreDir, returns: false});        // ww already there?
+            mkdir.expect({flags: '-p', path: wwCoreDir});                      // create path
+            exec.expect({cmd: /svn co/});                                      // svn checkout
+            test.expect({flags: '-d', arg: wwPartsBinDir, returns: false});    // partsbin here?
+            test.expect({flags: '-d', arg: env.PARTSBIN_DIR, returns: true});  // partsbin there?
+            exec.expect({cmd: util.format('ln -s %s %s',                       // link partsbin
+                                          env.PARTSBIN_DIR, wwPartsBinDir)});
+
+            setupCheckoutWw(options); run();
+            shelljs.assertAllCalled(); t.done();
+        }
+
+    };
+}
