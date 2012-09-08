@@ -21,10 +21,10 @@ function genericSpy(bodyFunc) {
     function run() {
         var spy = invovationsToRun.shift();
         if (!spy) {
-            if (ignoreUnexpected) return;
-            throw new Error('unepectedly trying to call: ' + arguments[0]);
+            if (ignoreUnexpected) return undefined;
+            throw new Error('unepectedly trying to call: ' + bodyFunc.name + ' with ' + util.inspect(arguments));
         }
-        spy.apply(null, arguments);
+        return spy.apply(null, arguments);
     }
 
     run.ignoreUnexpected = function() { ignoreUnexpected = true }
@@ -79,15 +79,55 @@ exports.fsForTest = function(test) {
     }
 }
 
+function assertStringMatches(test, actual, expectedStringOrRegExp, msg) {
+    if (typeof expectedStringOrRegExp === 'string') {
+        test.equal(actual, expectedStringOrRegExp, msg);
+        return;
+    }
+    test.ok(expectedStringOrRegExp.test(actual),
+                msg + ': ' + actual + 'does not match ' + expectedStringOrRegExp);
+}
+
 exports.shelljs = function(test) {
     var spies = {
-        echo: genericSpy(function echoSpy(expectedString, actualString) {
-            test.equal(actualString, expectedString, "echo not OK"); })
+        echo: genericSpy(function echoSpy(spec, actualString) {
+            test.equal(actualString, spec, "echo not OK");
+        }),
+        mkdir: genericSpy(function mkdirSpy(spec, flagsOrPath, path) {
+            if (!path) {
+                path = flagsOrPath;
+            } else {
+                test.equal(flagsOrPath, spec.flags, "flags not OK " + this);
+            }
+            test.equal(path, spec.path, "path not OK " + this);
+        }),
+        test: genericSpy(function testSpy(spec, flags, arg) {
+            test.equal(flags, spec.flags, "test flags not OK");
+            test.equal(arg, spec.arg, "test arg not OK");
+            return spec.returns;
+        }),
+        exec: genericSpy(function execSpy(spec, cmd, options, callback) {
+            assertStringMatches(test, cmd, spec.cmd, 'exec cmd');
+            if (spec.options) {
+                test.deepEqual(options, spec.options,  'options of ' + this);
+            }
+            if (callback) {
+                callback(null);
+            }
+        }),
+        cd: genericSpy(function cdSpy(spec, dir) {
+            test.equal(dir, spec, this + ' dir');
+        })
     };
+    var spyNames = Object.keys(spies);
     spies.beGlobal = function() {
-        Object.keys(spies).forEach(function(name) {
+        spyNames.forEach(function(name) {
             global[name] = spies[name];
         });
+        return spies;
+    }
+    spies.assertAllCalled = function() {
+        spyNames.forEach(function(name) { spies[name].assertAllCalled(); })
     }
     return spies;
 }
