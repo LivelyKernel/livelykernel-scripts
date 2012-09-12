@@ -15,7 +15,7 @@ var args = require('./helper/args'),
 
 var options = args.options([
     ['-h', '--help', 'show this help'],
-    ['-w', '--watch', 'Run with nodemon and watch for file changes'],
+    ['-w', '--watch [DIR]', 'Run with nodemon and watch for file changes'],
     ['-f', '--forever', 'Run with forever and restart server on a crash'],
     ['-p', '--port NUMBER', "On which port to run"],
     ['-m', '--mini-server', 'Start the minimal server (this is the default)'],
@@ -126,13 +126,14 @@ if (options.defined('info')) {
     }
 
     if (options.defined('watch')) {
+        console.log("watch " + options.watch);
         if (!lkDevDependencyExist(env.NODEMON)) process.exit(1);
         cmdAndArgs.push(env.NODEMON);
         if (options.defined('forever')) {
             cmdAndArgs.push('--exitcrash');
         }
         cmdAndArgs.push('--watch');
-        cmdAndArgs.push(env.MINISERVER_DIR);
+        cmdAndArgs.push(options.watch || (options.lifeStar ? env.LIFE_STAR_DIR : env.MINISERVER_DIR));
     }
 
     if (!options.defined('forever') && !options.defined('watch')) {
