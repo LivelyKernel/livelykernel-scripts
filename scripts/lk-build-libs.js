@@ -55,7 +55,7 @@ function download(urlString, thenDo) {
     comment += ' * ' + fileName + '\n';
     get({host: urlParsed.host, path: urlParsed.path}, function(res) {
         res.on('data', function (chunk) { data += chunk; })
-        res.on('end', function() { thenDo(null, '// ' + urlString + '\n' + data) })
+        res.on('end', function() { thenDo(null, '//! ' + urlString + '\n' + data) })
     }).on('error', function(e) {
         console.error("Error when trying to download %s: %s", urlString, e.message); })
 }
@@ -72,20 +72,45 @@ function downloadAndModify(urlString, modifyFunc, thenDo) {
     download(urlString, function(err, data) { thenDo(null, modifyFunc(data)); });
 }
 
-var comment = "/*\n"
+function write(filename, err, allData) {
+    comment += " */";
+    store(path.join(options.lkDir, filename), [comment].concat(allData).join('\n\n'));
+}
+
+var urls = {
+        jquery: {
+            src: "http://code.jquery.com/jquery-1.7.2.js",
+            minified: "http://code.jquery.com/jquery-1.7.2.min.js"
+        },
+        jqueryBounds: {
+            src: "https://raw.github.com/rksm/jquery-bounds/master/jquery-bounds.js",
+            minify: function(code) { return require('uglify-js')(code); }
+        },
+        es5Shim: {
+            src: "https://raw.github.com/kriskowal/es5-shim/v1.2.10/es5-shim.js",
+            minified: "https://raw.github.com/kriskowal/es5-shim/v1.2.10/es5-shim.min.js"
+        }
+    },
+    comment = "/*\n"
             + " * This file was compiled with \"lk build-libs\" on "
             + new Date().toUTCString() + " with the libs:\n",
-    downloads = [
-        download.bind(global, "http://code.jquery.com/jquery-1.7.2.min.js"),
-        download.bind(global, "https://raw.github.com/kriskowal/es5-shim/v1.2.10/es5-shim.min.js")],
+    downloadsMinified = [
+        download.bind(global, urls.jquery.minified),
+        downloadAndModify.bind(global, urls.jqueryBounds.src, urls.jqueryBounds.minify),
+        download.bind(global, urls.es5Shim.minified)
+    ],
+    downloadsDebug = [
+        download.bind(global, urls.jquery.src),
+        download.bind(global, urls.jqueryBounds.src),
+        download.bind(global, urls.es5Shim.src)
+    ],
     localLibs = [copyLocal.bind(global, "resources/pre-lib/requestAnimationFrame.js"),
                  copyLocal.bind(global, "resources/pre-lib/IE-fixes.js")];
 
 async.series(
-    downloads.concat(localLibs),
-    function(err, allData) {
-        comment += " */";
-        store(
-            path.join(options.lkDir, 'core/lib/lively-libs.js'),
-            [comment].concat(allData).join('\n\n'));
-    });
+    downloadsMinified.concat(localLibs),
+    write.bind(global, 'core/lib/lively-libs.js'));
+
+async.series(
+    downloadsDebug.concat(localLibs),
+    write.bind(global, 'core/lib/lively-libs-debug.js'));
