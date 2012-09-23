@@ -60,6 +60,10 @@ function download(urlString, thenDo) {
         console.error("Error when trying to download %s: %s", urlString, e.message); })
 }
 
+function downloadAndModify(urlString, modifyFunc, thenDo) {
+    download(urlString, function(err, data) { thenDo(null, modifyFunc(data)); });
+}
+
 function copyLocal(relativePath, thenDo) {
     var fullPath = path.join(env.LK_SCRIPTS_ROOT, relativePath),
         name = path.basename(fullPath);
@@ -68,13 +72,15 @@ function copyLocal(relativePath, thenDo) {
     fs.readFile(fullPath, function(err, data) { thenDo(err, '// ' + relativePath + '\n' + data) });
 }
 
-function downloadAndModify(urlString, modifyFunc, thenDo) {
-    download(urlString, function(err, data) { thenDo(null, modifyFunc(data)); });
+function write(next, filename, err, allData) {
+    store(path.join(options.lkDir, filename), [comment + " */"].concat(allData).join('\n\n'));
+    next && next();
 }
 
-function write(filename, err, allData) {
-    comment += " */";
-    store(path.join(options.lkDir, filename), [comment].concat(allData).join('\n\n'));
+function resetComment(next) {
+    comment = "/*\n * This file was compiled with \"lk build-libs\" on "
+            + new Date().toUTCString() + " with the libs:\n";
+    next();
 }
 
 var urls = {
@@ -91,9 +97,6 @@ var urls = {
             minified: "https://raw.github.com/kriskowal/es5-shim/v1.2.10/es5-shim.min.js"
         }
     },
-    comment = "/*\n"
-            + " * This file was compiled with \"lk build-libs\" on "
-            + new Date().toUTCString() + " with the libs:\n",
     downloadsMinified = [
         download.bind(global, urls.jquery.minified),
         downloadAndModify.bind(global, urls.jqueryBounds.src, urls.jqueryBounds.minify),
@@ -105,12 +108,19 @@ var urls = {
         download.bind(global, urls.es5Shim.src)
     ],
     localLibs = [copyLocal.bind(global, "resources/pre-lib/requestAnimationFrame.js"),
-                 copyLocal.bind(global, "resources/pre-lib/IE-fixes.js")];
+                 copyLocal.bind(global, "resources/pre-lib/IE-fixes.js")],
 
-async.series(
-    downloadsMinified.concat(localLibs),
-    write.bind(global, 'core/lib/lively-libs.js'));
+    comment = '';
 
-async.series(
-    downloadsDebug.concat(localLibs),
-    write.bind(global, 'core/lib/lively-libs-debug.js'));
+async.series([
+    function(next) {
+        async.series(
+            [resetComment].concat(downloadsMinified).concat(localLibs),
+            write.bind(global, next, 'core/lib/lively-libs.js'))
+    },
+    function(next) {
+        async.series(
+            [resetComment].concat(downloadsDebug).concat(localLibs),
+            write.bind(global, next, 'core/lib/lively-libs-debug.js'))
+    }
+]);
