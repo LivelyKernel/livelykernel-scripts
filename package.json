@@ -15,7 +15,7 @@
     "lk" : "./bin/lk"
   },
   "dependencies": {
-    "life_star": "https://github.com/fbornhofen/life_star/tarball/0.0.3",
+    "life_star": "https://github.com/rksm/life_star.git",
     "forever": "https://github.com/nodejitsu/forever/tarball/v0.10.1",
     "colorize": "0.1.0",
     "optparse": "~1.0",
