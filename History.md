@@ -1,3 +1,11 @@
+0.1.2 / 2012-10-04
+==================
+
+* fixed life_star proxying
+* lk server now has "--info" and "--kill" options
+* install.sh will download partsbin snapshot
+* fixing server --watch
+
 0.1.1 / 2012-08-24
 ==================
 
