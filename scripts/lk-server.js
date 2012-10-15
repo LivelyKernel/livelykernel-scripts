@@ -21,6 +21,11 @@ var options = args.options([
     ['-m', '--mini-server', 'Start the minimal server (this is the default)'],
     ['-s', '--life-star', 'Start the Life Star server (fully operational!)'],
     [      '--lk-dir DIR', 'The directory of the Lively Kernel core repository (git) '],
+    [      '--enable-ssl', 'Enable https server'],
+    [      '--enable-ssl-client-auth', 'Whether to use authentication via SSL client certificate'],
+    [      '--ssl-server-key FILE', 'Where the server key is located'],
+    [      '--ssl-server-cert FILE', 'Where the server certificate is located'],
+    [      '--ssl-ca-cert FILE', 'Where the CA certificate is located'],
     [      '--info', 'Print whether there is a running server on '
                    + 'the specified port or ' + env.MINISERVER_PORT
                    + ' and the process pid'],
@@ -152,6 +157,13 @@ if (options.defined('info')) {
     if (options.defined('lifeStar')) {
         cmdAndArgs.push(env.LIFE_STAR_TESTING);
         cmdAndArgs.push(env.LIFE_STAR_LOG_LEVEL);
+        if (options.defined('enableSsl')) {
+            cmdAndArgs.push(true);
+            cmdAndArgs.push(options.defined('enableSslClientAuth'));
+            cmdAndArgs.push(options.sslServerKey);
+            cmdAndArgs.push(options.sslServerCert);
+            cmdAndArgs.push(options.sslCaCert);
+        }
     }
 
 
@@ -160,7 +172,8 @@ if (options.defined('info')) {
     // -=-=-=-=-=-=-=-=-=-
     function startServer(callback) {
         var child = spawn(cmdAndArgs[0], cmdAndArgs.slice(1), {stdio: 'inherit'});
-        console.log("Server with pid %s is now running at http://%s:%s", child.pid, host, port);
+        console.log("Server with pid %s is now running at %s://%s:%s",
+                    child.pid, options.defined('enableSsl') ? 'https' : 'http', host, port);
         console.log("Serving files from " + options.lkDir);
         callback(null, child);
     }
