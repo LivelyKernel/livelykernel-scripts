@@ -181,7 +181,7 @@ if (!env.LK_SCRIPT_TEST_RUN) {
                 "  \"homepage\": \"http://lively-kernel.org\",\n" +
                 "  \"repository\": {\n" +
                 "    \"type\": \"git\",\n" +
-                "    \"url\": \"git@github.com:rksm/livelykernel-scripts.git\"\n" +
+                "    \"url\": \"git@github.com:LivelyKernel/livelykernel-scripts.git\"\n" +
                 "  },\n" +
                 "  \"engines\": {\"node\": \"~0.6.7\"},\n" +
                 "  \"bin\" : {\n" +

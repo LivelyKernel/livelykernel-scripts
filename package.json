@@ -6,7 +6,7 @@
   "homepage": "http://lively-kernel.org",
   "repository": {
     "type": "git",
-    "url": "git@github.com:rksm/livelykernel-scripts.git"
+    "url": "git@github.com:LivelyKernel/livelykernel-scripts.git"
   },
   "engines": {
     "node": "0.8.x"
@@ -15,7 +15,7 @@
     "lk" : "./bin/lk"
   },
   "dependencies": {
-    "life_star": "https://github.com/rksm/life_star/tarball/master",
+    "life_star": "https://github.com/LivelyKernel/life_star/tarball/master",
     "forever": "https://github.com/nodejitsu/forever/tarball/v0.10.1",
     "colorize": "0.1.0",
     "optparse": "~1.0",

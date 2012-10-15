@@ -20,8 +20,8 @@ require('shelljs/global');
 // -=-=-=-=-=-=-=-=-=-=-;
 
 var options = {
-    lkGitUrl: "git@github.com:rksm/LivelyKernel.git",
-    lkGitUrlReadOnly: "git://github.com/rksm/LivelyKernel.git",
+    lkGitUrl: "git@github.com:LivelyKernel/LivelyKernel.git",
+    lkGitUrlReadOnly: "git://github.com/LivelyKernel/LivelyKernel.git",
     lkBranch: "master",
     wwSvnUrl: "http://lively-kernel.org/repository/webwerkstatt/"
 };

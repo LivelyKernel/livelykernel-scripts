@@ -1,3 +1,13 @@
+0.1.4 / 2012-10-15
+==================
+
+* changing the URLs of dependencies since LivelyKernel repo structure changed
+
+0.1.3 / 2012-10-09
+==================
+
+* fixed life_star ref
+
 0.1.2 / 2012-10-04
 ==================
 
