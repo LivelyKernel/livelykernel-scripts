@@ -1,3 +1,10 @@
+0.1.5 / 2012-10-16
+==================
+
+* life_star can now be started with https
+* life_star allows to authenticate users via SSL certificate
+* behind-proxy option for life_star server
+
 0.1.4 / 2012-10-15
 ==================
 
