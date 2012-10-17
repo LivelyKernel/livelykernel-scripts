@@ -8,9 +8,10 @@ life_star({
     fsNode: args[3], // LivelyKernel directory to serve from
     enableTesting: args[4] !== 'notesting',
     logLevel: args[5], // log level for logger: error, warning, info, debug
-    enableSSL: args[6] == 'true',
-    enableSSLClientAuth: args[7] == 'true',
-    sslServerKey: args[8] !== 'undefined' ? args[8] : null,
-    sslServerCert: args[9] !== 'undefined' ? args[9] : null,
-    sslCACert: args[10] !== 'undefined' ? args[10] : null
+    behindProxy: args[6] == 'true',
+    enableSSL: args[7] == 'true',
+    enableSSLClientAuth: args[8] == 'true',
+    sslServerKey: args[9] !== 'undefined' ? args[9] : null,
+    sslServerCert: args[10] !== 'undefined' ? args[10] : null,
+    sslCACert: args[11] !== 'undefined' ? args[11] : null
 });

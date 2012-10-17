@@ -21,6 +21,8 @@ var options = args.options([
     ['-m', '--mini-server', 'Start the minimal server (this is the default)'],
     ['-s', '--life-star', 'Start the Life Star server (fully operational!)'],
     [      '--lk-dir DIR', 'The directory of the Lively Kernel core repository (git) '],
+    [      '--behind-proxy', 'Add this option if requests going to the server are '
+                           + 'proxied by another server, e.g. Apache'],
     [      '--enable-ssl', 'Enable https server'],
     [      '--enable-ssl-client-auth', 'Whether to use authentication via SSL client certificate'],
     [      '--ssl-server-key FILE', 'Where the server key is located'],
@@ -157,6 +159,7 @@ if (options.defined('info')) {
     if (options.defined('lifeStar')) {
         cmdAndArgs.push(env.LIFE_STAR_TESTING);
         cmdAndArgs.push(env.LIFE_STAR_LOG_LEVEL);
+        cmdAndArgs.push(options.defined('behindProxy'));
         if (options.defined('enableSsl')) {
             cmdAndArgs.push(true);
             cmdAndArgs.push(options.defined('enableSslClientAuth'));
