@@ -135,7 +135,7 @@ if (options.defined('info')) {
                 foreverLog = path.join(options.foreverLogDir, 'forever' + baseName), // where forever output is written
                 outLog = path.join(options.foreverLogDir, 'out' + baseName),
                 errLog = path.join(options.foreverLogDir, 'err' + baseName);
-            cmdAndArgs = cmdAndArgs.concat(['-l', foreverLog, '-o', outLog, '-e', errLog]);
+            cmdAndArgs = cmdAndArgs.concat(['-l', foreverLog, '-o', outLog, '-e', errLog, '--append']);
         }
     }
 
