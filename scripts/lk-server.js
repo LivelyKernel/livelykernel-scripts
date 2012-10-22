@@ -132,10 +132,9 @@ if (options.defined('info')) {
         cmdAndArgs = [env.FOREVER, 'start', '--spinSleepTime', '800'/*ms*/];
         if (options.foreverLogDir) {
             var baseName = '-lk-server-' + port + '.log',
-                foreverLog = path.join(options.foreverLogDir, 'forever' + baseName), // where forever output is written
                 outLog = path.join(options.foreverLogDir, 'out' + baseName),
                 errLog = path.join(options.foreverLogDir, 'err' + baseName);
-            cmdAndArgs = cmdAndArgs.concat(['-l', foreverLog, '-o', outLog, '-e', errLog, '--append']);
+            cmdAndArgs = cmdAndArgs.concat(['-o', outLog, '-e', errLog, '--append']);
         }
     }
 
