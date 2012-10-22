@@ -212,6 +212,7 @@ function printResult(testRunId, data) {
     } else {
         console.log(colorize.ansify('#green[PASSED]'));
     }
+    console.log("Repeat this test with: %s&stayOpen=true", testWorldUrl(testRunId))
 }
 
 function notifyResult(testRunId, data) {
