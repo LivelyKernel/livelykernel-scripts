@@ -17,6 +17,7 @@ var options = args.options([
     ['-h', '--help', 'show this help'],
     ['-w', '--watch [DIR]', 'Run with nodemon and watch for file changes'],
     ['-f', '--forever', 'Run with forever and restart server on a crash'],
+    [      '--forever-log-dir DIR', 'Where the forever stdout and stderr log is placed'],
     ['-p', '--port NUMBER', "On which port to run"],
     ['-m', '--mini-server', 'Start the minimal server (this is the default)'],
     ['-s', '--life-star', 'Start the Life Star server (fully operational!)'],
@@ -121,15 +122,21 @@ if (options.defined('info')) {
     async.waterfall([getServerInfo, killOldServer]);
 } else {
 
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    // Start the mini server & how to do that
-    // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+    // -=-=-=-=-=-=-=-=-
+    // Start the server
+    // -=-=-=-=-=-=-=-=-
 
-    // TODO add logfile param for forever
     // TODO add forever stop since forever automatically starts daemonized
     if (options.defined('forever')) {
         if (!lkDevDependencyExist(env.FOREVER)) process.exit(1);
         cmdAndArgs = [env.FOREVER, 'start', '--spinSleepTime', '800'/*ms*/];
+        if (options.foreverLogDir) {
+            var baseName = '-lk-server-' + port + '.log',
+                foreverLog = path.join(options.foreverLogDir, 'forever' + baseName), // where forever output is written
+                outLog = path.join(options.foreverLogDir, 'out' + baseName),
+                errLog = path.join(options.foreverLogDir, 'err' + baseName);
+            cmdAndArgs = cmdAndArgs.concat(['-l', foreverLog, '-o', outLog, '-e', errLog]);
+        }
     }
 
     if (options.defined('watch')) {
