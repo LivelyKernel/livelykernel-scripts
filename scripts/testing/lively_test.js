@@ -207,7 +207,11 @@ function printResult(testRunId, data) {
     console.log('tests run: ' + data.runs);
     if (data.fails > 0) {
         console.log(colorize.ansify('#red[FAILED]'));
-        data.messages.forEach(function(ea) { console.log(ea); });
+        data.messages.forEach(function(ea) {
+            var i = ea.indexOf('\n');
+            var firstLine = colorize.ansify('#bold[' + ea.substring(0, i) + ']');
+            console.log(firstLine + ea.substring(i, ea.length - 1));
+	});
         console.log(colorize.ansify('#red[' + data.messages.length + ' FAILED]'));
     } else {
         console.log(colorize.ansify('#green[PASSED]'));
