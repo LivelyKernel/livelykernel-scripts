@@ -72,7 +72,7 @@ set("LK_TEST_NOTIFIER",      ["growlnotify"], {notFs: true});
 /*
  * web-browser related
  */
-set("CHROME_BIN",            [which('chrome'), which('chromium-browser'),
+set("CHROME_BIN",            [which('chrome'), which('chromium-browser'), which('google-chrome'),
                               "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
                               "/usr/bin/chromium-browser",
                               path.join(env.LOCALAPPDATA, 'Google/Chrome/Application/chrome.exe')]);
