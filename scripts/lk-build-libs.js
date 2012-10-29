@@ -49,11 +49,15 @@ function download(urlString, thenDo) {
     var data = '',
         fileName = urlString.substring(urlString.lastIndexOf('/') + 1),
         urlParsed = url.parse(urlString),
-        get = urlParsed.protocol === 'https:' ? https.get : http.get;
-
-    console.log('Downloading %s...', fileName);
+        secure = urlParsed.protocol === 'https:',
+        get = secure ? https.get : http.get,
+        proxyFromEnv = env[secure ? 'https_proxy' : 'http_proxy'],
+        proxy = proxyFromEnv && url.parse(proxyFromEnv),
+        getOptions = proxy ? {host: proxy.hostname, port: proxy.port, path: urlParsed.hostname}
+                           : {host: urlParsed.host, path: urlParsed.path};
+    console.log('Downloading %s ...', fileName);
     comment += ' * ' + fileName + '\n';
-    get({host: urlParsed.host, path: urlParsed.path}, function(res) {
+    get(getOptions, function(res) {
         res.on('data', function (chunk) { data += chunk; })
         res.on('end', function() { thenDo(null, '//! ' + urlString + '\n' + data) })
     }).on('error', function(e) {
