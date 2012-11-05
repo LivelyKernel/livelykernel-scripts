@@ -89,8 +89,8 @@ function resetComment(next) {
 
 var urls = {
         jquery: {
-            src: "http://code.jquery.com/jquery-1.7.2.js",
-            minified: "http://code.jquery.com/jquery-1.7.2.min.js"
+            src: "http://code.jquery.com/jquery-1.8.2.js",
+            minified: "http://code.jquery.com/jquery-1.8.2.min.js"
         },
         jqueryBounds: {
             src: "https://raw.github.com/rksm/jquery-bounds/master/jquery-bounds.js",
