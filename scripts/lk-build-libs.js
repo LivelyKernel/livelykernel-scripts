@@ -97,8 +97,8 @@ var urls = {
             minify: function(code) { return require('uglify-js')(code); }
         },
         es5Shim: {
-            src: "https://raw.github.com/kriskowal/es5-shim/v1.2.10/es5-shim.js",
-            minified: "https://raw.github.com/kriskowal/es5-shim/v1.2.10/es5-shim.min.js"
+            src: "https://raw.github.com/kriskowal/es5-shim/v2.0.5/es5-shim.js",
+            minified: "https://raw.github.com/kriskowal/es5-shim/v2.0.5/es5-shim.min.js"
         }
     },
     downloadsMinified = [
