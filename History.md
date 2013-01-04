@@ -1,3 +1,11 @@
+0.1.6 / 2013-01-03
+==================
+
+* lk test support for html test worlds
+* jQuery 1.8 lib
+* adding convenience output to test results to re-run test manually
+* improved server logging (forever log output option, pass in log level)
+
 0.1.5 / 2012-10-16
 ==================
 
