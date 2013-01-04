@@ -63,7 +63,7 @@ set("LIFE_STAR_LOG_LEVEL", ["debug"], {notFs: true});
 set("MINISERVER_TEST_FILES", [env.MINISERVER_DIR + '/*_test.js'], {notFs: true});
 set("LK_TEST_SCRIPT_DIR",    [env.LK_SCRIPTS_DIR + '/testing']);
 set("LK_TEST_STARTER",       [env.LK_TEST_SCRIPT_DIR + '/lively_test.js']);
-set("LK_TEST_WORLD",         ["run_tests.xhtml"], {notFs: true});
+set("LK_TEST_WORLD_NAME",    ["run_tests"], {notFs: true});
 set("LK_TEST_WORLD_SCRIPT",  ["run_tests.js"], {notFs: true});
 set("LK_TEST_BROWSER",       ["chrome"], {notFs: true});
 set("LK_TEST_TIMEOUT",       [300], {notFs: true});

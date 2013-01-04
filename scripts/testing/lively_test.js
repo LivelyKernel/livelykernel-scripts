@@ -54,7 +54,7 @@ var options = {
     browserConf: platformConf[defaultBrowser],
     notifier: null,
     testScript: env.LK_TEST_WORLD_SCRIPT,
-    testWorld: env.LK_TEST_WORLD,
+    testWorld: env.LK_TEST_WORLD_NAME,
     verbose: false,
     maxRequests: env.LK_TEST_TIMEOUT,
     testFilter: null,
@@ -216,7 +216,9 @@ function printResult(testRunId, data) {
     } else {
         console.log(colorize.ansify('#green[PASSED]'));
     }
-    console.log("Repeat this test with: %s&stayOpen=true", testWorldUrl(testRunId))
+    findTestWorldUrl(testRunId, function(url) {
+        console.log("Repeat this test with: %s&stayOpen=true", url);
+    });
 }
 
 function notifyResult(testRunId, data) {
@@ -259,17 +261,50 @@ function randomId() {
     return Math.floor(Math.random() * 1000);
 }
 
-function testWorldUrl(id) {
-    return 'http://' + env.MINISERVER_HOST + ':' + env.MINISERVER_PORT + '/' + options.testWorld +
-        '?testRunId=' + id +
-        (options.testScript ? "&loadScript=" + escape(options.testScript) : '') +
-        (options.testFilter ? "&testFilter=" + escape(options.testFilter) : '') +
-        (options.modules ? "&additionalModules=" + escape(options.modules) : '');
+function findExistingResource(resourceList, thenDo, errorDo) {
+    function exists(path, cb) {
+        var req = http.request({
+            host: env.MINISERVER_HOST, port: env.MINISERVER_PORT,
+            path: path, method: "HEAD"
+        }, function(res) {
+            cb(res.statusCode < 400);
+        });
+        req.end();
+    }
+    var current = resourceList.shift();
+    if (!current) { errorDo(); return; }
+    exists(current, function(doesExist) {
+        if (doesExist) thenDo(current);
+        else findExistingResource(resourceList, thenDo, errorDo);
+    });
+}
+
+function findTestWorldUrl(id, thenDo) {
+    var baseName = '/' + options.testWorld,
+        xhtml = baseName + '.xhtml',
+        html = baseName + '.html';
+
+    function buildURL(testWorldName) {
+        return 'http://'
+             + env.MINISERVER_HOST + ':' + env.MINISERVER_PORT
+             + testWorldName
+             + '?testRunId=' + id
+             + (options.testScript ? "&loadScript=" + escape(options.testScript) : '')
+             + (options.testFilter ? "&testFilter=" + escape(options.testFilter) : '')
+             + (options.modules ? "&additionalModules=" + escape(options.modules) : '');
+    }
+
+    findExistingResource(
+        [html, xhtml],
+        function(testWorldName) { thenDo(buildURL(testWorldName)); },
+        function() { console.error("Cannot find test world"); process.exit(1); });
 }
 
 function startTests() {
     var id = randomId();
-    browserInterface.open(testWorldUrl(id) , options);
+    findTestWorldUrl(id, function(url) {
+        browserInterface.open(url , options);
+    });
     pollReport({testRunId: id});
 }
 
