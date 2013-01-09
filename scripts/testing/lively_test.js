@@ -135,13 +135,9 @@ var browserInterface = {
         console.log('open ' + browserPath + ' on ' + url);
         this.process = shell.callShowOutput(
             browserPath, browserArgs.concat([url]),
-            function(code) {
-                console.log('Browser closed');
-            },
+            function(code) { console.log('Browser closed'); },
             options);
-        this.process.on('exit', function() {
-            exec()
-        })
+        this.process.on('exit', function() { exec(); });
     },
 
     close: function() {
@@ -263,11 +259,14 @@ function randomId() {
 
 function findExistingResource(resourceList, thenDo, errorDo) {
     function exists(path, cb) {
+        console.log("Testing if %s exists...", path);
         var req = http.request({
             host: env.MINISERVER_HOST, port: env.MINISERVER_PORT,
             path: path, method: "HEAD"
         }, function(res) {
-            cb(res.statusCode < 400);
+            var result = res.statusCode < 400;
+            console.log("%s exists: %s", path, result);
+            cb(result);
         });
         req.end();
     }
