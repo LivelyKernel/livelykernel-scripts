@@ -61,6 +61,8 @@ var options = {
     display: null
 };
 
+var testWorldURL;
+
 parser.on("help", function() {
     console.log(parser.toString());
     process.exit(0);
@@ -212,9 +214,7 @@ function printResult(testRunId, data) {
     } else {
         console.log(colorize.ansify('#green[PASSED]'));
     }
-    findTestWorldUrl(testRunId, function(url) {
-        console.log("Repeat this test with: %s&stayOpen=true", url);
-    });
+    console.log("Repeat this test with: %s&stayOpen=true", testWorldURL);
 }
 
 function notifyResult(testRunId, data) {
@@ -278,32 +278,35 @@ function findExistingResource(resourceList, thenDo, errorDo) {
     });
 }
 
-function findTestWorldUrl(id, thenDo) {
-    var baseName = '/' + options.testWorld,
-        xhtml = baseName + '.xhtml',
-        html = baseName + '.html';
-
-    function buildURL(testWorldName) {
-        return 'http://'
-             + env.MINISERVER_HOST + ':' + env.MINISERVER_PORT
-             + testWorldName
-             + '?testRunId=' + id
-             + (options.testScript ? "&loadScript=" + escape(options.testScript) : '')
-             + (options.testFilter ? "&testFilter=" + escape(options.testFilter) : '')
-             + (options.modules ? "&additionalModules=" + escape(options.modules) : '');
-    }
-
-    findExistingResource(
-        [html, xhtml],
-        function(testWorldName) { thenDo(buildURL(testWorldName)); },
-        function() { console.error("Cannot find test world"); process.exit(1); });
+function buildTestWorldURL(testWorldName, id) {
+    return 'http://'
+         + env.MINISERVER_HOST + ':' + env.MINISERVER_PORT
+         + testWorldName
+         + '?testRunId=' + id
+         + (options.testScript ? "&loadScript=" + escape(options.testScript) : '')
+         + (options.testFilter ? "&testFilter=" + escape(options.testFilter) : '')
+         + (options.modules ? "&additionalModules=" + escape(options.modules) : '');
 }
 
+var id = randomId();
+testWorldURL = buildTestWorldURL('/' + options.testWorld + '.html', id);
+
+// function findTestWorldUrl(id, thenDo) {
+//     var baseName = '/' + options.testWorld,
+//         xhtml = baseName + '.xhtml',
+//         html = baseName + '.html';
+
+//     findExistingResource(
+//         [html, xhtml],
+//         function(testWorldName) { thenDo(buildURL(testWorldName)); },
+//         function() { console.error("Cannot find test world"); process.exit(1); });
+// }
+
 function startTests() {
-    var id = randomId();
-    findTestWorldUrl(id, function(url) {
-        browserInterface.open(url , options);
-    });
+    // findTestWorldUrl(id, function(url) {
+    //     browserInterface.open(url , options);
+    // });
+    browserInterface.open(testWorldURL, options);
     pollReport({testRunId: id});
 }
 
