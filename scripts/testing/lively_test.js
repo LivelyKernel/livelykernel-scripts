@@ -257,27 +257,6 @@ function randomId() {
     return Math.floor(Math.random() * 1000);
 }
 
-function findExistingResource(resourceList, thenDo, errorDo) {
-    function exists(path, cb) {
-        console.log("Testing if %s exists...", path);
-        var req = http.request({
-            host: env.MINISERVER_HOST, port: env.MINISERVER_PORT,
-            path: path, method: "HEAD"
-        }, function(res) {
-            var result = res.statusCode < 400;
-            console.log("%s exists: %s", path, result);
-            cb(result);
-        });
-        req.end();
-    }
-    var current = resourceList.shift();
-    if (!current) { errorDo(); return; }
-    exists(current, function(doesExist) {
-        if (doesExist) thenDo(current);
-        else findExistingResource(resourceList, thenDo, errorDo);
-    });
-}
-
 function buildTestWorldURL(testWorldName, id) {
     return 'http://'
          + env.MINISERVER_HOST + ':' + env.MINISERVER_PORT
@@ -288,24 +267,10 @@ function buildTestWorldURL(testWorldName, id) {
          + (options.modules ? "&additionalModules=" + escape(options.modules) : '');
 }
 
-var id = randomId();
-testWorldURL = buildTestWorldURL('/' + options.testWorld + '.html', id);
-
-// function findTestWorldUrl(id, thenDo) {
-//     var baseName = '/' + options.testWorld,
-//         xhtml = baseName + '.xhtml',
-//         html = baseName + '.html';
-
-//     findExistingResource(
-//         [html, xhtml],
-//         function(testWorldName) { thenDo(buildURL(testWorldName)); },
-//         function() { console.error("Cannot find test world"); process.exit(1); });
-// }
 
 function startTests() {
-    // findTestWorldUrl(id, function(url) {
-    //     browserInterface.open(url , options);
-    // });
+    var id = randomId();
+    testWorldURL = buildTestWorldURL('/' + options.testWorld + '.html', id);
     browserInterface.open(testWorldURL, options);
     pollReport({testRunId: id});
 }
