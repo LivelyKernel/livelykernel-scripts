@@ -1,3 +1,8 @@
+0.1.9 / 2013-01-11
+==================
+
+* reverting automatic html/xhtml world lookup due to travis issues
+
 0.1.8 / 2013-01-09
 ==================
 
