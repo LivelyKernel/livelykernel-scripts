@@ -3,7 +3,6 @@ var http     = require('http'),
     config   = require('./config'),
     optparse = require('optparse'),
     fs       = require('fs'),
-    exec     = require('child_process').exec,
     env      = require('../env'),
     shelljs  = require('shelljs'),
     shell    = require('../helper/shell');
@@ -139,7 +138,7 @@ var browserInterface = {
             browserPath, browserArgs.concat([url]),
             function(code) { console.log('Browser closed'); },
             options);
-        this.process.on('exit', function() { exec(); });
+        this.process.on('exit', function() { });
     },
 
     close: function() {
