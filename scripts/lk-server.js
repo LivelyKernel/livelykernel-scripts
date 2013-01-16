@@ -34,7 +34,10 @@ var options = args.options([
                    + 'the specified port or ' + env.MINISERVER_PORT
                    + ' and the process pid'],
     [      '--kill', 'Stop the server process for the specified port or ' + env.MINISERVER_PORT
-                   + ' if there exist one.']],
+                   + ' if there exist one.'],
+    [      '--subserver STRING', 'Add a subserver, expects filesystem path to js file like '
+                        + '"foo/bar.js" to start subserver bar. Aliasing supported via '
+                        + '"baz:foo/bar.js" to start subserver bar.js as baz.']],
     {},
     "Start a server to be used for running the tests. Either -m or -s must be given.");
 
@@ -42,7 +45,8 @@ var options = args.options([
 if (!options.defined('miniServer')) options.lifeStar = true;
 
 var port = options.port || env.MINISERVER_PORT,
-    host = options.lifeStar ? env.LIFE_STAR_HOST : env.MINISERVER_HOST;
+    host = options.lifeStar ? env.LIFE_STAR_HOST : env.MINISERVER_HOST,
+    subservers = {};
 
 if (!options.lkDir && env.WORKSPACE_LK_EXISTS) {
   options.lkDir = env.WORKSPACE_LK;
@@ -51,6 +55,25 @@ if (!options.lkDir && env.WORKSPACE_LK_EXISTS) {
 if (!options.defined('lkDir')) {
     console.log("Cannot find the Lively core repository. "
                + "Please start the server with --lk-dir PATH/TO/LK-REPO")
+}
+
+if (options.defined('subserver')) {
+    // read multiple --subserver STRING args
+    // STRING can be name:path or just path
+    for (var i = 0; i < process.argv.length; i++) {
+        if (process.argv[i] !== '--subserver') continue;
+        var spec = process.argv[i+1];
+        if (!spec) continue;
+        var nameAndPath = spec.split(':'), name, file;
+        if (nameAndPath.length === 2) {
+            name = nameAndPath[0];
+            file = nameAndPath[1];
+        } else {
+            file = nameAndPath[0];
+            name = file.substring(file.lastIndexOf('/') + 1, file.lastIndexOf('.'));
+        }
+        subservers[name] = file;
+    }
 }
 
 // -=-=-=-=-=-=-=-=-=-=-=-
@@ -167,6 +190,7 @@ if (options.defined('info')) {
         cmdAndArgs.push(env.LIFE_STAR_TESTING);
         cmdAndArgs.push(options.logLevel || env.LIFE_STAR_LOG_LEVEL);
         cmdAndArgs.push(options.defined('behindProxy'));
+        cmdAndArgs.push(JSON.stringify(subservers));
         if (options.defined('enableSsl')) {
             cmdAndArgs.push(true);
             cmdAndArgs.push(options.defined('enableSslClientAuth'));

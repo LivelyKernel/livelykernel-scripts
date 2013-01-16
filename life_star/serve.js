@@ -9,9 +9,10 @@ life_star({
     enableTesting: args[4] !== 'notesting',
     logLevel: args[5], // log level for logger: error, warning, info, debug
     behindProxy: args[6] == 'true',
-    enableSSL: args[7] == 'true',
-    enableSSLClientAuth: args[8] == 'true',
-    sslServerKey: args[9] !== 'undefined' ? args[9] : null,
-    sslServerCert: args[10] !== 'undefined' ? args[10] : null,
-    sslCACert: args[11] !== 'undefined' ? args[11] : null
+    subservers: args[7] !== 'undefined' ? JSON.parse(args[7]) : null,
+    enableSSL: args[8] == 'true',
+    enableSSLClientAuth: args[9] == 'true',
+    sslServerKey: args[10] !== 'undefined' ? args[10] : null,
+    sslServerCert: args[11] !== 'undefined' ? args[11] : null,
+    sslCACert: args[12] !== 'undefined' ? args[12] : null
 });
