@@ -1,3 +1,8 @@
+0.1.11 / 2013-01-21
+===================
+
+* life_star now supports browser application caching via manifest mechnism
+
 0.1.10 / 2013-01-15
 ==================
 
