@@ -9,7 +9,7 @@ var chromeTmpDir = path.join(env.TEMP_DIR, 'chrome-for-lively/'),
                     "--no-first-run",
                     "--no-sandbox",
                     "--disable-default-apps",
-                    // "--no-startup-window",
+                    "--silent-launch",
                     "--disable-history-quick-provider",
                     "--disable-history-url-provider",
                     "--disable-breakpad",
@@ -18,7 +18,8 @@ var chromeTmpDir = path.join(env.TEMP_DIR, 'chrome-for-lively/'),
                     "--disable-tab-closeable-state-watcher",
                     "--disable-background-mode",
                     "--disable-background-networking",
-                    "--disable-preconnect", "--disabled"],
+                    "--disable-preconnect",
+                    "--disabled"],
     firefoxArgs =  [];
 
 var Config = {
