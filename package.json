@@ -21,7 +21,8 @@
     "optparse": "~1.0",
     "seq": "https://github.com/dsc/node-seq/tarball/master",
     "async": "0.1",
-    "shelljs": "0.0.6"
+    "shelljs": "0.0.6",
+    "dryice": "0.4.10"
   },
   "devDependencies": {
     "jshint": "~0.5",
