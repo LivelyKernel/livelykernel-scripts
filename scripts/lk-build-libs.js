@@ -167,15 +167,38 @@ function createCoreLibs(next) {
 function createExternalLibs(next) {
     // package up ace
     console.log("Packaging external libs...");
+    var excludedThemes = ["xcode", "vibrant_ink", "tomorrow_night_eighties",
+                          "tomorrow_night_bright", "tomorrow_night_blue", "solarized_light",
+                          "mono_industrial", "merbivore_soft", "merbivore", "kr", "idle_fingers",
+                          "github", "dreamweaver", "dawn", "crimson_editor", "cobalt",
+                          "clouds_midnight", "clouds", "chaos"],
+        excludedModes = ["asciidoc", "c9search", "c_cpp", "coldfusion", "csharp", "curly",
+                         "dot", "glsl", "golang", "groovy", "haxe", "jsp", "jsx", "liquid",
+                         "lua", "luapage", "lucene", "ocaml", "perl", "pgsql", "php",
+                         "powershell", "rhtml", "ruby", "scad", "scala", "scss", "stylus",
+                         "tcl", "tex", "textile", "typescript", "vbscript", "xquery", "yaml"]
+
+    var excludedReString = "(mode-(" + excludedModes.join('|') + ')\\.js)'
+                         + '|'
+                         + "(theme-(" + excludedThemes.join('|') + ')\\.js)'
+                         + '|'
+                         + "(ext-.*\\.js)"
+                         + '|'
+                         + "(worker-(xquery|php)\\.js)",
+        excludedRe = new RegExp(excludedReString);
+
     async.series([
         gitClone.bind(global, {
             url: "https://github.com/ajaxorg/ace-builds.git",
             to: "resources/pre-lib/ace-builds"}),
         dryicePackage.bind(global, {
-            source: {root: "resources/pre-lib/ace-builds/src-min-noconflict"},
+            source: {root: "resources/pre-lib/ace-builds/src-min-noconflict",
+                     exclude: excludedRe},
+
             dest: "core/lib/lively-ace.min.js"}),
         dryicePackage.bind(global, {
-            source: {root: "resources/pre-lib/ace-builds/src-noconflict"},
+            source: {root: "resources/pre-lib/ace-builds/src-noconflict",
+                    exclude: excludedRe},
             dest: "core/lib/lively-ace.js"})
     ], function(err) { next && next() });
 }
