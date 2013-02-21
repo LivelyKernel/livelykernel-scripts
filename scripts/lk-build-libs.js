@@ -5,16 +5,17 @@
  *
  */
 
-var args   = require('./helper/args'),
-    fs     = require('fs'),
-    exec   = require('child_process').exec,
-    async  = require('async'),
-    path   = require('path'),
-    http   = require('http'),
-    https  = require('https'),
-    url    = require('url'),
-    dryice = require('dryice'),
-    env    = process.env;
+var args    = require('./helper/args'),
+    fs      = require('fs'),
+    exec    = require('child_process').exec,
+    shelljs = require('shelljs'),
+    async   = require('async'),
+    path    = require('path'),
+    http    = require('http'),
+    https   = require('https'),
+    url     = require('url'),
+    dryice  = require('dryice'),
+    env     = process.env;
 
 
 // -=-=-=-=-=-=-=-=-=-=-
@@ -39,6 +40,8 @@ if (!options.lkDir) {
 // -=-=-=-=-=-=-=-=-=-=-
 // the real thing
 // -=-=-=-=-=-=-=-=-=-=-
+var comment = '';
+
 function store(filePath, data, thenDo) {
     fs.writeFile(filePath, data, function() {
         console.log("storing all libs in %s (%skb)",
@@ -70,12 +73,17 @@ function downloadAndModify(urlString, modifyFunc, thenDo) {
     download(urlString, function(err, data) { thenDo(null, modifyFunc(data)); });
 }
 
-function copyLocal(relativePath, thenDo) {
+function includeLocalFile(relativePath, thenDo) {
     var fullPath = path.join(env.LK_SCRIPTS_ROOT, relativePath),
         name = path.basename(fullPath);
     console.log('Reading %s...', name);
     comment += ' * ' + name + '\n';
     fs.readFile(fullPath, function(err, data) { thenDo(err, '// ' + relativePath + '\n' + data) });
+}
+
+function copyFile(from, to, thenDo) {
+    shelljs.cp('-f', from, to);
+    thenDo(null);
 }
 
 function write(next, filename, err, allData) {
@@ -145,10 +153,8 @@ function createCoreLibs(next) {
             download.bind(global, urls.jqueryBounds.src),
             download.bind(global, urls.es5Shim.src)
         ],
-        localLibs = [copyLocal.bind(global, "resources/pre-lib/requestAnimationFrame.js"),
-                     copyLocal.bind(global, "resources/pre-lib/IE-fixes.js")],
-
-        comment = '';
+        localLibs = [includeLocalFile.bind(global, "resources/pre-lib/requestAnimationFrame.js"),
+                     includeLocalFile.bind(global, "resources/pre-lib/IE-fixes.js")];
 
     async.series([
         function(next) {
@@ -176,30 +182,36 @@ function createExternalLibs(next) {
                          "dot", "glsl", "golang", "groovy", "haxe", "jsp", "jsx", "liquid",
                          "lua", "luapage", "lucene", "ocaml", "perl", "pgsql", "php",
                          "powershell", "rhtml", "ruby", "scad", "scala", "scss", "stylus",
-                         "tcl", "tex", "textile", "typescript", "vbscript", "xquery", "yaml"]
-
-    var excludedReString = "(mode-(" + excludedModes.join('|') + ')\\.js)'
+                         "tcl", "tex", "textile", "typescript", "vbscript", "xquery", "yaml"],
+        excludedReString = "(mode-(" + excludedModes.join('|') + ')\\.js)'
                          + '|'
                          + "(theme-(" + excludedThemes.join('|') + ')\\.js)'
                          + '|'
                          + "(ext-.*\\.js)"
                          + '|'
-                         + "(worker-(xquery|php)\\.js)",
-        excludedRe = new RegExp(excludedReString);
+                         + "(worker-(.*)\\.js)",
+        excludedRe = new RegExp(excludedReString),
+        aceLibDir = path.join(options.lkDir, "core/lib/ace/"),
+        aceBuildDir = path.join(process.env.LK_SCRIPTS_ROOT, "resources/pre-lib/ace-builds/");
 
     async.series([
         gitClone.bind(global, {
             url: "https://github.com/ajaxorg/ace-builds.git",
             to: "resources/pre-lib/ace-builds"}),
+        function ensureAceLibDir(next) {
+            shelljs.mkdir('-p', aceLibDir);
+            next(null);
+        },
         dryicePackage.bind(global, {
-            source: {root: "resources/pre-lib/ace-builds/src-min-noconflict",
-                     exclude: excludedRe},
-
-            dest: "core/lib/lively-ace.min.js"}),
+            source: {root: aceBuildDir + "src-min-noconflict", exclude: excludedRe},
+            dest: "core/lib/ace/lively-ace.min.js"}),
         dryicePackage.bind(global, {
-            source: {root: "resources/pre-lib/ace-builds/src-noconflict",
-                    exclude: excludedRe},
-            dest: "core/lib/lively-ace.js"})
+            source: {root: aceBuildDir + "src-noconflict", exclude: excludedRe},
+            dest: "core/lib/ace/lively-ace.js"}),
+        copyFile.bind(global,
+                      [aceBuildDir + "src-noconflict/worker-javascript.js",
+                       aceBuildDir + "src-noconflict/worker-json.js"],
+                      aceLibDir)
     ], function(err) { next && next() });
 }
 
