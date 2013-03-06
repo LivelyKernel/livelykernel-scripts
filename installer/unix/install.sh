@@ -156,7 +156,7 @@ else
         ln -s $partsbin_in_lkcore_dir $partsbin_dir
     else
         partsbin_remote_location="http://lively-kernel.org/other/lively-core-install"
-        partsbin_version_name="PartsBin.2012-09-05.tar.gz"
+        partsbin_version_name="PartsBin.2013-02-06.tar.gz"
         partsbin_pkg_url="$partsbin_remote_location/$partsbin_version_name"
         echo "Downloading PartsBin from $partsbin_pkg_url" >&2
         curl -0 $partsbin_pkg_url | tar -zx
