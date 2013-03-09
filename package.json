@@ -22,7 +22,8 @@
     "seq": "https://github.com/dsc/node-seq/tarball/master",
     "async": "0.1",
     "shelljs": "0.1.2",
-    "dryice": "0.4.10"
+    "dryice": "0.4.10",
+    "uglify-js": "1.2.5"
   },
   "devDependencies": {
     "jshint": "~0.5",
