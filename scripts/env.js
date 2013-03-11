@@ -8,8 +8,13 @@ var fs = require('fs'),
     env = process.env,
     isWindows = /^win/i.test(process.platform);
 
+function join(pathA, pathB) {
+    pathA = pathA || ''; pathB = pathB || '';
+    return path.join(pathA, pathB);
+}
+
 function lkScriptDir(dirInRoot) {
-    return path.normalize(path.join(env.LK_SCRIPTS_ROOT, dirInRoot));
+    return path.normalize(join(env.LK_SCRIPTS_ROOT, dirInRoot));
 }
 
 function set(varName, choices, options) {
@@ -28,16 +33,16 @@ function set(varName, choices, options) {
  * general stuff
  */
 set("LK_SCRIPTS_ROOT", [path.normalize(__dirname + '/..')]);
-set("LK_BIN",          [path.join(env.LK_SCRIPTS_ROOT, isWindows ? 'bin/lk.cmd' : 'bin/lk')]);
+set("LK_BIN",          [join(env.LK_SCRIPTS_ROOT, isWindows ? 'bin/lk.cmd' : 'bin/lk')]);
 set("LK_SCRIPTS_DIR",  [lkScriptDir("/scripts")]);
 set("NODE_BIN",        [which('node'), which('node.exe'), process.execPath]);
 set("NODEMODULES",     [lkScriptDir("/node_modules"),
-                            path.join(env.LK_SCRIPTS_ROOT, '..')]);
-set("NODEUNIT",        [path.join(env.NODEMODULES, "nodeunit/bin/nodeunit"),
+                            join(env.LK_SCRIPTS_ROOT, '..')]);
+set("NODEUNIT",        [join(env.NODEMODULES, "nodeunit/bin/nodeunit"),
                             which('nodeunit')]);
-set("NODEMON",         [path.join(env.NODEMODULES, "nodemon/nodemon.js"),
+set("NODEMON",         [join(env.NODEMODULES, "nodemon/nodemon.js"),
                             which('nodemon')]);
-set("FOREVER",         [path.join(env.NODEMODULES, "forever/bin/forever"),
+set("FOREVER",         [join(env.NODEMODULES, "forever/bin/forever"),
                             which('forever')]);
 set("TEMP_DIR",        [env.TMP, env.TEMP, env.TEMPDIR, '/tmp'], {useLastIfNothingIsValid: true});
 
@@ -75,12 +80,12 @@ set("LK_TEST_NOTIFIER",      ["growlnotify"], {notFs: true});
 set("CHROME_BIN",            [which('chrome'), which('chromium-browser'), which('google-chrome'),
                               "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
                               "/usr/bin/chromium-browser",
-                              path.join(env.LOCALAPPDATA, 'Google/Chrome/Application/chrome.exe')]);
+                              join(env.LOCALAPPDATA, 'Google/Chrome/Application/chrome.exe')]);
 set("FIREFOX_BIN",            [which('firefox'),
                               "/Applications/Firefox.app/Contents/MacOS/firefox",
                               "/usr/bin/firefox",
-                               path.join(env['ProgramFiles(x86)'], 'Mozilla Firefox', 'firefox.exe'),
-                               path.join(env.ProgramFiles, 'Mozilla Firefox', 'firefox.exe')]);
+                               join(env['ProgramFiles(x86)'], 'Mozilla Firefox', 'firefox.exe'),
+                               join(env.ProgramFiles, 'Mozilla Firefox', 'firefox.exe')]);
 
 /*
  * jshint
@@ -104,15 +109,15 @@ set("SERVER_PID_DIR", [env.WORKSPACE_DIR], {useLastIfNothingIsValid: true});
 /*
  * PartsBin
  */
-set("PARTSBIN_DIR",      [path.join(env.WORKSPACE, 'PartsBin/'),
-                          path.join(env.WORKSPACE_WW, 'PartsBin/'),
-                          path.join(env.WORKSPACE_LK, 'PartsBin/'),
-                          path.join(env.WEBWERKSTATT, 'PartsBin/'),
-                          path.join(env.LIVELY, 'PartsBin/'),
-                          path.join(env.WORKSPACE, 'PartsBin/')], {useLastIfNothingIsValid: true});
-set("WW_USERS_DIR",      [path.normalize(path.join(env.WORKSPACE_LK, '../users')),
-                          path.normalize(path.join(env.WORKSPACE_WW, '../users')),
-                          path.normalize(path.join(env.WORKSPACE_LK, '../users'))], {useLastIfNothingIsValid: true});
+set("PARTSBIN_DIR",      [join(env.WORKSPACE, 'PartsBin/'),
+                          join(env.WORKSPACE_WW, 'PartsBin/'),
+                          join(env.WORKSPACE_LK, 'PartsBin/'),
+                          join(env.WEBWERKSTATT, 'PartsBin/'),
+                          join(env.LIVELY, 'PartsBin/'),
+                          join(env.WORKSPACE, 'PartsBin/')], {useLastIfNothingIsValid: true});
+set("WW_USERS_DIR",      [path.normalize(join(env.WORKSPACE_LK, '../users')),
+                          path.normalize(join(env.WORKSPACE_WW, '../users')),
+                          path.normalize(join(env.WORKSPACE_LK, '../users'))], {useLastIfNothingIsValid: true});
 set("WW_SVN_URL",        ["http://lively-kernel.org/repository/webwerkstatt/"], {notFs: true});
 set("PARTSBIN_SVN_URL",  [env.WW_SVN_URL + 'PartsBin/'], {notFs: true});
 set("USERS_DIR_SVN_URL", [env.WW_SVN_URL + 'users/'], {notFs: true});
