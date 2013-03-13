@@ -49,7 +49,9 @@ var port = options.port || env.MINISERVER_PORT,
     subservers = {};
 
 if (!options.lkDir && env.WORKSPACE_LK_EXISTS) {
-  options.lkDir = env.WORKSPACE_LK;
+    options.lkDir = env.WORKSPACE_LK;
+} else {
+    env.WORKSPACE_LK = options.lkDir;
 }
 
 if (!options.defined('lkDir')) {
