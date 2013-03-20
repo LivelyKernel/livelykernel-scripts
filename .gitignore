@@ -18,3 +18,7 @@ npm-debug.log
 # emacs #
 #*
 *~
+
+# Ace Builds
+resources/pre-lib/ace-builds
+
