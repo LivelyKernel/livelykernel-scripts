@@ -43,7 +43,8 @@ var platformConf = config.platformConfigs[process.platform],
                                + "those test methods that match 'filter'."],
         ['--test-script FILE', "Script file that is sent to the browser and "
                              + "runs the tests. If not specified then \""
-                             + env.LK_TEST_WORLD_SCRIPT + "\" is used."]],
+                             + env.LK_TEST_WORLD_SCRIPT + "\" is used."],
+        ['--nodejs', "Runs the nodejs test suite instead of the browser tests"]];
     parser = new optparse.OptionParser(switches);
 
 
@@ -96,6 +97,11 @@ parser.on("display", function(name, value) {
 
 parser.on("modules", function(name, value) {
     options.modules = value;
+});
+
+parser.on("nodejs", function() {
+    options.browserName = 'nodejs';
+    options.nodejs = true;
 });
 
 parser.parse(process.argv);
@@ -213,7 +219,9 @@ function printResult(testRunId, data) {
     } else {
         console.log(colorize.ansify('#green[PASSED]'));
     }
-    console.log("Repeat this test with: %s&stayOpen=true", testWorldURL);
+    if (!options.nodejs) {
+        console.log("Repeat this test with: %s&stayOpen=true", testWorldURL);
+    }
 }
 
 function notifyResult(testRunId, data) {
@@ -274,4 +282,23 @@ function startTests() {
     pollReport({testRunId: id});
 }
 
-startTests();
+function startNodeJSTests() {
+    var lively = require(env.WORKSPACE_LK + '/core/lively/bootstrap');
+    lively.testRun = {testRunId: randomId(),isNodeJS: true};
+    if (options.testFilter) lively.testRun.testFilter = options.testFilter;
+    if (options.modules) lively.testRun.additionalModules = options.modules;
+    lively.testRun.onTestResult = function(result) {
+        printResult(lively.testRun.testRunId, result);
+        notifyResult(lively.testRun.testRunId, result);
+    };
+    if (options.testScript[0] !== '/') {
+        options.testScript = env.WORKSPACE_LK + '/' + options.testScript;
+    }
+    lively.JSLoader.require(options.testScript);
+}
+
+if (options.nodejs) {
+    startNodeJSTests();
+} else {
+    startTests();
+}
