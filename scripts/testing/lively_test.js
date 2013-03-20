@@ -290,6 +290,7 @@ function startNodeJSTests() {
     lively.testRun.onTestResult = function(result) {
         printResult(lively.testRun.testRunId, result);
         notifyResult(lively.testRun.testRunId, result);
+        process.exit(result.fails > 0 ? 1 : 0);
     };
     if (options.testScript[0] !== '/') {
         options.testScript = env.WORKSPACE_LK + '/' + options.testScript;
