@@ -39,7 +39,8 @@ var platformConf = config.platformConfigs[process.platform],
                                + "those test methods that match 'filter'."],
         ['--test-script FILE', "Script file that is sent to the browser and "
                              + "runs the tests. If not specified then \""
-                             + env.LK_TEST_WORLD_SCRIPT + "\" is used."]],
+                             + env.LK_TEST_WORLD_SCRIPT + "\" is used."],
+        ['--nodejs', "Runs the nodejs test suite instead of the browser tests"]],
         {},
         "Run the core tests.");
 
@@ -59,7 +60,7 @@ if (options.defined("watch")) {
 // nodemon needs it relative...
 argList.push([path.relative(env.PWD, env.LK_TEST_STARTER)]);
 
-['verbose', 'browser', 'notfier', 'display', 'focus', 'testScript', 'modules'].forEach(function(option) {
+['verbose', 'browser', 'notfier', 'display', 'focus', 'testScript', 'modules', 'nodejs'].forEach(function(option) {
     if (!options.defined(option)) return;
     argList.push(options.dasherize(option));
     if (options.hasValue(option)) {
