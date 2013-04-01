@@ -15,7 +15,7 @@
     "lk" : "./bin/lk"
   },
   "dependencies": {
-    "life_star": "https://github.com/LivelyKernel/life_star/tarball/0.2.3",
+    "life_star": "https://github.com/LivelyKernel/life_star/tarball/0.3.0",
     "forever": "https://github.com/nodejitsu/forever/tarball/v0.10.1",
     "colorize": "0.1.0",
     "optparse": "~1.0",
