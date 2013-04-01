@@ -35,9 +35,12 @@ var options = args.options([
                    + ' and the process pid'],
     [      '--kill', 'Stop the server process for the specified port or ' + env.MINISERVER_PORT
                    + ' if there exist one.'],
+    [      '--no-subservers', 'By default servers in ' + env.WORKSPACE_LK
+                            + ' are started with the core server. Setting this option'
+                            + ' disables this behavior'],
     [      '--subserver STRING', 'Add a subserver, expects filesystem path to js file like '
-                        + '"foo/bar.js" to start subserver bar. Aliasing supported via '
-                        + '"baz:foo/bar.js" to start subserver bar.js as baz.']],
+                               + '"foo/bar.js" to start subserver bar. Aliasing supported via '
+                               + '"baz:foo/bar.js" to start subserver bar.js as baz.']],
     {},
     "Start a server to be used for running the tests. Either -m or -s must be given.");
 
@@ -59,7 +62,20 @@ if (!options.defined('lkDir')) {
                + "Please start the server with --lk-dir PATH/TO/LK-REPO")
 }
 
-if (options.defined('subserver')) {
+if (!options.defined('no-subservers')) {
+    var lkSubserverDir = path.join(options.lkDir, "core/servers");
+    try {
+        var fileList = fs.readdirSync(lkSubserverDir);
+        fileList.forEach(function(name) {
+            if (!name.match(/.js$/)) return;
+            subservers[name.slice(0, -3)] = path.join(lkSubserverDir, name);
+        });
+    } catch(e) {
+        console.warn('Problems finding subservers in %s: %s', lkSubserverDir, e);
+    }
+}
+
+if (!options.defined('no-subservers') && options.defined('subserver')) {
     // read multiple --subserver STRING args
     // STRING can be name:path or just path
     for (var i = 0; i < process.argv.length; i++) {
