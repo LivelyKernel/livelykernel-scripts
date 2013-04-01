@@ -1,3 +1,17 @@
+0.1.14 / 2013-04-01
+===================
+
+* subservers: by default putting new subservers into
+   `WORKSPACE_LK/core/servers/`
+* adding websocket support so that subservers can register websocket handlers
+* enabling travis tests
+
+0.1.13 / 2013-03-22
+===================
+
+* `lk-test` support for running the tests in plain nodejs without starting a
+  browser
+
 0.1.12 / 2013-03-11
 ===================
 
