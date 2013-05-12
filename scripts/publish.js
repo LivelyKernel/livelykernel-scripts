@@ -75,7 +75,7 @@ function publish(env, optionalVersion, repoDir) {
             // TODO do a
             // git tag -d <version> && git push origin :refs/tags/<version>
             // if tag already exists
-            exec('git push && git push --tags', {cwd: repoDir}, function(code, out, err) {
+            exec('git push origin master && git push --tags', {cwd: repoDir}, function(code, out, err) {
                 console.log(out);
                 if (err) console.log(err);
                 next(code);
