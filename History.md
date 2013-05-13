@@ -1,3 +1,7 @@
+0.1.15 / 2013-05-12
+===================
+* life_star now exposes server for inspection & modifiaction
+
 0.1.14 / 2013-04-01
 ===================
 
