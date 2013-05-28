@@ -1,3 +1,8 @@
+0.1.16 / 2013-05-28
+===================
+* manifest uri escapes its entries
+* life_star dep fix
+
 0.1.15 / 2013-05-12
 ===================
 * life_star now exposes server for inspection & modifiaction
