@@ -40,7 +40,8 @@ var options = args.options([
                             + ' disables this behavior'],
     [      '--subserver STRING', 'Add a subserver, expects filesystem path to js file like '
                                + '"foo/bar.js" to start subserver bar. Aliasing supported via '
-                               + '"baz:foo/bar.js" to start subserver bar.js as baz.']],
+                               + '"baz:foo/bar.js" to start subserver bar.js as baz.'],
+    [      '--no-manifest', 'Disables creation of manifest file for application cache.']],
     {},
     "Start a server to be used for running the tests. Either -m or -s must be given.");
 
@@ -209,6 +210,7 @@ if (options.defined('info')) {
         cmdAndArgs.push(options.logLevel || env.LIFE_STAR_LOG_LEVEL);
         cmdAndArgs.push(options.defined('behindProxy'));
         cmdAndArgs.push(JSON.stringify(subservers));
+        cmdAndArgs.push(options.defined('noManifest') ? false : true);
         if (options.defined('enableSsl')) {
             cmdAndArgs.push(true);
             cmdAndArgs.push(options.defined('enableSslClientAuth'));

@@ -10,9 +10,10 @@ life_star({
     logLevel: args[5], // log level for logger: error, warning, info, debug
     behindProxy: args[6] == 'true',
     subservers: args[7] !== 'undefined' ? JSON.parse(args[7]) : null,
-    enableSSL: args[8] == 'true',
-    enableSSLClientAuth: args[9] == 'true',
-    sslServerKey: args[10] !== 'undefined' ? args[10] : null,
-    sslServerCert: args[11] !== 'undefined' ? args[11] : null,
-    sslCACert: args[12] !== 'undefined' ? args[12] : null
+    useManifestCaching: args[8] !== 'undefined' ? args[8] === 'true' : undefined,
+    enableSSL: args[9] == 'true',
+    enableSSLClientAuth: args[10] == 'true',
+    sslServerKey: args[11] !== 'undefined' ? args[11] : null,
+    sslServerCert: args[12] !== 'undefined' ? args[12] : null,
+    sslCACert: args[13] !== 'undefined' ? args[13] : null
 });
