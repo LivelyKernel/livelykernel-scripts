@@ -10,7 +10,7 @@ life_star({
     logLevel: args[5], // log level for logger: error, warning, info, debug
     behindProxy: args[6] == 'true',
     subservers: args[7] !== 'undefined' ? JSON.parse(args[7]) : null,
-    useManifestCaching: args[8] !== 'undefined' ? args[8] === 'true' : undefined,
+    useManifestCaching: args[8] == 'true',
     enableSSL: args[9] == 'true',
     enableSSLClientAuth: args[10] == 'true',
     sslServerKey: args[11] !== 'undefined' ? args[11] : null,
