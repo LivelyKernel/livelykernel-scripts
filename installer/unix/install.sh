@@ -181,4 +181,4 @@ echo ""
 echo "${GREEN_F}Yay! Lively Kernel installation finished successfully!${NORM}" >&2
 echo "1. Start the Lively Kernel server with" >&2
 echo "   ${BOLD}lk server{NORM}" >&2
-echo "2. Visit ${UNDR}http://localhost:9001/welcome.xhtml${NORM} for opening a Lively world." >&2
+echo "2. Visit ${UNDR}http://localhost:9001/welcome.html${NORM} for opening a Lively world." >&2
