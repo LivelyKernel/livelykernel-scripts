@@ -7,6 +7,7 @@ var chromeTmpDir = path.join(env.TEMP_DIR, 'chrome-for-lively/'),
     chromeArgs   = ["--enable-logging",
                     "--v=1",
                     "--enable-logging=stderr",
+                    "--no-sandbox", // for chrome/ubuntu bug
                     "--no-process-singleton-dialog",
                     "--user-data-dir=" + chromeTmpDir,
                     "--no-first-run",
