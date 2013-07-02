@@ -1,3 +1,7 @@
+0.1.19 / 2013-07-01
+===================
+* chrome logs console to stderr
+
 0.1.18 / 2013-07-01
 ===================
 * bump life_star: no manifest

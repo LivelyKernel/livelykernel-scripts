@@ -4,7 +4,10 @@ var path = require('path'),
 
 // see http://peter.sh/experiments/chromium-command-line-switches/
 var chromeTmpDir = path.join(env.TEMP_DIR, 'chrome-for-lively/'),
-    chromeArgs   = ["--no-process-singleton-dialog",
+    chromeArgs   = ["--enable-logging",
+                    "--v=1",
+                    "--enable-logging=stderr",
+                    "--no-process-singleton-dialog",
                     "--user-data-dir=" + chromeTmpDir,
                     "--no-first-run",
                     "--no-sandbox",
