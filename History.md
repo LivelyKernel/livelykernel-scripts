@@ -1,3 +1,12 @@
+0.1.18 / 2013-07-01
+===================
+* bump life_star: no manifest
+* install.sh fix
+
+0.1.17 / 2013-06-20
+===================
+* don't enable manifest by default
+
 0.1.16 / 2013-05-28
 ===================
 * manifest uri escapes its entries
