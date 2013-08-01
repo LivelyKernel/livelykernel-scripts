@@ -1,3 +1,7 @@
+0.1.20 / 2013-08-01
+===================
+* enable JS harmony features in Chrome
+
 0.1.19 / 2013-07-01
 ===================
 * chrome logs console to stderr
