@@ -63,7 +63,7 @@ if (!options.defined('lkDir')) {
                + "Please start the server with --lk-dir PATH/TO/LK-REPO")
 }
 
-if (!options.defined('no-subservers')) {
+if (!options.defined('noSubservers')) {
     var lkSubserverDir = path.join(options.lkDir, "core/servers");
     try {
         var fileList = fs.readdirSync(lkSubserverDir);
@@ -76,7 +76,7 @@ if (!options.defined('no-subservers')) {
     }
 }
 
-if (!options.defined('no-subservers') && options.defined('subserver')) {
+if (!options.defined('noSubservers') && options.defined('subserver')) {
     // read multiple --subserver STRING args
     // STRING can be name:path or just path
     for (var i = 0; i < process.argv.length; i++) {
