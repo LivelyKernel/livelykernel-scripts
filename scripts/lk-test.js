@@ -58,7 +58,7 @@ if (options.defined("watch")) {
 }
 
 // nodemon needs it relative...
-argList.push([path.relative(env.PWD, env.LK_TEST_STARTER)]);
+argList.push([path.relative(env.PWD || process.cwd(), env.LK_TEST_STARTER)]);
 
 ['verbose', 'browser', 'notfier', 'display', 'focus', 'testScript', 'modules', 'nodejs'].forEach(function(option) {
     if (!options.defined(option)) return;

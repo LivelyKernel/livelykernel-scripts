@@ -50,12 +50,12 @@ set("TEMP_DIR",        [env.TMP, env.TEMP, env.TEMPDIR, '/tmp'], {useLastIfNothi
  * server related stuff
  * life_star will use miniserver settings
  */
-set("MINISERVER_DIR",      [env.LK_SCRIPTS_ROOT + "/minimal_server"]);
+set("MINISERVER_DIR",      [join(env.LK_SCRIPTS_ROOT, "/minimal_server")]);
 set("MINISERVER_PORT",     [9001], {notFs: true});
-set("MINISERVER",          [env.MINISERVER_DIR + "/serve.js"]);
+set("MINISERVER",          [join(env.MINISERVER_DIR, "/serve.js")]);
 set("MINISERVER_HOST",     ["localhost"], {notFs: true});
-set("LIFE_STAR_DIR",       [env.LK_SCRIPTS_ROOT + "/life_star"]);
-set("LIFE_STAR",           [env.LIFE_STAR_DIR + "/serve.js"]);
+set("LIFE_STAR_DIR",       [join(env.LK_SCRIPTS_ROOT, "/life_star")]);
+set("LIFE_STAR",           [join(env.LIFE_STAR_DIR, "/serve.js")]);
 set("LIFE_STAR_HOST",           ["localhost"], {notFs: true});
 // replace with "notesting" to disable test runner interface on server
 set("LIFE_STAR_TESTING",   ["testing"], {notFs: true});
@@ -65,9 +65,9 @@ set("LIFE_STAR_LOG_LEVEL", ["debug"], {notFs: true});
 /*
  * tests
  */
-set("MINISERVER_TEST_FILES", [env.MINISERVER_DIR + '/*_test.js'], {notFs: true});
-set("LK_TEST_SCRIPT_DIR",    [env.LK_SCRIPTS_DIR + '/testing']);
-set("LK_TEST_STARTER",       [env.LK_TEST_SCRIPT_DIR + '/lively_test.js']);
+set("MINISERVER_TEST_FILES", [join(env.MINISERVER_DIR, '/*_test.js')], {notFs: true});
+set("LK_TEST_SCRIPT_DIR",    [join(env.LK_SCRIPTS_DIR, '/testing')]);
+set("LK_TEST_STARTER",       [join(env.LK_TEST_SCRIPT_DIR, '/lively_test.js')]);
 set("LK_TEST_WORLD_NAME",    ["run_tests"], {notFs: true});
 set("LK_TEST_WORLD_SCRIPT",  ["run_tests.js"], {notFs: true});
 set("LK_TEST_BROWSER",       ["chrome"], {notFs: true});
@@ -80,7 +80,9 @@ set("LK_TEST_NOTIFIER",      ["growlnotify"], {notFs: true});
 set("CHROME_BIN",            [which('chrome'), which('chromium-browser'), which('google-chrome'),
                               "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
                               "/usr/bin/chromium-browser",
-                              join(env.LOCALAPPDATA, 'Google/Chrome/Application/chrome.exe')]);
+                              join(env.LOCALAPPDATA, 'Google/Chrome/Application/chrome.exe'),
+                              join(env.ProgramFiles, 'Google/Chrome/Application/chrome.exe'),
+                              join(env['ProgramFiles(x86)'], 'Google/Chrome/Application/chrome.exe')]);
 set("FIREFOX_BIN",            [which('firefox'),
                               "/Applications/Firefox.app/Contents/MacOS/firefox",
                               "/usr/bin/firefox",
@@ -90,8 +92,8 @@ set("FIREFOX_BIN",            [which('firefox'),
 /*
  * jshint
  */
-set("JSHINT",        [env.LK_SCRIPTS_ROOT + "/node_modules/jshint/bin/hint", which('jshint')]);
-set("JSHINT_CONFIG", [env.LK_SCRIPTS_ROOT + "/jshint.config"]);
+set("JSHINT",        [join(env.LK_SCRIPTS_ROOT, "node_modules/jshint/bin/hint"), which('jshint')]);
+set("JSHINT_CONFIG", [join(env.LK_SCRIPTS_ROOT, "jshint.config")]);
 
 
 /*
