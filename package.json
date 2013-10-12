@@ -23,7 +23,7 @@
     "async": "~0.2",
     "shelljs": "~0.2",
     "dryice": "~0.4",
-    "uglify-js": "2.x"
+    "uglify-js": "1.2.5"
   },
   "devDependencies": {
     "jshint": "~0.5",

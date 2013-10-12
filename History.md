@@ -1,3 +1,10 @@
+0.1.21 / 2013-10-11
+===================
+* enable to pass server option --object-db-file for object storage provided by
+  lively-davfs
+* lk server --no-subserver fixed
+* lk test fixed on windows
+
 0.1.20 / 2013-08-01
 ===================
 * enable JS harmony features in Chrome
