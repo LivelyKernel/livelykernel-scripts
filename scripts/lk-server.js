@@ -65,7 +65,6 @@ if (!options.defined('lkDir')) {
 }
 
 var objectDbFile;
-console.log(options);
 if (options.defined('objectDbFile')) {
     objectDbFile = options.objectDbFile;
 }
