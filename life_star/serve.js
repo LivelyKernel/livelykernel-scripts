@@ -6,7 +6,7 @@ life_star({
     host: env.LIFE_STAR_HOST,
     port: parseInt(args[2]),
     fsNode: args[3], // LivelyKernel directory to serve from
-    objectDBFile: args[4] !== 'undefined' ? args[4] : null, // lively-davfs
+    dbConf: args[4] !== 'undefined' ? args[4] : null, // lively-davfs
     enableTesting: args[5] !== 'notesting',
     logLevel: args[6], // log level for logger: error, warning, info, debug
     behindProxy: args[7] == 'true',

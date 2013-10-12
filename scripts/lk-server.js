@@ -23,7 +23,14 @@ var options = args.options([
     ['-s', '--life-star', 'Start the Life Star server (fully operational!)'],
     [      '--log-level STRING', 'Log level, accepted values: error, warning, info, debug'],
     [      '--lk-dir DIR', 'The directory of the Lively Kernel core repository (git) '],
-    [      '--object-db-file FILE', 'path to Object DB file, if file-based database should be used '],
+    [      '--db-config JSON', 'Stringified JSON object that configures the object DB and lively-davfs\n'
+    + "                                 like {\n"
+    + '                                   includedFiles: [STRING],\n'
+    + '                                   excludedDirectories: [STRING],\n'
+    + '                                   excludedFiles: [STRING],\n'
+    + '                                   dbFile: [STRING], -- path to db file\n'
+    + '                                   resetDatabase: [BOOL]\n'
+    + '                                 }'],
     [      '--behind-proxy', 'Add this option if requests going to the server are '
                            + 'proxied by another server, e.g. Apache'],
     [      '--enable-ssl', 'Enable https server'],
@@ -64,9 +71,9 @@ if (!options.defined('lkDir')) {
                + "Please start the server with --lk-dir PATH/TO/LK-REPO")
 }
 
-var objectDbFile;
-if (options.defined('objectDbFile')) {
-    objectDbFile = options.objectDbFile;
+var dbConfig;
+if (options.defined('dbConfig')) {
+    dbConfig = options.dbConfig;
 }
 
 if (!options.defined('noSubservers')) {
@@ -212,7 +219,7 @@ if (options.defined('info')) {
     cmdAndArgs.push(port);
     cmdAndArgs.push(options.lkDir);
     if (options.defined('lifeStar')) {
-        cmdAndArgs.push(objectDbFile);
+        cmdAndArgs.push(dbConfig);
         cmdAndArgs.push(env.LIFE_STAR_TESTING);
         cmdAndArgs.push(options.logLevel || env.LIFE_STAR_LOG_LEVEL);
         cmdAndArgs.push(options.defined('behindProxy'));
