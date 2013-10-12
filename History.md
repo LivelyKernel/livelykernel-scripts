@@ -1,3 +1,7 @@
+0.1.22 / 2013-10-11
+===================
+* --db-config option, replaces --object-db-file
+
 0.1.21 / 2013-10-11
 ===================
 * enable to pass server option --object-db-file for object storage provided by
