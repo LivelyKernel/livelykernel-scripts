@@ -17,17 +17,17 @@
   "dependencies": {
     "life_star": "https://github.com/LivelyKernel/life_star/tarball/0.3.5",
     "forever": "https://github.com/nodejitsu/forever/tarball/v0.10.1",
-    "colorize": "0.1.0",
+    "colorize": "~0.1",
     "optparse": "~1.0",
     "seq": "https://github.com/dsc/node-seq/tarball/master",
-    "async": "0.1",
-    "shelljs": "0.1.2",
-    "dryice": "0.4.10",
-    "uglify-js": "1.2.5"
+    "async": "~0.2",
+    "shelljs": "~0.2",
+    "dryice": "~0.4",
+    "uglify-js": "2.x"
   },
   "devDependencies": {
     "jshint": "~0.5",
-    "nodeunit": "~0.7",
+    "nodeunit": "~0.8",
     "express": "3.x",
     "nodemon": "~0.6"
   },
