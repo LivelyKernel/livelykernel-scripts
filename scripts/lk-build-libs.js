@@ -131,8 +131,8 @@ function createCoreLibs(next) {
     console.log("Packaging core libs...");
     var urls = {
         jquery: {
-            src: "http://code.jquery.com/jquery-1.8.2.js",
-            minified: "http://code.jquery.com/jquery-1.8.2.min.js"
+            src: "http://code.jquery.com/jquery-2.0.3.js",
+            minified: "http://code.jquery.com/jquery-2.0.3.min.js"
         },
         jqueryBounds: {
             src: "https://raw.github.com/rksm/jquery-bounds/master/jquery-bounds.js",
