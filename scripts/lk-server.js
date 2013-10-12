@@ -23,6 +23,7 @@ var options = args.options([
     ['-s', '--life-star', 'Start the Life Star server (fully operational!)'],
     [      '--log-level STRING', 'Log level, accepted values: error, warning, info, debug'],
     [      '--lk-dir DIR', 'The directory of the Lively Kernel core repository (git) '],
+    [      '--object-db-file FILE', 'path to Object DB file, if file-based database should be used '],
     [      '--behind-proxy', 'Add this option if requests going to the server are '
                            + 'proxied by another server, e.g. Apache'],
     [      '--enable-ssl', 'Enable https server'],
@@ -61,6 +62,12 @@ if (!options.lkDir && env.WORKSPACE_LK_EXISTS) {
 if (!options.defined('lkDir')) {
     console.log("Cannot find the Lively core repository. "
                + "Please start the server with --lk-dir PATH/TO/LK-REPO")
+}
+
+var objectDbFile;
+console.log(options);
+if (options.defined('objectDbFile')) {
+    objectDbFile = options.objectDbFile;
 }
 
 if (!options.defined('noSubservers')) {
@@ -206,6 +213,7 @@ if (options.defined('info')) {
     cmdAndArgs.push(port);
     cmdAndArgs.push(options.lkDir);
     if (options.defined('lifeStar')) {
+        cmdAndArgs.push(objectDbFile);
         cmdAndArgs.push(env.LIFE_STAR_TESTING);
         cmdAndArgs.push(options.logLevel || env.LIFE_STAR_LOG_LEVEL);
         cmdAndArgs.push(options.defined('behindProxy'));

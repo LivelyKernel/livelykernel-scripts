@@ -6,14 +6,15 @@ life_star({
     host: env.LIFE_STAR_HOST,
     port: parseInt(args[2]),
     fsNode: args[3], // LivelyKernel directory to serve from
-    enableTesting: args[4] !== 'notesting',
-    logLevel: args[5], // log level for logger: error, warning, info, debug
-    behindProxy: args[6] == 'true',
-    subservers: args[7] !== 'undefined' ? JSON.parse(args[7]) : null,
-    useManifestCaching: args[8] == 'true',
-    enableSSL: args[9] == 'true',
-    enableSSLClientAuth: args[10] == 'true',
-    sslServerKey: args[11] !== 'undefined' ? args[11] : null,
-    sslServerCert: args[12] !== 'undefined' ? args[12] : null,
-    sslCACert: args[13] !== 'undefined' ? args[13] : null
+    objectDBFile: args[4] !== 'undefined' ? args[4] : null, // lively-davfs
+    enableTesting: args[5] !== 'notesting',
+    logLevel: args[6], // log level for logger: error, warning, info, debug
+    behindProxy: args[7] == 'true',
+    subservers: args[8] !== 'undefined' ? JSON.parse(args[8]) : null,
+    useManifestCaching: args[9] == 'true',
+    enableSSL: args[10] == 'true',
+    enableSSLClientAuth: args[11] == 'true',
+    sslServerKey: args[12] !== 'undefined' ? args[12] : null,
+    sslServerCert: args[13] !== 'undefined' ? args[13] : null,
+    sslCACert: args[14] !== 'undefined' ? args[14] : null
 });
