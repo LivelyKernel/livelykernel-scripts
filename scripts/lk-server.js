@@ -135,7 +135,7 @@ function isPidInOutput(pid, out, callback) {
 }
 
 function processExists(pid, callback) {
-    if (!pid) {callback({err: 'No pid'}); return }
+    if (!pid || !pid.length) { callback({err: 'No pid'}); return; }
     var isWindows = /^win/i.test(process.platform),
         cmd = isWindows ? 'tasklist.exe' : 'ps -A';
     shelljs.exec(cmd, {async: true, silent: true}, function(err, data) {
